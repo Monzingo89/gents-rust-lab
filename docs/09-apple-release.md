@@ -15,7 +15,7 @@ The supplied macOS shell uses a separate local or Azure backend. The iOS shell s
 npm run tauri icon -- /absolute/path/to/your-icon.png
 ```
 
-Check the generated Tauri configuration and Apple asset catalogs; the starter's icon list is intentionally empty. Inspect icons at small sizes.
+The canonical branded source is `src-tauri/app-icon.png`. Tauri-generated App Store and platform assets live under `src-tauri/icons/`; the reusable transparent master is `assets/brand/gents-icon-transparent.png`, and the optimized browser derivative is `web/favicon.png`. Regenerate platform and web assets from those canonical sources and inspect them at small sizes before release.
 
 ## 2. Build the local Mac application
 

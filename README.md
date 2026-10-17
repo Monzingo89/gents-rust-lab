@@ -1,5 +1,9 @@
 # Gents Office — Rust harness learning project
 
+<p align="center">
+  <img src="src-tauri/app-icon.png" alt="Gents Office owl wearing a tuxedo" width="220">
+</p>
+
 Open **START-HERE.html** for the full walkthrough and complete code appendix, or start at **[docs/00-start-here.md](docs/00-start-here.md)** and follow the numbered chapters. All commands run from this folder unless a chapter says otherwise.
 
 This is a staged educational starter, not a finished App Store product. The Rust HTTP harness and browser office run locally with simulated responses and a persistent SQLite event journal. Live adapters, desktop PKCE sign-in, and Azure deployment material are supplied for account-backed validation. iOS native authentication, distributed execution, retrieval, training, and production deployment hardening remain explicit exercises.
