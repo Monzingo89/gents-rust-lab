@@ -1,0 +1,1 @@
+{"$schema":"../gen/schemas/desktop-schema.json","identifier":"default","description":"Office window core permissions","windows":["main"],"permissions":["core:default"]}

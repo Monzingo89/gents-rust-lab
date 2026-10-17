@@ -1,0 +1,13 @@
+target/
+node_modules/
+.env
+.env.*
+!.env.example
+config/local.json
+src-tauri/gen/
+.DS_Store
+*.p8
+*.p12
+dist/
+data/
+*.sqlite3*

@@ -1,0 +1,37 @@
+name: Verify harness
+on: [push, pull_request]
+permissions:
+  contents: read
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install tested Rust toolchain
+        run: rustup toolchain install 1.99.1 --profile minimal --component rustfmt --component clippy
+      - name: Rust format, lint and tests
+        run: |
+          cargo +1.99.1 fmt --all -- --check
+          cargo +1.99.1 clippy --workspace --all-targets --locked -- -D warnings
+          cargo +1.99.1 test --workspace --locked
+          cargo +1.99.1 build --workspace --locked
+      - name: Exercise execution and recovery without cloud credentials
+        run: |
+          python3 scripts/smoke.py
+          python3 scripts/reliability_smoke.py
+      - name: Web build and dependency advisory check
+        run: |
+          npm ci
+          node --check web/app.js
+          npm run build
+          npm audit --audit-level=high

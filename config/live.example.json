@@ -1,0 +1,109 @@
+{
+  "max_steps": 2,
+  "max_tokens": 1024,
+  "agents": [
+    {
+      "id": "Claude Atlas",
+      "assignment": "Create an evidence-based first draft.",
+      "planner": {
+        "provider": "openrouter",
+        "model": "REPLACE_WITH_CURRENT_MODEL_ID",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "key_env": "OPENROUTER_API_KEY"
+      },
+      "worker": {
+        "provider": "huggingface",
+        "model": "REPLACE_WITH_SUPPORTED_HF_MODEL_ID",
+        "url": "https://router.huggingface.co/v1/chat/completions",
+        "key_env": "HF_TOKEN"
+      }
+    },
+    {
+      "id": "Vera Veo",
+      "assignment": "Review the previous draft and return a clearer final answer.",
+      "planner": {
+        "provider": "openrouter",
+        "model": "REPLACE_WITH_CURRENT_MODEL_ID",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "key_env": "OPENROUTER_API_KEY"
+      },
+      "worker": {
+        "provider": "databricks",
+        "model": "REPLACE_WITH_SERVING_ENDPOINT_NAME",
+        "url": "https://REPLACE_WORKSPACE.azuredatabricks.net/serving-endpoints/chat/completions",
+        "key_env": "DATABRICKS_TOKEN"
+      }
+    }
+  ],
+  "judges": {
+    "router": {
+      "provider": "openrouter",
+      "model": "REPLACE_WITH_CURRENT_MODEL_ID",
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "key_env": "OPENROUTER_API_KEY"
+    },
+    "completion": {
+      "provider": "openrouter",
+      "model": "REPLACE_WITH_CURRENT_MODEL_ID",
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "key_env": "OPENROUTER_API_KEY"
+    },
+    "max_rounds": 3,
+    "max_calls": 32,
+    "max_context_chars": 64000,
+    "models": {
+      "model-1-planner": {
+        "model": {
+          "provider": "openrouter",
+          "model": "REPLACE_WITH_CURRENT_MODEL_ID",
+          "url": "https://openrouter.ai/api/v1/chat/completions",
+          "key_env": "OPENROUTER_API_KEY"
+        },
+        "description": "Configured candidate for Claude Atlas planner; evaluate suitability for the task.",
+        "allowed_roles": [
+          "planner",
+          "worker"
+        ]
+      },
+      "model-1-worker": {
+        "model": {
+          "provider": "huggingface",
+          "model": "REPLACE_WITH_SUPPORTED_HF_MODEL_ID",
+          "url": "https://router.huggingface.co/v1/chat/completions",
+          "key_env": "HF_TOKEN"
+        },
+        "description": "Configured candidate for Claude Atlas worker; evaluate suitability for the task.",
+        "allowed_roles": [
+          "planner",
+          "worker"
+        ]
+      },
+      "model-2-planner": {
+        "model": {
+          "provider": "openrouter",
+          "model": "REPLACE_WITH_CURRENT_MODEL_ID",
+          "url": "https://openrouter.ai/api/v1/chat/completions",
+          "key_env": "OPENROUTER_API_KEY"
+        },
+        "description": "Configured candidate for Vera Veo planner; evaluate suitability for the task.",
+        "allowed_roles": [
+          "planner",
+          "worker"
+        ]
+      },
+      "model-2-worker": {
+        "model": {
+          "provider": "databricks",
+          "model": "REPLACE_WITH_SERVING_ENDPOINT_NAME",
+          "url": "https://REPLACE_WORKSPACE.azuredatabricks.net/serving-endpoints/chat/completions",
+          "key_env": "DATABRICKS_TOKEN"
+        },
+        "description": "Configured candidate for Vera Veo worker; evaluate suitability for the task.",
+        "allowed_roles": [
+          "planner",
+          "worker"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+target
+node_modules
+src-tauri/target
+.git
+.env*
+data
+*.sqlite3*
+**/.env*
+**/*.p8
+**/*.p12
+**/data/**

@@ -1,0 +1,109 @@
+{
+  "max_steps": 2,
+  "max_tokens": 1024,
+  "agents": [
+    {
+      "id": "Claude Atlas",
+      "assignment": "Create an evidence-based first draft.",
+      "planner": {
+        "provider": "mock",
+        "model": "simulator",
+        "url": null,
+        "key_env": null
+      },
+      "worker": {
+        "provider": "mock",
+        "model": "simulator",
+        "url": null,
+        "key_env": null
+      }
+    },
+    {
+      "id": "Vera Veo",
+      "assignment": "Review the previous draft and return a clearer final answer.",
+      "planner": {
+        "provider": "mock",
+        "model": "simulator",
+        "url": null,
+        "key_env": null
+      },
+      "worker": {
+        "provider": "mock",
+        "model": "simulator",
+        "url": null,
+        "key_env": null
+      }
+    }
+  ],
+  "judges": {
+    "router": {
+      "provider": "mock",
+      "model": "mock-router",
+      "url": null,
+      "key_env": null
+    },
+    "completion": {
+      "provider": "mock",
+      "model": "mock-completion",
+      "url": null,
+      "key_env": null
+    },
+    "max_rounds": 3,
+    "max_calls": 32,
+    "max_context_chars": 64000,
+    "models": {
+      "model-1-planner": {
+        "model": {
+          "provider": "mock",
+          "model": "simulator",
+          "url": null,
+          "key_env": null
+        },
+        "description": "Configured candidate for Claude Atlas planner; evaluate suitability for the task.",
+        "allowed_roles": [
+          "planner",
+          "worker"
+        ]
+      },
+      "model-1-worker": {
+        "model": {
+          "provider": "mock",
+          "model": "simulator",
+          "url": null,
+          "key_env": null
+        },
+        "description": "Configured candidate for Claude Atlas worker; evaluate suitability for the task.",
+        "allowed_roles": [
+          "planner",
+          "worker"
+        ]
+      },
+      "model-2-planner": {
+        "model": {
+          "provider": "mock",
+          "model": "simulator",
+          "url": null,
+          "key_env": null
+        },
+        "description": "Configured candidate for Vera Veo planner; evaluate suitability for the task.",
+        "allowed_roles": [
+          "planner",
+          "worker"
+        ]
+      },
+      "model-2-worker": {
+        "model": {
+          "provider": "mock",
+          "model": "simulator",
+          "url": null,
+          "key_env": null
+        },
+        "description": "Configured candidate for Vera Veo worker; evaluate suitability for the task.",
+        "allowed_roles": [
+          "planner",
+          "worker"
+        ]
+      }
+    }
+  }
+}

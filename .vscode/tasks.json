@@ -1,0 +1,1 @@
+{"version":"2.0.0","tasks":[{"label":"Harness: run mock","type":"shell","command":"cargo run -p gents-harness","problemMatcher":["$rustc"],"isBackground":true},{"label":"Harness: test","type":"shell","command":"cargo test --workspace","problemMatcher":["$rustc"],"group":{"kind":"test","isDefault":true}}]}

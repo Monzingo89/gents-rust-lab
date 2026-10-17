@@ -1,0 +1,38 @@
+{
+  "max_steps": 2,
+  "max_tokens": 1024,
+  "agents": [
+    {
+      "id": "Claude Atlas",
+      "assignment": "Create an evidence-based first draft.",
+      "planner": {
+        "provider": "mock",
+        "model": "simulator",
+        "url": null,
+        "key_env": null
+      },
+      "worker": {
+        "provider": "mock",
+        "model": "simulator",
+        "url": null,
+        "key_env": null
+      }
+    },
+    {
+      "id": "Vera Veo",
+      "assignment": "Review the previous draft and return a clearer final answer.",
+      "planner": {
+        "provider": "mock",
+        "model": "simulator",
+        "url": null,
+        "key_env": null
+      },
+      "worker": {
+        "provider": "mock",
+        "model": "simulator",
+        "url": null,
+        "key_env": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+ "$schema":"https://schema.tauri.app/config/2",
+ "productName":"Gents Office",
+ "version":"0.1.0",
+ "identifier":"com.example.gentsoffice",
+ "build":{"beforeDevCommand":"npm run dev","devUrl":"http://localhost:1420","beforeBuildCommand":"npm run build","frontendDist":"../dist"},
+ "app":{"withGlobalTauri":true,"windows":[{"title":"Gents Office","width":1440,"height":920}],"security":{"csp":"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' ipc: http://ipc.localhost http://localhost:1420 ws://localhost:1420 http://127.0.0.1:8787 https:; img-src 'self' asset: data:; object-src 'none'; base-uri 'self'"}},
+ "bundle":{"active":true,"targets":["app","dmg"],"icon":[],"iOS":{"minimumSystemVersion":"15.0"}}
+}
