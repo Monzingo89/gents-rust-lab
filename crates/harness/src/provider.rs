@@ -3,6 +3,7 @@ use anyhow::{bail, Context, Result};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
+use std::sync::atomic::AtomicBool;
 use std::time::Instant;
 
 #[derive(Clone, Deserialize, Serialize)]
@@ -12,13 +13,30 @@ pub struct Model {
     pub model: String,
     pub url: Option<String>, // full chat-completions URL, operator configured
     pub key_env: Option<String>,
+    #[serde(default)]
+    pub path: Option<String>,
+    #[serde(default)]
+    pub adapter: Option<String>,
 }
 impl Model {
     pub fn validate(&self) -> Result<()> {
+        if self.adapter.is_some() && self.provider != "mlx" {
+            bail!("role adapters currently require MLX");
+        }
         if self.model.trim().is_empty() || self.model.len() > 256 {
             bail!("invalid model ID");
         }
         if self.provider == "mock" {
+            return Ok(());
+        }
+        if matches!(self.provider.as_str(), "local" | "mlx") {
+            let path = self.path.as_deref().context("local model requires path")?;
+            if path.trim().is_empty() || (self.provider == "local" && !path.ends_with(".gguf")) {
+                bail!("local requires a GGUF file; mlx requires a local model directory");
+            }
+            if self.url.is_some() || self.key_env.is_some() {
+                bail!("local models do not accept URL or credential configuration");
+            }
             return Ok(());
         }
         let url = reqwest::Url::parse(self.url.as_deref().context("live model requires URL")?)?;
@@ -95,10 +113,12 @@ pub trait LanguageModel: Send + Sync {
         system: &str,
         input: &str,
         max_tokens: u32,
+        cancel: &AtomicBool,
     ) -> Result<Reply>;
 }
 pub struct Gateway {
     pub client: reqwest::Client,
+    pub local: crate::local_runtime::LocalRuntime,
 }
 #[async_trait]
 impl LanguageModel for Gateway {
@@ -108,12 +128,79 @@ impl LanguageModel for Gateway {
         system: &str,
         input: &str,
         max_tokens: u32,
+        cancel: &AtomicBool,
     ) -> Result<Reply> {
         m.validate()?;
         let start = Instant::now();
         if m.provider == "mock" {
             tokio::time::sleep(std::time::Duration::from_millis(1000)).await;
-            let text = if system.starts_with("ROUTING_JUDGE") {
+            let text = if system.starts_with("COMPANY_ADMIN") {
+                let denied = input.contains("deny-admin-smoke");
+                json!({"decision":if denied{"deny"}else{"allow"},"reason":"SIMULATED admin fixture; not real-model validation","question":""}).to_string()
+            } else if system.starts_with("COMPANY_OPERATOR") {
+                let outer: Value = serde_json::from_str(input)?;
+                let value: Value = if let Some(nested) = outer["task_input"].as_str() {
+                    serde_json::from_str(nested)?
+                } else if outer["task_input"].is_object() {
+                    outer["task_input"].clone()
+                } else {
+                    outer
+                };
+                let evidence = value["recent_evidence"]
+                    .as_array()
+                    .context("mock evidence missing")?;
+                let loop_fixture = value["task"]
+                    .as_str()
+                    .is_some_and(|s| s.contains("autonomy-loop-smoke"));
+                let answered = loop_fixture
+                    || evidence.iter().any(|e| e.get("operator_answer").is_some())
+                    || value["operator_answers"]
+                        .as_array()
+                        .is_some_and(|a| !a.is_empty());
+                let written = evidence
+                    .iter()
+                    .any(|e| e["action"] == "files" && e["arguments"]["op"] == "write");
+                let tested = evidence.iter().any(|e| e["action"] == "shell");
+                let (action, args) = if loop_fixture
+                    && value["recovery_attempt"].as_u64().unwrap_or(0) == 0
+                    && value["verified_progress"]["tool_results"]
+                        .as_u64()
+                        .unwrap_or(0)
+                        <= 2
+                {
+                    ("files", json!({"op":"list","path":""}))
+                } else if !answered {
+                    (
+                        "ask_user",
+                        json!({"question":"Which project name should the smoke fixture use?"}),
+                    )
+                } else if !written {
+                    (
+                        "files",
+                        json!({"op":"write","path":"deliverable.txt","content":"Actual file written by simulated model tool proposal"}),
+                    )
+                } else if !tested {
+                    ("shell", json!({"command":"/usr/bin/printf verified"}))
+                } else {
+                    (
+                        "finish",
+                        json!({"deliverable":"SIMULATED model fixture with real workspace artifact and shell evidence","evidence":"deliverable.txt"}),
+                    )
+                };
+                json!({"action":action,"arguments_json":args.to_string(),"summary":"SIMULATED next action"}).to_string()
+            } else if system.starts_with("COMPANY_JUDGE")
+                && input.contains("SIMULATED model fixture")
+            {
+                let outer: Value = serde_json::from_str(input)?;
+                let value: Value = if let Some(nested) = outer["task_input"].as_str() {
+                    serde_json::from_str(nested)?
+                } else {
+                    outer
+                };
+                let checks=value["criteria"].as_array().context("mock criteria missing")?.iter().enumerate().map(|(i,_)|json!({"criterion_index":i,"passed":true,"evidence":"SIMULATED semantic review; real file/shell output checked separately by smoke script"})).collect::<Vec<_>>();
+                json!({"verdict":"accepted","summary":"SIMULATED QA fixture","checks":checks})
+                    .to_string()
+            } else if system.starts_with("CTO_ROUTER") {
                 let v: Value = serde_json::from_str(input)?;
                 let round = v["round"].as_u64().unwrap_or(1);
                 let catalog = v["catalog"].as_object().context("mock catalog missing")?;
@@ -167,7 +254,7 @@ impl LanguageModel for Gateway {
                     ])
                 };
                 json!({"summary":"SIMULATED routing: two agents first, then one repair agent with different model slots","definition_of_done":criteria,"deployments":deployments}).to_string()
-            } else if system.starts_with("COMPLETION_JUDGE") {
+            } else if system.starts_with("COMPLIANCE_SECURITY_QA") {
                 let v: Value = serde_json::from_str(input)?;
                 let pass = v["round"].as_u64().unwrap_or(1) > 1 && m.model != "mock-reject-always";
                 let checks:Vec<_>=v["definition_of_done"].as_array().context("mock criteria missing")?.iter().enumerate().map(|(i,_)|json!({"criterion_index":i,"passed":pass||i>0,"evidence":if pass||i>0 {"SIMULATED evidence for lifecycle demonstration; not a real quality assessment"}else{"SIMULATED first-round gap to demonstrate repair"}})).collect();
@@ -191,6 +278,17 @@ impl LanguageModel for Gateway {
                 latency_ms: start.elapsed().as_millis() as u64,
                 response_id: None,
             });
+        }
+        if matches!(m.provider.as_str(), "local" | "mlx") {
+            return self
+                .local
+                .complete(m, system, input, max_tokens, cancel)
+                .await;
+        }
+        if std::env::var("GENTS_LOCAL_ONLY").as_deref() != Ok("0") {
+            bail!(
+                "Cloud inference is disabled. GENTS_LOCAL_ONLY=0 is an explicit operator override"
+            );
         }
         let url = m.url.as_deref().context("missing provider URL")?;
         if !url.starts_with("https://") {
@@ -288,6 +386,8 @@ mod tests {
             model: "test".into(),
             url: Some("https://openrouter.ai/api/v1/chat/completions".into()),
             key_env: Some("TEST_KEY".into()),
+            path: None,
+            adapter: None,
         };
         assert!(m.validate().is_ok());
         m.url = Some("https://user:secret@openrouter.ai/api/v1/chat/completions".into());

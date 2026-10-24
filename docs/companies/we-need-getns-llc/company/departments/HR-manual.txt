@@ -1,0 +1,187 @@
+WE NEED GENTS LC | PEOPLE OPERATIONS MANUAL
+
+Document HRC-MAN-01 | Version 3.2 | APPROVED | effective 2026-09-15
+Owner: Mara Chen. All names, systems, events, and requirements are fictional.
+This manual includes general company practices beyond any single assigned task. Only applicable clauses govern a specific decision.
+
+HRC-01. Recruitment approvals
+Open a position only after a manager has documented the business need, reporting line, work location, and employment type. An approved position is not permission to make an offer. Offers require People Operations review and an approved compensation range.
+
+HRC-01.1 Intake and ownership
+The People Operations coordinator registers the incoming recruitment approvals item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+HRC-01.2 Evidence and version handling
+For recruitment approvals, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+HRC-01.3 Example and exception
+Suppose the Brookhaven demonstration project submits a recruitment approvals request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+HRC-01.4 Completion and handover
+A recruitment approvals item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+HRC-01.5 Reporting and retention
+The People Operations dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+HRC-02. Interview records
+Interviewers record job-related observations separately from hiring recommendations. Do not record protected personal characteristics or speculative medical information. A coordinator removes duplicate feedback and preserves the original dated forms.
+
+HRC-02.1 Intake and ownership
+The People Operations coordinator registers the incoming interview records item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+HRC-02.2 Evidence and version handling
+For interview records, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+HRC-02.3 Example and exception
+Suppose the Brookhaven demonstration project submits a interview records request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+HRC-02.4 Completion and handover
+A interview records item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+HRC-02.5 Reporting and retention
+The People Operations dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+HRC-03. Worker classification
+Employees, agency personnel, and independent contractors use different appointment records. The roster stores the classification, sponsoring manager, and assignment dates. A change of classification requires a new effective-dated record rather than overwriting historical service.
+
+HRC-03.1 Intake and ownership
+The People Operations coordinator registers the incoming worker classification item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+HRC-03.2 Evidence and version handling
+For worker classification, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+HRC-03.3 Example and exception
+Suppose the Brookhaven demonstration project submits a worker classification request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+HRC-03.4 Completion and handover
+A worker classification item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+HRC-03.5 Reporting and retention
+The People Operations dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+HRC-04. Assignments and mobility
+A transfer request specifies the sending manager, receiving manager, effective date, and equipment implications. A project transfer does not itself change the legal employer. People Operations records the decision and notifies the relevant support teams.
+
+HRC-04.1 Intake and ownership
+The People Operations coordinator registers the incoming assignments and mobility item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+HRC-04.2 Evidence and version handling
+For assignments and mobility, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+HRC-04.3 Example and exception
+Suppose the Brookhaven demonstration project submits a assignments and mobility request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+HRC-04.4 Completion and handover
+A assignments and mobility item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+HRC-04.5 Reporting and retention
+The People Operations dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+HRC-05. Leave and availability
+Managers plan coverage before approving discretionary leave. A calendar availability marker is operational scheduling information, not a medical record. Detailed supporting documents remain in the restricted personnel system and are not copied into project trackers.
+
+HRC-05.1 Intake and ownership
+The People Operations coordinator registers the incoming leave and availability item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+HRC-05.2 Evidence and version handling
+For leave and availability, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+HRC-05.3 Example and exception
+Suppose the Brookhaven demonstration project submits a leave and availability request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+HRC-05.4 Completion and handover
+A leave and availability item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+HRC-05.5 Reporting and retention
+The People Operations dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+HRC-06. Training administration
+A course attendance list is not always evidence of completion. Completion records include the worker identifier, course version, completion date, and issuing system. Corrections retain both the previously exported value and the verified source value.
+
+HRC-06.1 Intake and ownership
+The People Operations coordinator registers the incoming training administration item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+HRC-06.2 Evidence and version handling
+For training administration, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+HRC-06.3 Example and exception
+Suppose the Brookhaven demonstration project submits a training administration request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+HRC-06.4 Completion and handover
+A training administration item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+HRC-06.5 Reporting and retention
+The People Operations dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+HRC-07. Personnel clearances
+The personnel clearance register records codes separately from training status. Register entries are effective-dated and keyed by employee_id. A blank clearance is unresolved, while an explicit disallowed code is a failed gate. Do not infer a clearance from a friendly email or an active badge.
+
+For the contractor mobilization batch, HR PASS requires clearance_code exactly HRC-2 and assignment_state exactly ACTIVE in the personnel-clearance register. Any other explicit code or state is HR HOLD; absence is UNKNOWN. This requirement applies to both V1 and V2 training cohorts.
+
+HRC-07.1 Intake and ownership
+The People Operations coordinator registers the incoming personnel clearances item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+HRC-07.2 Evidence and version handling
+For personnel clearances, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+HRC-07.3 Example and exception
+Suppose the Brookhaven demonstration project submits a personnel clearances request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+HRC-07.4 Completion and handover
+A personnel clearances item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+HRC-07.5 Reporting and retention
+The People Operations dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+HRC-08. Performance conversations
+Quarterly conversations cover outcomes, support needs, and agreed next steps. Development goals are not disciplinary findings. Managers confirm the employee has received the written summary and can record a factual correction without altering the original conversation date.
+
+HRC-08.1 Intake and ownership
+The People Operations coordinator registers the incoming performance conversations item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+HRC-08.2 Evidence and version handling
+For performance conversations, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+HRC-08.3 Example and exception
+Suppose the Brookhaven demonstration project submits a performance conversations request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+HRC-08.4 Completion and handover
+A performance conversations item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+HRC-08.5 Reporting and retention
+The People Operations dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+HRC-09. Offboarding
+A departure checklist assigns owners for access closure, asset return, expense review, and records retention. The effective departure timestamp matters when comparing system events. Completed offboarding tasks retain evidence rather than simply disappearing from a dashboard.
+
+HRC-09.1 Intake and ownership
+The People Operations coordinator registers the incoming offboarding item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+HRC-09.2 Evidence and version handling
+For offboarding, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+HRC-09.3 Example and exception
+Suppose the Brookhaven demonstration project submits a offboarding request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+HRC-09.4 Completion and handover
+A offboarding item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+HRC-09.5 Reporting and retention
+The People Operations dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+HRC-10. People data quality
+A report joins by stable worker identifier, never by display name alone. Distinguish a late source update from a missing fact. Keep a reconciliation ledger for corrections, and do not add sensitive information to general operational exports.
+
+HRC-10.1 Intake and ownership
+The People Operations coordinator registers the incoming people data quality item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+HRC-10.2 Evidence and version handling
+For people data quality, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+HRC-10.3 Example and exception
+Suppose the Brookhaven demonstration project submits a people data quality request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+HRC-10.4 Completion and handover
+A people data quality item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+HRC-10.5 Reporting and retention
+The People Operations dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.

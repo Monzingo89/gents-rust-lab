@@ -1,0 +1,32 @@
+{
+  "max_steps": 3,
+  "max_tokens": 2048,
+  "max_run_seconds": 3600,
+  "agents": [
+    {
+      "id": "Builder Gent",
+      "assignment": "Plan and implement the expense CLI in the isolated run workspace.",
+      "planner": {"provider":"local","model":"Qwen3.8-27B planner","url":null,"key_env":null,"path":"models/qwen3.8-27b-planner-judge/Qwen3.8-27B-UD-Q4_K_M.gguf"},
+      "worker": {"provider":"local","model":"Qwen3 Coder 30B worker","url":null,"key_env":null,"path":"models/qwen3-coder-30b-worker/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"}
+    },
+    {
+      "id": "Verifier Gent",
+      "assignment": "Plan and execute independent black-box verification.",
+      "planner": {"provider":"local","model":"Qwen3.8-27B planner","url":null,"key_env":null,"path":"models/qwen3.8-27b-planner-judge/Qwen3.8-27B-UD-Q4_K_M.gguf"},
+      "worker": {"provider":"local","model":"Qwen3 Coder 30B worker","url":null,"key_env":null,"path":"models/qwen3-coder-30b-worker/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"}
+    }
+  ],
+  "poc": {
+    "router": {"provider":"local","model":"Qwen3.5-4B router","url":null,"key_env":null,"path":"models/qwen3.5-4b-router/Qwen3.5-4B-Q4_K_M.gguf"},
+    "planner_judge": {"provider":"local","model":"Qwen3.8-27B planner/judge","url":null,"key_env":null,"path":"models/qwen3.8-27b-planner-judge/Qwen3.8-27B-UD-Q4_K_M.gguf"},
+    "coding_worker": {"provider":"local","model":"Qwen3 Coder 30B worker","url":null,"key_env":null,"path":"models/qwen3-coder-30b-worker/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"},
+    "workspace_root": "data/poc-runs",
+    "onboarding_documents": [
+      "docs/company/expense-operations.md",
+      "docs/company/engineering-release-standard.md"
+    ],
+    "memory_root": "data/rag-quick-cache",
+    "max_repairs": 2,
+    "max_tool_calls": 12
+  }
+}

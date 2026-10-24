@@ -1,0 +1,29 @@
+{
+  "skills": [
+    {
+      "id": "source-onboarding",
+      "version": "1.0.0",
+      "status": "approved-demo",
+      "path": "approved/source-onboarding/SKILL.md"
+    },
+    {
+      "id": "timestamped-media-evidence",
+      "version": "1.0.0",
+      "status": "approved-demo",
+      "path": "approved/timestamped-media-evidence/SKILL.md"
+    },
+    {
+      "id": "identifier-reconciliation",
+      "version": "1.0.0",
+      "status": "approved-demo",
+      "path": "approved/identifier-reconciliation/SKILL.md"
+    },
+    {
+      "id": "independent-verification",
+      "version": "1.0.0",
+      "status": "approved-demo",
+      "path": "approved/independent-verification/SKILL.md"
+    }
+  ],
+  "intentionally_missing": "A company-specific contractor-release reconciliation skill is not supplied. Agents should identify this gap and create it through the Skill Generator Room."
+}

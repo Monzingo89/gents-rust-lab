@@ -1,0 +1,185 @@
+WE NEED GENTS LC | SALES AND CLIENT SERVICES MANUAL
+
+Document SAL-MAN-01 | Version 3.2 | APPROVED | effective 2026-09-15
+Owner: Sam Cedar. All names, systems, events, and requirements are fictional.
+This manual includes general company practices beyond any single assigned task. Only applicable clauses govern a specific decision.
+
+SAL-01. Opportunity qualification
+Opportunity qualification records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Sales and Client Services distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+SAL-01.1 Intake and ownership
+The Sales and Client Services coordinator registers the incoming opportunity qualification item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SAL-01.2 Evidence and version handling
+For opportunity qualification, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SAL-01.3 Example and exception
+Suppose the Brookhaven demonstration project submits a opportunity qualification request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SAL-01.4 Completion and handover
+A opportunity qualification item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SAL-01.5 Reporting and retention
+The Sales and Client Services dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+SAL-02. Discovery notes
+Discovery notes records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Sales and Client Services distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+SAL-02.1 Intake and ownership
+The Sales and Client Services coordinator registers the incoming discovery notes item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SAL-02.2 Evidence and version handling
+For discovery notes, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SAL-02.3 Example and exception
+Suppose the Brookhaven demonstration project submits a discovery notes request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SAL-02.4 Completion and handover
+A discovery notes item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SAL-02.5 Reporting and retention
+The Sales and Client Services dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+SAL-03. Proposals
+Proposals records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Sales and Client Services distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+SAL-03.1 Intake and ownership
+The Sales and Client Services coordinator registers the incoming proposals item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SAL-03.2 Evidence and version handling
+For proposals, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SAL-03.3 Example and exception
+Suppose the Brookhaven demonstration project submits a proposals request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SAL-03.4 Completion and handover
+A proposals item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SAL-03.5 Reporting and retention
+The Sales and Client Services dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+SAL-04. Client demonstrations
+Client demonstrations records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Sales and Client Services distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+SAL-04.1 Intake and ownership
+The Sales and Client Services coordinator registers the incoming client demonstrations item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SAL-04.2 Evidence and version handling
+For client demonstrations, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SAL-04.3 Example and exception
+Suppose the Brookhaven demonstration project submits a client demonstrations request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SAL-04.4 Completion and handover
+A client demonstrations item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SAL-04.5 Reporting and retention
+The Sales and Client Services dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+SAL-05. Service descriptions
+Service descriptions records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Sales and Client Services distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+SAL-05.1 Intake and ownership
+The Sales and Client Services coordinator registers the incoming service descriptions item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SAL-05.2 Evidence and version handling
+For service descriptions, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SAL-05.3 Example and exception
+Suppose the Brookhaven demonstration project submits a service descriptions request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SAL-05.4 Completion and handover
+A service descriptions item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SAL-05.5 Reporting and retention
+The Sales and Client Services dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+SAL-06. Renewal planning
+Renewal planning records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Sales and Client Services distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+SAL-06.1 Intake and ownership
+The Sales and Client Services coordinator registers the incoming renewal planning item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SAL-06.2 Evidence and version handling
+For renewal planning, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SAL-06.3 Example and exception
+Suppose the Brookhaven demonstration project submits a renewal planning request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SAL-06.4 Completion and handover
+A renewal planning item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SAL-06.5 Reporting and retention
+The Sales and Client Services dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+SAL-07. Reference requests
+Reference requests records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Sales and Client Services distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+SAL-07.1 Intake and ownership
+The Sales and Client Services coordinator registers the incoming reference requests item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SAL-07.2 Evidence and version handling
+For reference requests, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SAL-07.3 Example and exception
+Suppose the Brookhaven demonstration project submits a reference requests request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SAL-07.4 Completion and handover
+A reference requests item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SAL-07.5 Reporting and retention
+The Sales and Client Services dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+SAL-08. Pricing coordination
+Pricing coordination records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Sales and Client Services distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+SAL-08.1 Intake and ownership
+The Sales and Client Services coordinator registers the incoming pricing coordination item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SAL-08.2 Evidence and version handling
+For pricing coordination, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SAL-08.3 Example and exception
+Suppose the Brookhaven demonstration project submits a pricing coordination request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SAL-08.4 Completion and handover
+A pricing coordination item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SAL-08.5 Reporting and retention
+The Sales and Client Services dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+SAL-09. Client feedback
+Client feedback records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Sales and Client Services distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+SAL-09.1 Intake and ownership
+The Sales and Client Services coordinator registers the incoming client feedback item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SAL-09.2 Evidence and version handling
+For client feedback, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SAL-09.3 Example and exception
+Suppose the Brookhaven demonstration project submits a client feedback request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SAL-09.4 Completion and handover
+A client feedback item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SAL-09.5 Reporting and retention
+The Sales and Client Services dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+SAL-10. Handover to delivery
+Handover to delivery records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Sales and Client Services distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+SAL-10.1 Intake and ownership
+The Sales and Client Services coordinator registers the incoming handover to delivery item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SAL-10.2 Evidence and version handling
+For handover to delivery, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SAL-10.3 Example and exception
+Suppose the Brookhaven demonstration project submits a handover to delivery request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SAL-10.4 Completion and handover
+A handover to delivery item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SAL-10.5 Reporting and retention
+The Sales and Client Services dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.

@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "company_scope": "company_id",
+  "execution": {
+    "large_models_loaded": 1,
+    "concurrent_generations": 1,
+    "daily_dream_budget_minutes": 120,
+    "production_requires_fresh_dream_review": true
+  },
+  "models": [
+    {
+      "key": "qwen3-8b",
+      "display": "Qwen3-8B",
+      "repository": "Qwen/Qwen3-8B-GGUF",
+      "base_repository": "Qwen/Qwen3-8B",
+      "license": "Apache-2.0",
+      "quantization": "Q4_K_M",
+      "purpose": "Fast orchestration, intake, classification, and onboarding assessment",
+      "review_status": "candidate_requires_hr_law_and_owner_approval"
+    },
+    {
+      "key": "phi-4",
+      "display": "Phi-4",
+      "repository": "microsoft/phi-4-gguf",
+      "base_repository": "microsoft/phi-4",
+      "license": "MIT",
+      "quantization": "Q4_K",
+      "purpose": "Structured project reasoning, legal issue spotting, and policy comparison",
+      "review_status": "candidate_requires_hr_law_and_owner_approval"
+    },
+    {
+      "key": "qwen3-coder-30b-a3b",
+      "display": "Qwen3-Coder-30B-A3B-Instruct",
+      "repository": "unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF",
+      "base_repository": "Qwen/Qwen3-Coder-30B-A3B-Instruct",
+      "license": "Apache-2.0",
+      "quantization": "Q4_K_M",
+      "purpose": "Architecture, implementation, code review, security remediation, and tool integration",
+      "review_status": "candidate_requires_hr_law_and_owner_approval"
+    },
+    {
+      "key": "qwen3-vl-8b",
+      "display": "Qwen3-VL-8B-Instruct",
+      "repository": "Qwen/Qwen3-VL-8B-Instruct-GGUF",
+      "base_repository": "Qwen/Qwen3-VL-8B-Instruct",
+      "license": "Apache-2.0",
+      "quantization": "Q4_K_M",
+      "purpose": "Screenshot, visual regression, accessibility, and product analytics interpretation",
+      "review_status": "candidate_requires_hr_law_and_owner_approval"
+    }
+  ],
+  "roles": [
+    {"id":"ceo","title":"CEO - Qwen3-8B","model":"qwen3-8b","tier":-1,"group":"leadership","responsibility":"Observe milestones and explicit deadlines, review progress on change, and call company-scoped all-hands meetings without changing approved scope or acceptance gates."},
+    {"id":"cto","title":"CTO - Qwen3-8B","model":"qwen3-8b","tier":0,"group":"leadership","responsibility":"Own intake routing, staffing, PM allocation, access escalation, and final production authorization."},
+    {"id":"law","title":"Law - Phi-4","model":"phi-4","tier":1,"group":"governance","responsibility":"Perform issue spotting, prior-art and contract-scope review with cited current sources; escalate legal conclusions to qualified human counsel."},
+    {"id":"hr","title":"HR - Qwen3-8B","model":"qwen3-8b","tier":1,"group":"governance","responsibility":"Run role assessments and onboarding; admit a model only after capability, license, source, and policy checks pass with Law and owner approval."},
+    {"id":"cfo","title":"CFO - Phi-4","model":"phi-4","tier":1,"group":"governance","responsibility":"Track the zero cash budget, resource usage and estimate uncertainty. All arithmetic uses deterministic calculations."},
+    {"id":"accountant","title":"Accountant - Phi-4","model":"phi-4","tier":2,"group":"governance","responsibility":"Reconcile usage and integer-cent ledgers using deterministic calculations. No payment or filing authority."},
+    {"id":"pm","title":"PM - Phi-4","model":"phi-4","tier":1,"group":"delivery","scalable":true,"responsibility":"Own one feature branch, milestones, granular assignments, handoffs, and requests to the CTO for more Gents."},
+    {"id":"lead-architect","title":"Lead Architect - Qwen3-Coder-30B-A3B-Instruct","model":"qwen3-coder-30b-a3b","tier":2,"group":"delivery","scalable":true,"split":["planner","worker"],"responsibility":"Own end-to-end local, web, backend, mobile, data, and cloud architecture plus integration standards."},
+    {"id":"web-engineer","title":"Web Engineer - Qwen3-Coder-30B-A3B-Instruct","model":"qwen3-coder-30b-a3b","tier":3,"group":"engineering","scalable":true,"split":["planner","worker"],"responsibility":"Implement full-stack web features and tests on the assigned PM feature branch."},
+    {"id":"mobile-engineer","title":"Mobile Engineer - Qwen3-Coder-30B-A3B-Instruct","model":"qwen3-coder-30b-a3b","tier":3,"group":"engineering","scalable":true,"split":["planner","worker"],"responsibility":"Implement iOS, Android, and cross-platform mobile features and tests."},
+    {"id":"vr-engineer","title":"VR Engineer - Qwen3-Coder-30B-A3B-Instruct","model":"qwen3-coder-30b-a3b","tier":3,"group":"engineering","scalable":true,"split":["planner","worker"],"responsibility":"Implement spatial and immersive clients with platform-specific performance and interaction checks."},
+    {"id":"database-engineer","title":"Database Engineer - Qwen3-Coder-30B-A3B-Instruct","model":"qwen3-coder-30b-a3b","tier":3,"group":"engineering","scalable":true,"split":["planner","worker"],"responsibility":"Own schemas, migrations, query behavior, retention, backup, and data-access boundaries."},
+    {"id":"backend-engineer","title":"Backend Engineer - Qwen3-Coder-30B-A3B-Instruct","model":"qwen3-coder-30b-a3b","tier":3,"group":"engineering","scalable":true,"split":["planner","worker"],"responsibility":"Implement services, APIs, authorization, queues, and operational safeguards."},
+    {"id":"ui-ux-engineer","title":"UI/UX Engineer - Qwen3-VL-8B-Instruct","model":"qwen3-vl-8b","tier":3,"group":"engineering","scalable":true,"split":["planner","worker"],"responsibility":"Design and verify interaction, visual regression, accessibility, and production product-health telemetry."},
+    {"id":"cloud-engineer","title":"Cloud Engineer - Qwen3-Coder-30B-A3B-Instruct","model":"qwen3-coder-30b-a3b","tier":3,"group":"engineering","scalable":true,"split":["planner","worker"],"responsibility":"Own infrastructure, deployment, identity, observability, resilience, and least-privilege operations."},
+    {"id":"ai-engineer","title":"AI Engineer - Qwen3-Coder-30B-A3B-Instruct","model":"qwen3-coder-30b-a3b","tier":2,"group":"enablement","responsibility":"Evaluate requested models, MCP endpoints, plugins, skills, CLIs, SDKs, and hooks with architecture and security evidence."},
+    {"id":"compliance-security-qa","title":"Compliance Security & QA Engineer - Qwen3-Coder-30B-A3B-Instruct","model":"qwen3-coder-30b-a3b","tier":4,"group":"assurance","responsibility":"Run deterministic tests, Playwright and accessibility checks, dependency and vulnerability scans, and evidence-based industry-control review before production."}
+  ],
+  "workflow": [
+    "CEO observes progress and explicit deadlines; all-hands briefs are acknowledged at call boundaries",
+    "Law intake and contract/scope gate",
+    "CTO staffing and PM selection",
+    "PM branch and milestone creation",
+    "Lead Architect plan and engineer selection",
+    "Specialist implementation with planner/worker separation",
+    "AI, Law, Architecture, and Security review of requested capabilities",
+    "Compliance Security & QA evidence gate",
+    "Two-hour daily dream/consolidation budget",
+    "CTO production authorization",
+    "UI/UX production analytics and regression monitoring"
+  ],
+  "context": {
+    "tiers": [
+      {"id":"ASTC","temperature":"hot","meaning":"Active Short-Term Context","scope":"agent and active handoff"},
+      {"id":"PSTC","temperature":"cool","meaning":"Passive Short-Term Context","scope":"active project and company retrieval"},
+      {"id":"ALTC","temperature":"warm","meaning":"Active Long-Term Context","scope":"completed company jobs, explicitly reactivated for follow-up"},
+      {"id":"PLTC","temperature":"cold","meaning":"Passive Long-Term Context","scope":"inactive company history, excluded from working prompts"}
+    ],
+    "handoff":"ASTC is durably promoted to company PSTC when the next role is admitted. CEO all-hands briefs accompany subsequent role prompts. These are transactional audit records, not signed contracts.",
+    "paths": {
+      "company":"data/companies/<company_id>/brain.sqlite3 (ASTC/PSTC/ALTC/PLTC)",
+      "run":"data/companies/<company_id>/runs/<run_id>/",
+      "branch":"data/companies/<company_id>/runs/<run_id>/branches/pm-<pm_id>/<feature>/",
+      "dream":"data/companies/<company_id>/dream/{company,role,task}/"
+    }
+  },
+  "approval_gates": {
+    "training":["reviewed role-specific examples","company-scoped disjoint train/valid/test","unchanged base lineage","held-out comparison","independent task and general regression checks","privacy and license review","explicit operator promotion","retained rollback candidate"],
+    "tool_request":["AI Engineer evaluation","Lead Architect compatibility review","Compliance Security approval"],
+    "global_promotion":"Repeated approval creates a candidate only; explicit owner review is always required before cross-company promotion.",
+    "production":["tests","Playwright","WCAG 2.2 AA evidence","dependency audit","vulnerability review","company controls","applicable industry controls","fresh dream checkpoint","CTO authorization"],
+    "legal":"Model output is issue spotting and evidence collection, not legal advice or a finding of compliance. Qualified human review is required where applicable."
+  }
+}

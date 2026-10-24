@@ -1,0 +1,4 @@
+supplier_id,supplier_name,status,insurance_valid_through
+S100,Cedar Workforce Demo,APPROVED,2026-12-31
+S200,Harbor Staffing Demo,APPROVED,2026-10-14
+S300,Juniper Catering Demo,REVIEW,2027-01-01

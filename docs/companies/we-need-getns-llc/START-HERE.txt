@@ -1,0 +1,12 @@
+WE NEED GENTS LC — FICTIONAL COMPANY POC
+Contains 14 lengthy department manuals, handbook, culture guide, an archived memo, source registers, lifecycle specification, four shared skills, a skill-generation standard, task fixtures, and isolated owner evaluation. Company text contains approximately 63,671 words.
+
+1. Give HARNESS-INTEGRATION-PROMPT.txt to Codex with your actual repo open. It must implement the lifecycle/rooms/cache/skills against your real code. These documents alone do not implement a server.
+2. Import company/ and shared-skills/ as described by that prompt. Keep owner-evaluation/ completely outside agent tools and retrieval.
+3. Start your actual server/UI using the commands Codex verifies.
+4. Attach all files in task/ and paste TASK-TO-PASTE.txt into the UI. The company corpus and registers must be accessible through onboarding, not merely visible in a screenshot.
+5. Inspect actual agent events and artifacts. Then run the independent owner evaluator.
+
+The video and audio are synthetic narrated training media carried forward from the first onboarding task. This variant ADDS company release requirements across four departments. The source corpus intentionally includes many policies irrelevant to the task. Full access uses retrieval; it must not mean placing every document into each model prompt. Quick cache is a derived copy/index; never remove canonical originals when an agent sleeps.
+
+Shared skills here are harness-native demonstration recipes, not installed ChatGPT/Cowork skills. Existing approved-demo skills are fixtures; new candidates must be tested and reviewed. No holdout scenario is included. No claim is made that your local app has been modified or run.

@@ -1,0 +1,49 @@
+{
+  "specification_only": true,
+  "rooms": [
+    "Reception",
+    "Onboarding",
+    "HR",
+    "Finance",
+    "IT",
+    "Supply Chain",
+    "Workshop",
+    "Evidence Lab",
+    "Review",
+    "Skill Generator",
+    "Cache",
+    "Rest"
+  ],
+  "states": [
+    "new",
+    "onboarding",
+    "ready",
+    "planning",
+    "working",
+    "verifying",
+    "drafting_skill",
+    "reviewing_skill",
+    "checkpointing",
+    "sleeping",
+    "waking",
+    "blocked",
+    "completed"
+  ],
+  "sleep_commit": [
+    "plan",
+    "worker_state",
+    "evidence_refs",
+    "pending_tools",
+    "source_hashes",
+    "skill_versions",
+    "resume_summary"
+  ],
+  "cache": "content addressed; preserve canonical source; invalidate changed dependencies",
+  "runtime_policy": {
+    "large_models_loaded": 1,
+    "concurrent_generations": 1,
+    "initial_context_tokens": 8192,
+    "max_model_downloads": 2,
+    "max_repair_cycles": 3
+  }
+}

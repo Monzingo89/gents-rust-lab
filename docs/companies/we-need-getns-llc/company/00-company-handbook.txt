@@ -1,0 +1,22 @@
+WE NEED GENTS LC — FICTIONAL COMPANY HANDBOOK
+Document WNG-HBK-01 | version 4.0 | APPROVED | effective 2026-09-15
+We Need Gents LC designs and supports modular field equipment and project information services. Its fictional offices are Brookhaven, Cedar Bay, and Stonebridge. Its internal project names are Lantern, Juniper, and Harbor. There is no real corporation or real employee behind this dataset.
+
+HBK-01. Company background
+We Need Gents LC began as a small equipment documentation workshop and expanded into engineering support, field coordination, and commercial administration. The Brookhaven office houses the demonstration agent building. Departments share stable identifiers but retain separate approval responsibilities. A marketing promise, training demonstration, or ceremonial title does not create operational authority.
+
+HBK-02. Working culture
+Teams use concise handovers and source-backed decisions. The kitchen coffee survey closes each Friday; the preferred mug color is forest green. The annual model bridge contest is judged on appearance and load capacity. Neither tradition affects personnel clearance, financial approval, or technology access. Lunch clubs and sports predictions are voluntary activities with no bearing on audit outcomes.
+
+HBK-03. Records and applicability
+APPROVED documents control within their stated scope and effective dates. ARCHIVED and DRAFT documents are historical context only. A task-specific authorized change notice can amend the process it explicitly names. Company-wide release gates remain separate from training policy changes unless a notice explicitly changes those gates. Department source registers supply facts; manuals supply rules. A verified source-system correction overrides only the fields explicitly shown.
+
+HBK-04. We Need Gents LC contractor release method
+For contractor mobilization, first calculate the evidence-backed training/access result under the task SOP and authorized notices. Then obtain HR, Finance, IT, and Supply Chain gate results under their approved manuals. Final release is ALLOW only when the task access result is ALLOW and all four department gates PASS. Any confirmed HOLD produces final HOLD; otherwise unresolved evidence produces UNKNOWN. Never report ALLOW with an unresolved prerequisite. This rule is additional to the task SOP, not a replacement for its training logic.
+When final release is ALLOW, issue a recommendation identifier exactly WNG|<employee_id>|<cost_center>|READY. Otherwise release_ticket is the empty string. This identifier is a recommendation artifact; it does not execute a real account or payment change.
+
+HBK-05. Meeting customs
+Regular department meetings have an agenda, timekeeper, action owners, and a brief decision record. The third Wednesday is reserved for optional lunch-and-learn talks. Meeting attendance does not prove an operational approval unless the relevant approval process explicitly treats the recorded decision as authority.
+
+HBK-06. Agent knowledge access
+Every newly activated Gent receives the complete document catalog and access to the approved company corpus, with source hashes and locators. Full access does not mean copying the entire corpus into every model context. Agents read foundational rules, relevant department sections, and task sources in bounded chunks. They can retrieve any other applicable record when needed. They must not consult owner-only evaluation material.

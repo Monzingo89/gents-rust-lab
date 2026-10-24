@@ -1,15 +1,15 @@
 # 12 — AI routing, definition of done and repair loops
 
-This upgrade adds two independent model roles to the harness: a **Routing Judge** and a **Completion Judge**. Both can use different providers/models. Their public decisions, outputs, latency and reported usage appear in the office alongside the agent calls.
+This upgrade adds two independent model roles to the harness: a **CTO** for routing and a **Compliance Security & QA Engineer** for final assurance. Both can use different providers/models. Their public decisions, outputs, latency and reported usage appear in the office alongside the agent calls.
 
 ## 1. The new lifecycle
 
 ```mermaid
 flowchart TD
-  T["Task + optional acceptance criteria"] --> R["Routing Judge: team, models, context"]
+  T["Task + optional acceptance criteria"] --> R["CTO: team, models, context"]
   R --> V["Rust validates decision"]
   V --> A["Selected agents: planner + worker"]
-  A --> J["Completion Judge: check every criterion"]
+  A --> J["Compliance Security & QA: check every criterion"]
   J --> C{"Validated verdict"}
   C -->|"Accepted"| D["Completed"]
   C -->|"Revise + limits remain"| F["Remaining work + prior candidate"]
@@ -32,12 +32,12 @@ cargo run -p gents-harness --locked
 
 Open the office, click Connect and Start task. The default `config/mock.json` now enables judge mode:
 
-1. Routing Judge proposes two acceptance criteria (unless you supplied your own) and deploys Atlas and Vera.
+1. The CTO proposes two acceptance criteria (unless you supplied your own) and deploys Atlas and Vera.
 2. Each agent makes one planner call and two worker calls.
-3. Completion Judge deliberately returns a **simulated revise** verdict.
-4. Routing Judge deploys Vera alone for repair, changes the model-slot selection, and passes `previous_round` plus `feedback`.
+3. The Compliance Security & QA Engineer deliberately returns a **simulated revise** verdict.
+4. The CTO deploys Vera alone for repair, changes the model-slot selection, and passes `previous_round` plus `feedback`.
 5. Vera plans and performs two worker steps.
-6. Completion Judge returns **simulated accepted**; the run becomes completed.
+6. Compliance Security & QA returns **simulated accepted**; the run becomes completed.
 
 This is 13 completed model calls: four judge calls plus nine agent calls. Mock tokens remain unknown and mock provider cost is zero. Mock acceptance is a scripted lifecycle demonstration, not an assessment of the answer's quality. The office now has routing (R) and completion-judge (J) sprites. Agent cards display the chosen model catalog IDs, context sources and whether the agent is deployed in the current round.
 
@@ -55,14 +55,14 @@ Open `config/mock.json` or copy `config/live.example.json` to `config/local.json
 
 | Setting | Meaning |
 |---|---|
-| `router` | Model configuration for the routing judge |
-| `completion` | Model configuration for the independent completion judge |
+| `router` | Model configuration for the CTO routing role |
+| `completion` | Model configuration for the independent Compliance Security & QA role |
 | `models` | Approved model candidates keyed by stable catalog IDs |
 | `max_rounds` | Maximum execution/review rounds, 1..5 |
 | `max_calls` | Run-wide cap including BOTH judges, planners and workers, 3..128 |
 | `max_context_chars` | Combined instructions + serialized input character limit per call, 16,000..128,000 |
 
-Each candidate has `model` (provider/model/URL/key environment variable), `description` (operator-supplied suitability information), and `allowed_roles` (`planner`, `worker`, or both). Maximum catalog size is 16 in this lab. The roster contains 1..8 available Gents; the routing judge selects a unique subset for each round.
+Each candidate has `model` (provider/model/URL/key environment variable), `description` (operator-supplied suitability information), and `allowed_roles` (`planner`, `worker`, or both). Maximum catalog size is 16 in this lab. The roster contains 1..8 available Gents; the CTO selects a unique subset for each round.
 
 In judge mode, the roster's original `planner` and `worker` fields are **fixed-mode defaults only**. Live calls use `judges.models` and the routing decision. The roster's `assignment` describes a Gent's specialty; the router creates the actual round-specific assignment.
 
@@ -90,7 +90,7 @@ curl -X POST http://127.0.0.1:8787/api/runs \
 
 With no supplied criteria, the first routing decision proposes 1..8 criteria derived from the original task. Rust freezes that list. Every later routing decision must copy it exactly; revising or weakening it is an error. If you supply criteria, they are fixed from the beginning. Inspect the first `route_accepted` activity entry to see the frozen definition.
 
-Completion Judge must return exactly one check per criterion, with a zero-based criterion index, pass/fail and nonempty evidence. Rust rejects missing/duplicate checks, acceptance with failed checks, and acceptance that still lists remaining work. `revise` requires at least one failed check and concrete remaining work. `blocked` is available when completion needs unavailable evidence, permissions or capabilities.
+Compliance Security & QA must return exactly one check per criterion, with a zero-based criterion index, pass/fail and nonempty evidence. Rust rejects missing/duplicate checks, acceptance with failed checks, and acceptance that still lists remaining work. `revise` requires at least one failed check and concrete remaining work. `blocked` is available when completion needs unavailable evidence, permissions or capabilities.
 
 Evidence is currently text supplied by the judge. Nonempty text is a schema requirement; Rust does not magically establish that it is true. Add actual task-specific tests for stronger assurance.
 
@@ -127,9 +127,9 @@ Every agent always receives the original task, fixed criteria and its assignment
 - `previous_round`: the previous round's final candidate, available after round one.
 - `feedback`: the full previous completion review, available after round one.
 
-Unknown, forward, self, cyclic and duplicate dependencies are rejected. Deployments execute sequentially in the specified order. The final deployed agent is the integration/output owner; the routing prompt tells it to pass required earlier outputs explicitly. The completion judge evaluates that final candidate against the original task and criteria.
+Unknown, forward, self, cyclic and duplicate dependencies are rejected. Deployments execute sequentially in the specified order. The final deployed agent is the integration/output owner; the CTO prompt tells it to pass required earlier outputs explicitly. Compliance Security & QA evaluates that final candidate against the original task and criteria.
 
-Each handoff source is limited to 8,000 Unicode characters and carries a `truncated` flag. The routing judge also receives a bounded previous candidate. This is explicit clipping, not AI summarization, and a character limit is not an exact token budget. The task and criteria are not silently clipped. Worker drafts and the completion judge's final candidate remain untruncated; an oversized total prompt fails before dispatch. No vector memory or invisible full chat history is passed automatically.
+Each handoff source is limited to 8,000 Unicode characters and carries a `truncated` flag. The CTO also receives a bounded previous candidate. This is explicit clipping, not AI summarization, and a character limit is not an exact token budget. The task and criteria are not silently clipped. Worker drafts and the assurance role's final candidate remain untruncated; an oversized total prompt fails before dispatch. No vector memory or invisible full chat history is passed automatically.
 
 Inspect `context_passed`, `route_accepted` and `completion_review` activity entries or export the event JSON to trace the process. Do not put secrets in context. All live catalog and judge providers are disclosed by the UI before consent; judges receive the task and intermediate artifacts too.
 
@@ -166,4 +166,4 @@ Limits are imposed by Rust, not by trusting a model to obey its prompt. They bou
 - `web/app.js`: judge sprites, deployment cards, verdict display and aggregate usage including judges.
 - `scripts/smoke.py`: fixed-mode checks plus routing/revision/acceptance, limits and invalid-judge scenarios.
 
-**Checkpoint:** explain who proposes a route, who enforces it, why the definition of done cannot change during repair, and why only the completion judge's validated acceptance ends the task successfully.
+**Checkpoint:** explain who proposes a route, who enforces it, why the definition of done cannot change during repair, and why only the assurance role's validated acceptance ends the task successfully.

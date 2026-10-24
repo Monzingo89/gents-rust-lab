@@ -1,0 +1,187 @@
+WE NEED GENTS LC | SUPPLY CHAIN AND SUPPLIER ASSURANCE MANUAL
+
+Document SUP-MAN-01 | Version 3.2 | APPROVED | effective 2026-09-15
+Owner: Lena Ortiz. All names, systems, events, and requirements are fictional.
+This manual includes general company practices beyond any single assigned task. Only applicable clauses govern a specific decision.
+
+SUP-01. Supplier registration
+A supplier profile includes a stable supplier ID, legal name, business category, and assurance status. Marketing names are aliases, not join keys. Registration creates a profile; it does not automatically approve every service or region.
+
+SUP-01.1 Intake and ownership
+The Supply Chain and Supplier Assurance coordinator registers the incoming supplier registration item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SUP-01.2 Evidence and version handling
+For supplier registration, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SUP-01.3 Example and exception
+Suppose the Brookhaven demonstration project submits a supplier registration request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SUP-01.4 Completion and handover
+A supplier registration item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SUP-01.5 Reporting and retention
+The Supply Chain and Supplier Assurance dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+SUP-02. Supplier assurance
+The assurance register uses APPROVED, SUSPENDED, and REVIEW states. Coverage evidence includes insurance expiration dates. Expiration is evaluated against the specified audit snapshot, not against the worker start date or the computer clock.
+
+For contractor mobilization, Supply Chain PASS requires sponsor supplier status APPROVED and insurance_valid_through on or after the audit snapshot date. Coverage through the snapshot itself passes. Join worker to sponsor by supplier_id. Explicit failure is HOLD; absent supplier or date is UNKNOWN.
+
+SUP-02.1 Intake and ownership
+The Supply Chain and Supplier Assurance coordinator registers the incoming supplier assurance item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SUP-02.2 Evidence and version handling
+For supplier assurance, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SUP-02.3 Example and exception
+Suppose the Brookhaven demonstration project submits a supplier assurance request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SUP-02.4 Completion and handover
+A supplier assurance item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SUP-02.5 Reporting and retention
+The Supply Chain and Supplier Assurance dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+SUP-03. Purchase requisitions
+A requisition describes the item or service, quantity, delivery location, required date, and budget reference. An urgent label does not replace missing specifications. Buyers clarify an ambiguous scope before requesting comparable quotations.
+
+SUP-03.1 Intake and ownership
+The Supply Chain and Supplier Assurance coordinator registers the incoming purchase requisitions item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SUP-03.2 Evidence and version handling
+For purchase requisitions, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SUP-03.3 Example and exception
+Suppose the Brookhaven demonstration project submits a purchase requisitions request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SUP-03.4 Completion and handover
+A purchase requisitions item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SUP-03.5 Reporting and retention
+The Supply Chain and Supplier Assurance dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+SUP-04. Competitive sourcing
+Quote comparisons identify scope exclusions and delivery assumptions. The lowest headline price may omit required inspection or freight. Evaluation records separate technical suitability from commercial comparison and retain the selected supplier rationale.
+
+SUP-04.1 Intake and ownership
+The Supply Chain and Supplier Assurance coordinator registers the incoming competitive sourcing item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SUP-04.2 Evidence and version handling
+For competitive sourcing, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SUP-04.3 Example and exception
+Suppose the Brookhaven demonstration project submits a competitive sourcing request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SUP-04.4 Completion and handover
+A competitive sourcing item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SUP-04.5 Reporting and retention
+The Supply Chain and Supplier Assurance dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+SUP-05. Order acknowledgments
+A supplier acknowledgment is checked against the issued order. Differences in quantity, dates, and substitutions require a recorded decision. Silence is not acceptance of a changed requirement, even when prior orders used the same product.
+
+SUP-05.1 Intake and ownership
+The Supply Chain and Supplier Assurance coordinator registers the incoming order acknowledgments item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SUP-05.2 Evidence and version handling
+For order acknowledgments, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SUP-05.3 Example and exception
+Suppose the Brookhaven demonstration project submits a order acknowledgments request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SUP-05.4 Completion and handover
+A order acknowledgments item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SUP-05.5 Reporting and retention
+The Supply Chain and Supplier Assurance dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+SUP-06. Expediting
+Expediting updates distinguish a supplier promise from independently verified progress. A photograph may show an item without proving that it belongs to the order. Material status reports include the evidence date and next follow-up action.
+
+SUP-06.1 Intake and ownership
+The Supply Chain and Supplier Assurance coordinator registers the incoming expediting item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SUP-06.2 Evidence and version handling
+For expediting, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SUP-06.3 Example and exception
+Suppose the Brookhaven demonstration project submits a expediting request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SUP-06.4 Completion and handover
+A expediting item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SUP-06.5 Reporting and retention
+The Supply Chain and Supplier Assurance dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+SUP-07. Receiving
+Receiving records identify location, quantity, condition, and reference documents. Damaged goods can be physically received while remaining commercially disputed. Partial deliveries do not close the remaining order quantity automatically.
+
+SUP-07.1 Intake and ownership
+The Supply Chain and Supplier Assurance coordinator registers the incoming receiving item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SUP-07.2 Evidence and version handling
+For receiving, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SUP-07.3 Example and exception
+Suppose the Brookhaven demonstration project submits a receiving request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SUP-07.4 Completion and handover
+A receiving item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SUP-07.5 Reporting and retention
+The Supply Chain and Supplier Assurance dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+SUP-08. Inventory transfers
+A transfer records origin, destination, custody handoff, and item identifiers. Dispatch and receipt timestamps are separate events. A missing receipt may be a delayed record or a lost shipment; investigate before adjusting stock.
+
+SUP-08.1 Intake and ownership
+The Supply Chain and Supplier Assurance coordinator registers the incoming inventory transfers item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SUP-08.2 Evidence and version handling
+For inventory transfers, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SUP-08.3 Example and exception
+Suppose the Brookhaven demonstration project submits a inventory transfers request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SUP-08.4 Completion and handover
+A inventory transfers item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SUP-08.5 Reporting and retention
+The Supply Chain and Supplier Assurance dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+SUP-09. Supplier performance
+Performance scorecards use consistent denominators and exclude cancelled lines only under documented rules. A supplier must not improve its on-time rate simply because late lines were removed from the extract. Keep the underlying event history.
+
+SUP-09.1 Intake and ownership
+The Supply Chain and Supplier Assurance coordinator registers the incoming supplier performance item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SUP-09.2 Evidence and version handling
+For supplier performance, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SUP-09.3 Example and exception
+Suppose the Brookhaven demonstration project submits a supplier performance request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SUP-09.4 Completion and handover
+A supplier performance item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SUP-09.5 Reporting and retention
+The Supply Chain and Supplier Assurance dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+SUP-10. Contract closeout
+Closeout reconciles deliverables, claims, unused commitments, retained documents, and outstanding assurance items. Project completion does not erase supplier obligations that survive delivery. Archive the contract with its amendments and final acceptance evidence.
+
+SUP-10.1 Intake and ownership
+The Supply Chain and Supplier Assurance coordinator registers the incoming contract closeout item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+SUP-10.2 Evidence and version handling
+For contract closeout, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+SUP-10.3 Example and exception
+Suppose the Brookhaven demonstration project submits a contract closeout request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+SUP-10.4 Completion and handover
+A contract closeout item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+SUP-10.5 Reporting and retention
+The Supply Chain and Supplier Assurance dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.

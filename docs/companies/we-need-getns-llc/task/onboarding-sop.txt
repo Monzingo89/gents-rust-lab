@@ -1,0 +1,13 @@
+FICTIONAL TRAINING DATA — WE NEED GENTS LC DEMO ONBOARDING SOP
+S01. Audit snapshot: 2026-10-15, end of day. All people and policies are fictional.
+S02. Policy V1 applies to employees hired before 2026-10-01. Training must be completed no later than hire_date plus 10 calendar days. Hire date is day zero; completion on the deadline passes.
+S03. Under V1, system access is allowed exactly when training is on time. Manager approval is not required.
+S04. Authorized spoken change notices can amend V1 for new hires. Apply their explicitly stated effective hire dates; never apply a change retroactively to earlier hires.
+S05. The attached audio is an authorized change notice. The training video demonstrates the OLD V1 workflow; its spoken policy does not override a later authorized change.
+S06. For employee facts, a timestamped source-system record visibly opened in the training video overrides the exported CSV. Only override fields actually shown. A blank exported date is not proof that no training occurred.
+S07. Other fields come from the CSV. manager_approved is yes/no. Recorded statuses are claims to audit, not authoritative decisions.
+S08. Determine training_decision as PASS or LATE; use UNKNOWN if evidence is absent. Determine access_decision as ALLOW, HOLD, or UNKNOWN. All completed dates in this case are before the snapshot.
+S09. If training is late, access is HOLD and reason_code is TRAINING_LATE. If training passes but required approval is missing, access is HOLD and reason_code is APPROVAL_MISSING. Otherwise access is ALLOW and reason_code is REQUIREMENTS_MET. These reason codes use this precedence.
+S10. Report one discrepancy per employee when either recorded training or recorded access differs from the evidence-backed decision. Combine that employee's incorrect fields into one finding. Do not count a versioned policy update as an extra employee discrepancy.
+S11. Output exactly one decision per employee with employee_id, policy_version, deadline, effective_completion_date, training_decision, access_decision, reason_code, and evidence_ids. Preserve original inputs.
+S12. Cite CSV employee IDs/columns, these SOP section IDs, audio time intervals, and video timestamps with extracted frame filenames. Include policy evidence as well as employee evidence.

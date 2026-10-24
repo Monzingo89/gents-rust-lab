@@ -6,9 +6,16 @@
   "scripts": {
     "tauri": "tauri",
     "dev": "vite web --host 127.0.0.1 --port 1420 --strictPort",
+    "company": "node scripts/start-company.mjs",
+    "company:mobile": "node scripts/start-mobile.mjs",
+    "test:mobile": "node --test scripts/mobile-access.test.mjs",
+    "test:mobile:browser": "node scripts/mobile-browser-smoke.mjs",
+    "test:office": "node scripts/office-smoke.mjs",
+    "test:company:local": "python3 scripts/autonomy_live_smoke.py",
     "build": "vite build web --outDir ../dist --emptyOutDir"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@tauri-apps/cli": "^2",
     "vite": "^7"
   }

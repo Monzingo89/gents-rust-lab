@@ -1,0 +1,16 @@
+{
+  "company_mode": true,
+  "company_tools": true,
+  "admin_judge": {"provider":"local","model":"Qwen3-8B Admin Judge","path":"models/qwen3-8b/Qwen3-8B-Q4_K_M.gguf"},
+  "max_steps": 3,
+  "max_tokens": 3072,
+  "max_run_seconds": 2592000,
+  "agents": [
+    {"id":"Law Gent","assignment":"Identify contract scope, legal questions and missing evidence. Escalate legal conclusions.","planner":{"provider":"local","model":"Phi-4","path":"models/phi-4/phi-4-Q4_K.gguf"},"worker":{"provider":"local","model":"Phi-4","path":"models/phi-4/phi-4-Q4_K.gguf"}},
+    {"id":"CTO","assignment":"Select staffing, record decisions and enforce the zero cash budget.","planner":{"provider":"local","model":"Qwen3-8B","path":"models/qwen3-8b/Qwen3-8B-Q4_K_M.gguf"},"worker":{"provider":"local","model":"Qwen3-8B","path":"models/qwen3-8b/Qwen3-8B-Q4_K_M.gguf"}},
+    {"id":"PM Gent","assignment":"Create milestones, task owners, dependencies, timeline estimates and open questions. Estimates are not commitments.","planner":{"provider":"local","model":"Phi-4","path":"models/phi-4/phi-4-Q4_K.gguf"},"worker":{"provider":"local","model":"Phi-4","path":"models/phi-4/phi-4-Q4_K.gguf"}},
+    {"id":"Lead Architect Gent","assignment":"Propose the smallest local architecture and review evidence and assumptions.","planner":{"provider":"local","model":"Qwen3-Coder-30B-A3B-Instruct","path":"models/qwen3-coder-30b-worker/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"},"worker":{"provider":"local","model":"Qwen3-Coder-30B-A3B-Instruct","path":"models/qwen3-coder-30b-worker/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"}},
+    {"id":"Engineer Gent","assignment":"Produce the requested text deliverable from evidence, or a concrete implementation proposal when execution is unavailable.","planner":{"provider":"local","model":"Qwen3-Coder-30B-A3B-Instruct","path":"models/qwen3-coder-30b-worker/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"},"worker":{"provider":"local","model":"Qwen3-Coder-30B-A3B-Instruct","path":"models/qwen3-coder-30b-worker/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"}},
+    {"id":"Compliance Security & QA Engineer","assignment":"Independently review each acceptance criterion using actual evidence. Identify checks that still need execution.","planner":{"provider":"local","model":"Qwen3-Coder-30B-A3B-Instruct","path":"models/qwen3-coder-30b-worker/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"},"worker":{"provider":"local","model":"Qwen3-Coder-30B-A3B-Instruct","path":"models/qwen3-coder-30b-worker/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"}}
+  ]
+}

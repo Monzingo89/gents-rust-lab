@@ -57,6 +57,6 @@ Follow chapters 01 through 13, including the optional 01a hand-coding route. Cha
 
 ## Updated default lifecycle
 
-The default now routes through a model-selection judge before agents run and an independent completion judge afterward. A rejected candidate returns, with feedback, to the routing judge for another bounded round. Acceptance criteria remain fixed. Read chapter 12 before interpreting completion in the default demo.
+The default now routes through the CTO before agents run and an independent Compliance Security & QA Engineer afterward. A rejected candidate returns, with feedback, to the CTO for another bounded round. Acceptance criteria remain fixed. Read chapter 12 before interpreting completion in the default demo.
 
 The final version now checkpoints events to local SQLite, recovers interrupted history without replaying requests, and adds optional deterministic acceptance vetoes. Chapter 13 documents the journal, deadlines, idempotency, recovery UI and production boundaries.

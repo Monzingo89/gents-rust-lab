@@ -1,0 +1,2 @@
+# Version tested on this Mac. No remote inference service or API key.
+mlx-lm==0.32.2

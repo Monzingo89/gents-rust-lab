@@ -1,0 +1,162 @@
+{
+  "company": "We Need Gents LC",
+  "fictional": true,
+  "corpus_version": "1.0.0",
+  "documents": [
+    {
+      "path": "company/00-company-handbook.txt",
+      "sha256": "d59449adaa9cf54dcd77d8db2419890ef18e48cd6dfe5b19f78cd133f6364767",
+      "bytes": 3442,
+      "status": "approved-demo",
+      "line_count": 22
+    },
+    {
+      "path": "company/agent-onboarding-and-memory.txt",
+      "sha256": "72d2ed271d52b440138a6bdd3a60be6d8727592a166cb091a685da4df3fd9651",
+      "bytes": 3186,
+      "status": "approved-demo",
+      "line_count": 10
+    },
+    {
+      "path": "company/culture-and-office-guide.txt",
+      "sha256": "8a4bc1e02a19ee0452faad8518181425bf9df79d2a3fb58e6861cd51d5cafeb0",
+      "bytes": 1268,
+      "status": "approved-demo",
+      "line_count": 5
+    },
+    {
+      "path": "company/departments/Communications-manual.txt",
+      "sha256": "99ca56d88d7445500e0c081a074f0329b2e1855c709038a72fd16e2ebef64c2f",
+      "bytes": 32132,
+      "status": "approved-demo",
+      "line_count": 185
+    },
+    {
+      "path": "company/departments/Document-Control-manual.txt",
+      "sha256": "d6476b3e6ebaedf00bd6c775e704c85c924b923f4dd5231638768f5d58d4004a",
+      "bytes": 31706,
+      "status": "approved-demo",
+      "line_count": 185
+    },
+    {
+      "path": "company/departments/ES-and-H-manual.txt",
+      "sha256": "e47d2125c5bca64c753e304819cadae2bf67653ab46a71e0d14334d9103beb89",
+      "bytes": 32163,
+      "status": "approved-demo",
+      "line_count": 185
+    },
+    {
+      "path": "company/departments/Engineering-manual.txt",
+      "sha256": "fd4c15618fb06fef59863e67840ae41e04d94ab3bdcf1b89fa0c4455ab082f91",
+      "bytes": 31886,
+      "status": "approved-demo",
+      "line_count": 185
+    },
+    {
+      "path": "company/departments/Facilities-manual.txt",
+      "sha256": "bfe51520c9a4f4f888f1541ee8685331a0596b2a1231e881936faa140bb02845",
+      "bytes": 31930,
+      "status": "approved-demo",
+      "line_count": 185
+    },
+    {
+      "path": "company/departments/Finance-manual.txt",
+      "sha256": "4185ef92991ace0819295cda2693d526a9160bdcfcc2493157a415fcb991e916",
+      "bytes": 31039,
+      "status": "approved-demo",
+      "line_count": 187
+    },
+    {
+      "path": "company/departments/HR-manual.txt",
+      "sha256": "5ac083c3bf84e4d1a1b889464d1bd25c056002719f77747bb6b1aaf8ed9c087e",
+      "bytes": 31072,
+      "status": "approved-demo",
+      "line_count": 187
+    },
+    {
+      "path": "company/departments/IT-manual.txt",
+      "sha256": "8f6173a4953fbc32253081a70f30129d8835a745ce0b677462fe67d1c4f85296",
+      "bytes": 30811,
+      "status": "approved-demo",
+      "line_count": 187
+    },
+    {
+      "path": "company/departments/Legal-manual.txt",
+      "sha256": "153f43240e1a2112ce1a40fd120dc8183abf2f6df476f344859d462381cb108a",
+      "bytes": 31842,
+      "status": "approved-demo",
+      "line_count": 185
+    },
+    {
+      "path": "company/departments/Operations-manual.txt",
+      "sha256": "e8cd43039fb585608f87ceaf540160406d84ffa6b7b34037d27bb5cbf4ca69de",
+      "bytes": 31701,
+      "status": "approved-demo",
+      "line_count": 185
+    },
+    {
+      "path": "company/departments/Quality-manual.txt",
+      "sha256": "8ced37d1fa282ded4b8e193eebc2b5b6f745a0a219efc8bd7df1edbe3a60b3cf",
+      "bytes": 31775,
+      "status": "approved-demo",
+      "line_count": 185
+    },
+    {
+      "path": "company/departments/Sales-manual.txt",
+      "sha256": "85d3297bed1e250ceaf01ab5d969ec5095c5948ed2b9f50ae27209e2e930b605",
+      "bytes": 32075,
+      "status": "approved-demo",
+      "line_count": 185
+    },
+    {
+      "path": "company/departments/Security-manual.txt",
+      "sha256": "93db354eb7452740c30716a604f85465c8116f1d884e5fbf5efb59ee48b946fc",
+      "bytes": 31757,
+      "status": "approved-demo",
+      "line_count": 185
+    },
+    {
+      "path": "company/departments/Supply-Chain-manual.txt",
+      "sha256": "49b17394cc13d549d68899e9e79aabbb10bd07a017180e65c1cb9119326ed288",
+      "bytes": 31124,
+      "status": "approved-demo",
+      "line_count": 187
+    },
+    {
+      "path": "company/history/archived-release-memo.txt",
+      "sha256": "a44d2a630f3b8dd0a385cbace0212f69017e9f79261e087539c8fb1829566dec",
+      "bytes": 410,
+      "status": "archived",
+      "line_count": 3
+    },
+    {
+      "path": "company/registers/finance-cost-centers.csv",
+      "sha256": "6580dd15774f66ee1cdd3ce22fcf908d779c4c7ff82dda42f4d5007e450b8379",
+      "bytes": 78,
+      "status": "approved-demo",
+      "line_count": 3
+    },
+    {
+      "path": "company/registers/hr-clearance.csv",
+      "sha256": "f3a42efac261b7b0cd4d8f30880e10c5d5ce63444d308c5fe2b52f75e8a1dc05",
+      "bytes": 273,
+      "status": "approved-demo",
+      "line_count": 13
+    },
+    {
+      "path": "company/registers/it-identity.csv",
+      "sha256": "520ff7f759c271b92c027c22ce0522ff951aad64bdda1bd8714b0ee3f7f5df92",
+      "bytes": 202,
+      "status": "approved-demo",
+      "line_count": 13
+    },
+    {
+      "path": "company/registers/suppliers.csv",
+      "sha256": "050d29dfd07b09fa753a28a3b07f0d802714193c9ba9e73697663a8fc0e4ac91",
+      "bytes": 198,
+      "status": "approved-demo",
+      "line_count": 4
+    }
+  ],
+  "access": "Entire company corpus discoverable; load relevant bounded chunks. Owner evaluation excluded."
+}

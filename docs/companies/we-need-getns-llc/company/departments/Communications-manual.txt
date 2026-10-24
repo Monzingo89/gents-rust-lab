@@ -1,0 +1,185 @@
+WE NEED GENTS LC | COMMUNICATIONS AND CULTURE MANUAL
+
+Document COM-MAN-01 | Version 3.2 | APPROVED | effective 2026-09-15
+Owner: Taylor Wren. All names, systems, events, and requirements are fictional.
+This manual includes general company practices beyond any single assigned task. Only applicable clauses govern a specific decision.
+
+COM-01. Brand voice
+Brand voice records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Communications and Culture distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+COM-01.1 Intake and ownership
+The Communications and Culture coordinator registers the incoming brand voice item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+COM-01.2 Evidence and version handling
+For brand voice, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+COM-01.3 Example and exception
+Suppose the Brookhaven demonstration project submits a brand voice request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+COM-01.4 Completion and handover
+A brand voice item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+COM-01.5 Reporting and retention
+The Communications and Culture dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+COM-02. Newsletter calendar
+Newsletter calendar records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Communications and Culture distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+COM-02.1 Intake and ownership
+The Communications and Culture coordinator registers the incoming newsletter calendar item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+COM-02.2 Evidence and version handling
+For newsletter calendar, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+COM-02.3 Example and exception
+Suppose the Brookhaven demonstration project submits a newsletter calendar request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+COM-02.4 Completion and handover
+A newsletter calendar item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+COM-02.5 Reporting and retention
+The Communications and Culture dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+COM-03. Community volunteering
+Community volunteering records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Communications and Culture distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+COM-03.1 Intake and ownership
+The Communications and Culture coordinator registers the incoming community volunteering item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+COM-03.2 Evidence and version handling
+For community volunteering, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+COM-03.3 Example and exception
+Suppose the Brookhaven demonstration project submits a community volunteering request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+COM-03.4 Completion and handover
+A community volunteering item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+COM-03.5 Reporting and retention
+The Communications and Culture dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+COM-04. Photography consent
+Photography consent records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Communications and Culture distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+COM-04.1 Intake and ownership
+The Communications and Culture coordinator registers the incoming photography consent item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+COM-04.2 Evidence and version handling
+For photography consent, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+COM-04.3 Example and exception
+Suppose the Brookhaven demonstration project submits a photography consent request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+COM-04.4 Completion and handover
+A photography consent item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+COM-04.5 Reporting and retention
+The Communications and Culture dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+COM-05. Town hall planning
+Town hall planning records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Communications and Culture distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+COM-05.1 Intake and ownership
+The Communications and Culture coordinator registers the incoming town hall planning item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+COM-05.2 Evidence and version handling
+For town hall planning, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+COM-05.3 Example and exception
+Suppose the Brookhaven demonstration project submits a town hall planning request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+COM-05.4 Completion and handover
+A town hall planning item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+COM-05.5 Reporting and retention
+The Communications and Culture dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+COM-06. Recognition stories
+Recognition stories records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Communications and Culture distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+COM-06.1 Intake and ownership
+The Communications and Culture coordinator registers the incoming recognition stories item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+COM-06.2 Evidence and version handling
+For recognition stories, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+COM-06.3 Example and exception
+Suppose the Brookhaven demonstration project submits a recognition stories request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+COM-06.4 Completion and handover
+A recognition stories item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+COM-06.5 Reporting and retention
+The Communications and Culture dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+COM-07. Internal announcements
+Internal announcements records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Communications and Culture distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+COM-07.1 Intake and ownership
+The Communications and Culture coordinator registers the incoming internal announcements item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+COM-07.2 Evidence and version handling
+For internal announcements, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+COM-07.3 Example and exception
+Suppose the Brookhaven demonstration project submits a internal announcements request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+COM-07.4 Completion and handover
+A internal announcements item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+COM-07.5 Reporting and retention
+The Communications and Culture dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+COM-08. Event invitations
+Event invitations records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Communications and Culture distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+COM-08.1 Intake and ownership
+The Communications and Culture coordinator registers the incoming event invitations item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+COM-08.2 Evidence and version handling
+For event invitations, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+COM-08.3 Example and exception
+Suppose the Brookhaven demonstration project submits a event invitations request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+COM-08.4 Completion and handover
+A event invitations item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+COM-08.5 Reporting and retention
+The Communications and Culture dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+COM-09. Social channels
+Social channels records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Communications and Culture distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+COM-09.1 Intake and ownership
+The Communications and Culture coordinator registers the incoming social channels item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+COM-09.2 Evidence and version handling
+For social channels, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+COM-09.3 Example and exception
+Suppose the Brookhaven demonstration project submits a social channels request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+COM-09.4 Completion and handover
+A social channels item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+COM-09.5 Reporting and retention
+The Communications and Culture dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+COM-10. Accessibility reviews
+Accessibility reviews records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Communications and Culture distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+COM-10.1 Intake and ownership
+The Communications and Culture coordinator registers the incoming accessibility reviews item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+COM-10.2 Evidence and version handling
+For accessibility reviews, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+COM-10.3 Example and exception
+Suppose the Brookhaven demonstration project submits a accessibility reviews request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+COM-10.4 Completion and handover
+A accessibility reviews item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+COM-10.5 Reporting and retention
+The Communications and Culture dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.

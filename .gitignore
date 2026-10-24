@@ -3,6 +3,7 @@ node_modules/
 .env
 .env.*
 !.env.example
+!.env.company.example
 config/local.json
 src-tauri/gen/
 .DS_Store
@@ -11,3 +12,10 @@ src-tauri/gen/
 dist/
 data/
 *.sqlite3*
+models/
+*.gguf
+*.safetensors
+.venv*/
+__pycache__/
+# Private local company integrations
+.env.company

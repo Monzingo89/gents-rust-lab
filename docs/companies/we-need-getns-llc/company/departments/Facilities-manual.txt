@@ -1,0 +1,185 @@
+WE NEED GENTS LC | FACILITIES AND WORKPLACE MANUAL
+
+Document FAC-MAN-01 | Version 3.2 | APPROVED | effective 2026-09-15
+Owner: Robin Ash. All names, systems, events, and requirements are fictional.
+This manual includes general company practices beyond any single assigned task. Only applicable clauses govern a specific decision.
+
+FAC-01. Room bookings
+Room bookings records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Facilities and Workplace distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+FAC-01.1 Intake and ownership
+The Facilities and Workplace coordinator registers the incoming room bookings item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+FAC-01.2 Evidence and version handling
+For room bookings, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+FAC-01.3 Example and exception
+Suppose the Brookhaven demonstration project submits a room bookings request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+FAC-01.4 Completion and handover
+A room bookings item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+FAC-01.5 Reporting and retention
+The Facilities and Workplace dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+FAC-02. Maintenance requests
+Maintenance requests records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Facilities and Workplace distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+FAC-02.1 Intake and ownership
+The Facilities and Workplace coordinator registers the incoming maintenance requests item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+FAC-02.2 Evidence and version handling
+For maintenance requests, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+FAC-02.3 Example and exception
+Suppose the Brookhaven demonstration project submits a maintenance requests request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+FAC-02.4 Completion and handover
+A maintenance requests item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+FAC-02.5 Reporting and retention
+The Facilities and Workplace dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+FAC-03. Cleaning schedules
+Cleaning schedules records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Facilities and Workplace distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+FAC-03.1 Intake and ownership
+The Facilities and Workplace coordinator registers the incoming cleaning schedules item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+FAC-03.2 Evidence and version handling
+For cleaning schedules, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+FAC-03.3 Example and exception
+Suppose the Brookhaven demonstration project submits a cleaning schedules request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+FAC-03.4 Completion and handover
+A cleaning schedules item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+FAC-03.5 Reporting and retention
+The Facilities and Workplace dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+FAC-04. Waste collection
+Waste collection records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Facilities and Workplace distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+FAC-04.1 Intake and ownership
+The Facilities and Workplace coordinator registers the incoming waste collection item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+FAC-04.2 Evidence and version handling
+For waste collection, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+FAC-04.3 Example and exception
+Suppose the Brookhaven demonstration project submits a waste collection request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+FAC-04.4 Completion and handover
+A waste collection item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+FAC-04.5 Reporting and retention
+The Facilities and Workplace dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+FAC-05. Parking allocation
+Parking allocation records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Facilities and Workplace distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+FAC-05.1 Intake and ownership
+The Facilities and Workplace coordinator registers the incoming parking allocation item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+FAC-05.2 Evidence and version handling
+For parking allocation, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+FAC-05.3 Example and exception
+Suppose the Brookhaven demonstration project submits a parking allocation request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+FAC-05.4 Completion and handover
+A parking allocation item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+FAC-05.5 Reporting and retention
+The Facilities and Workplace dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+FAC-06. Meeting equipment
+Meeting equipment records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Facilities and Workplace distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+FAC-06.1 Intake and ownership
+The Facilities and Workplace coordinator registers the incoming meeting equipment item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+FAC-06.2 Evidence and version handling
+For meeting equipment, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+FAC-06.3 Example and exception
+Suppose the Brookhaven demonstration project submits a meeting equipment request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+FAC-06.4 Completion and handover
+A meeting equipment item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+FAC-06.5 Reporting and retention
+The Facilities and Workplace dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+FAC-07. Quiet zones
+Quiet zones records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Facilities and Workplace distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+FAC-07.1 Intake and ownership
+The Facilities and Workplace coordinator registers the incoming quiet zones item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+FAC-07.2 Evidence and version handling
+For quiet zones, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+FAC-07.3 Example and exception
+Suppose the Brookhaven demonstration project submits a quiet zones request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+FAC-07.4 Completion and handover
+A quiet zones item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+FAC-07.5 Reporting and retention
+The Facilities and Workplace dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+FAC-08. Storage lockers
+Storage lockers records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Facilities and Workplace distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+FAC-08.1 Intake and ownership
+The Facilities and Workplace coordinator registers the incoming storage lockers item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+FAC-08.2 Evidence and version handling
+For storage lockers, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+FAC-08.3 Example and exception
+Suppose the Brookhaven demonstration project submits a storage lockers request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+FAC-08.4 Completion and handover
+A storage lockers item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+FAC-08.5 Reporting and retention
+The Facilities and Workplace dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+FAC-09. Power interruptions
+Power interruptions records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Facilities and Workplace distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+FAC-09.1 Intake and ownership
+The Facilities and Workplace coordinator registers the incoming power interruptions item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+FAC-09.2 Evidence and version handling
+For power interruptions, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+FAC-09.3 Example and exception
+Suppose the Brookhaven demonstration project submits a power interruptions request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+FAC-09.4 Completion and handover
+A power interruptions item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+FAC-09.5 Reporting and retention
+The Facilities and Workplace dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.
+
+FAC-10. Move requests
+Move requests records identify a responsible owner, the affected location or deliverable, an effective date, and the source evidence. Facilities and Workplace distinguishes a request from an approved action and a completed action from an unverified claim. Use the department register to preserve those distinctions; do not silently change historical entries to match a later report.
+
+FAC-10.1 Intake and ownership
+The Facilities and Workplace coordinator registers the incoming move requests item, checks the relevant project and effective date, and assigns an owner. The register entry links to the received source rather than replacing it with a paraphrase. If the request combines unrelated items, separate their owners and completion conditions. Reassigning an item does not reset the original receipt date. An incorrect department assignment is returned with a brief explanation and a suggested destination, without inventing a completed decision.
+
+FAC-10.2 Evidence and version handling
+For move requests, reviewers distinguish source-system observations, exported snapshots, proposals, approvals, and final records. Keep author, version, and evidence date visible. If two records disagree, record the conflicting values and apply the controlling policy for that process. Do not pick the most convenient value. When the process lacks an explicit precedence rule, mark the issue unresolved and request clarification. A filename containing the word final is not itself proof of approval.
+
+FAC-10.3 Example and exception
+Suppose the Brookhaven demonstration project submits a move requests request on Monday and sends a correction on Wednesday. The owner retains the Monday record, links the Wednesday correction, and identifies exactly which fields changed. Unchanged fields remain attributable to the earlier source. If a manager is absent, the coordinator records the pending approval and its operational consequence rather than signing on the manager's behalf. An expedited review changes queue priority; it does not change the acceptance requirements.
+
+FAC-10.4 Completion and handover
+A move requests item closes only when the documented deliverable exists, mandatory checks are recorded, and remaining exceptions have a named owner. The handover note includes stable identifiers, file references, and the next action. A downstream reader should be able to verify the outcome without reconstructing a chat conversation. For recurring work, update the relevant work instruction only after review; for a one-time exception, preserve the case note without rewriting company policy.
+
+FAC-10.5 Reporting and retention
+The Facilities and Workplace dashboard distinguishes open, awaiting evidence, awaiting approval, complete, and cancelled items. Count stable item IDs rather than message volume. Report missing evidence separately from confirmed failure. Store the final record with its applicable sources and access controls. Department statistics may be used for capacity planning and lessons learned, but should not become a substitute for the individual case evidence needed to support an operational decision.

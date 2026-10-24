@@ -1,0 +1,13 @@
+{
+  "backend":"local MLX LoRA",
+  "inference_and_training_share_gpu_lease":true,
+  "initial_base":"models/gemma-4-E4B-it",
+  "base_weights_immutable":true,
+  "adapter_scope":"company_id + role + base fingerprint + training_id",
+  "defaults":{"rank":4,"layers":1,"batch_size":1,"sequence_length":512,"learning_rate":0.00001,"iterations":100},
+  "minimum_examples":{"train":20,"valid":5,"test":5},
+  "automatic_collection_from_dreams":false,
+  "automatic_promotion":false,
+  "global_promotion_requires_separate_review":true,
+  "smoke_adapters_never_promoted":true
+}

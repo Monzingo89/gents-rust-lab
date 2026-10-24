@@ -1,0 +1,13 @@
+id: <stable-id>
+version: 0.1.0
+status: draft
+scope: run-only OR reusable-candidate
+trigger: <specific situation>
+inputs: <schemas and sources>
+outputs: <schemas>
+source_dependencies: <document IDs, hashes, section locators>
+procedure: <bounded steps>
+allowed_tools: <existing capabilities only>
+failure_states: <missing, contradictory, unsupported, invalid>
+validation_cases: <positive and negative cases with actual results>
+provenance: <run ID, author agent, reviewer, timestamps>
