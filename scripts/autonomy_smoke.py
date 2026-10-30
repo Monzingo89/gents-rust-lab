@@ -29,6 +29,7 @@ with tempfile.TemporaryDirectory(prefix="gents-autonomy-smoke-") as temporary:
     base = f"http://127.0.0.1:{port}"
     env = dict(os.environ, AUTH_MODE="local", BIND=f"127.0.0.1:{port}", CONFIG=str(root / "config.json"),
                RUN_STORE=str(root / "runs.sqlite3"), GENTS_SUPERVISED="1")
+    env.pop("RUST_OPENAI_API_KEY", None)  # This smoke must never incur a cloud call.
     process = None
     def request(path, data=None):
         req = urllib.request.Request(base + path, data=None if data is None else json.dumps(data).encode(), headers={"Content-Type": "application/json"})
@@ -73,6 +74,18 @@ with tempfile.TemporaryDirectory(prefix="gents-autonomy-smoke-") as temporary:
         process = start()
         recovered = request(f"/api/runs/{run}/attention")["attention"]
         assert recovered["id"] == question["id"], "question changed across restart"
+        process.terminate()
+        assert process.wait(timeout=15) == 0
+        process = start()
+        recovered = request(f"/api/runs/{run}/attention")["attention"]
+        assert recovered["id"] == question["id"], "program shutdown lost the resumable question"
+        request(f"/api/runs/{run}/cancel", {})
+        stopped = wait_for(lambda: request(f"/api/runs/{run}"), lambda r: r["status"] != "running")
+        assert stopped["status"] == "cancelled", stopped["status"]
+        resumed = request(f"/api/runs/{run}/resume", {})
+        assert resumed["resumed"] and resumed["id"] == run
+        assert request(f"/api/runs/{run}/resume", {})["already_running"], "resume launched duplicate execution"
+        assert request(f"/api/runs/{run}/attention")["attention"]["id"] == question["id"]
         try:
             request(f"/api/runs/{run}/attention", {"question_id": "wrong", "answer": "stale"})
             raise AssertionError("stale answer admitted")
@@ -81,6 +94,11 @@ with tempfile.TemporaryDirectory(prefix="gents-autonomy-smoke-") as temporary:
         request(f"/api/runs/{run}/attention", {"question_id": question["id"], "answer": "Smoke Project"})
         result = wait_for(lambda: request(f"/api/runs/{run}"), lambda r: r["status"] != "running")
         assert result["status"] == "completed", result
+        try:
+            request(f"/api/runs/{run}/resume", {})
+            raise AssertionError("completed run resumed")
+        except urllib.error.HTTPError as error:
+            assert error.code == 409
         work = root / f"data/companies/one/runs/{run}"
         assert (work / "workspace/deliverable.txt").read_text().startswith("Actual file written")
         journals = [json.loads(p.read_text()) for p in sorted(work.glob("tool-*.json"))]
@@ -115,6 +133,18 @@ with tempfile.TemporaryDirectory(prefix="gents-autonomy-smoke-") as temporary:
         result = wait_for(lambda: request(f"/api/runs/{denied}"), lambda r: r["status"] != "running")
         assert result["status"] == "blocked", result
         assert not list((root / f"data/companies/one/runs/{denied}").glob("tool-*.json"))
+        stalled = intake("autonomy-stall-smoke")
+        question = wait_for(lambda: request(f"/api/runs/{stalled}/attention"), lambda r: r.get("attention"), seconds=75)["attention"]
+        assert "12 recovery attempts" in question["question"]
+        observed = request(f"/api/runs/{stalled}")
+        assert any(e["kind"] == "codex_phone_ringing" for e in observed["events"])
+        assert any(e["kind"] == "codex_phone_unanswered" for e in observed["events"])
+        request(f"/api/runs/{stalled}/cancel", {})
+        wait_for(lambda: request(f"/api/runs/{stalled}"), lambda r: r["status"] != "running")
+        tool_failure = intake("autonomy-tool-failure-smoke")
+        observed = wait_for(lambda: request(f"/api/runs/{tool_failure}"), lambda r: any(e["kind"] == "loop_recovery" and "recorded_tool_failure" in e["message"] for e in r["events"]))
+        assert any(e["kind"] == "tool_result" and not json.loads(e["message"])["result"]["ok"] for e in observed["events"])
+        request(f"/api/runs/{tool_failure}/cancel", {})
     finally:
         if process and process.poll() is None:
             process.terminate()

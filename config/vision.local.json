@@ -1,0 +1,7 @@
+{
+  "model_id": "Qwen3-VL-8B Instruct",
+  "model": "qwen3-vl-8b/Qwen3VL-8B-Instruct-Q4_K_M.gguf",
+  "projector": "qwen3-vl-8b/mmproj-Qwen3VL-8B-Instruct-Q8_0.gguf",
+  "image_tokens": 2048,
+  "context_tokens": 16384
+}

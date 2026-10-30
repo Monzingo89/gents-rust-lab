@@ -53,6 +53,7 @@ fn connect(root: &Path, company: &str, owner: &str, create: bool) -> Result<Conn
     db.execute_batch("PRAGMA journal_mode=WAL;
         CREATE TABLE IF NOT EXISTS company(owner TEXT NOT NULL, name TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS context(id TEXT PRIMARY KEY, run_id TEXT NOT NULL, agent TEXT NOT NULL, tier TEXT NOT NULL, body TEXT NOT NULL, source TEXT NOT NULL, created INTEGER NOT NULL);
+        CREATE TABLE IF NOT EXISTS context_archive(id TEXT PRIMARY KEY, run_id TEXT NOT NULL, agent TEXT NOT NULL, tier TEXT NOT NULL, body TEXT NOT NULL, source TEXT NOT NULL, created INTEGER NOT NULL);
         CREATE TABLE IF NOT EXISTS jobs(run_id TEXT PRIMARY KEY, intake TEXT NOT NULL, digest TEXT NOT NULL, approval TEXT, state TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS audit(seq INTEGER PRIMARY KEY, run_id TEXT NOT NULL, kind TEXT NOT NULL, body TEXT NOT NULL, created INTEGER NOT NULL);
         CREATE TABLE IF NOT EXISTS capabilities(id TEXT PRIMARY KEY, manifest TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'quarantined');
@@ -66,6 +67,11 @@ fn connect(root: &Path, company: &str, owner: &str, create: bool) -> Result<Conn
         CREATE TRIGGER IF NOT EXISTS index_context AFTER INSERT ON context BEGIN
           INSERT INTO knowledge(id,body,source) VALUES (new.id,new.body,new.source);
         END;
+        CREATE TRIGGER IF NOT EXISTS unindex_context AFTER DELETE ON context BEGIN
+          DELETE FROM knowledge WHERE id=old.id;
+        END;
+        INSERT OR IGNORE INTO context_archive SELECT id,run_id,agent,tier,body,source,created FROM context WHERE tier IN ('ALTC','PLTC','EVIDENCE_ALTC','EVIDENCE_PLTC');
+        DELETE FROM context WHERE tier IN ('ALTC','PLTC','EVIDENCE_ALTC','EVIDENCE_PLTC');
         INSERT INTO knowledge(id,body,source) SELECT id,body,source FROM context WHERE id NOT IN (SELECT id FROM knowledge);")?;
     let existing: Option<String> = db
         .query_row("SELECT owner FROM company LIMIT 1", [], |r| r.get(0))
@@ -85,6 +91,105 @@ fn audit(db: &Connection, run: &str, kind: &str, body: Value) -> Result<()> {
         params![run, kind, body.to_string(), crate::now_ms() as i64],
     )?;
     Ok(())
+}
+
+#[derive(Clone, Copy)]
+enum ContextLifecycle {
+    Completed,
+    Inactive,
+}
+
+trait ContextPlacementPolicy {
+    fn cold_tier(&self, current: &str, lifecycle: ContextLifecycle) -> &'static str;
+}
+
+/// Cheapest approved placement is local private disk: active context remains
+/// in the FTS-backed hot table; completed/inactive context moves to a private,
+/// non-indexed SQLite archive until an explicit operator recall.
+struct CheapestPrivatePlacement;
+
+impl ContextPlacementPolicy for CheapestPrivatePlacement {
+    fn cold_tier(&self, current: &str, lifecycle: ContextLifecycle) -> &'static str {
+        match (current.starts_with("EVIDENCE"), lifecycle) {
+            (true, ContextLifecycle::Completed) => "EVIDENCE_ALTC",
+            (true, ContextLifecycle::Inactive) => "EVIDENCE_PLTC",
+            (false, ContextLifecycle::Completed) => "ALTC",
+            (false, ContextLifecycle::Inactive) => "PLTC",
+        }
+    }
+}
+
+fn move_to_cold(db: &Connection, run: Option<&str>, lifecycle: ContextLifecycle) -> Result<usize> {
+    let policy = CheapestPrivatePlacement;
+    let predicate = if run.is_some() { "WHERE run_id=?1" } else { "" };
+    let mut select = db.prepare(&format!(
+        "SELECT id,run_id,agent,tier,body,source,created FROM context {predicate}"
+    ))?;
+    let records: Vec<(String, String, String, String, String, String, i64)> = select
+        .query_map(rusqlite::params_from_iter(run), |row| {
+            Ok((
+                row.get(0)?,
+                row.get(1)?,
+                row.get(2)?,
+                row.get(3)?,
+                row.get(4)?,
+                row.get(5)?,
+                row.get(6)?,
+            ))
+        })?
+        .collect::<rusqlite::Result<_>>()?;
+    for (id, run_id, agent, tier, body, source, created) in &records {
+        db.execute(
+            "INSERT OR REPLACE INTO context_archive VALUES (?1,?2,?3,?4,?5,?6,?7)",
+            params![
+                id,
+                run_id,
+                agent,
+                policy.cold_tier(tier, lifecycle),
+                body,
+                source,
+                created
+            ],
+        )?;
+    }
+    if let Some(run) = run {
+        db.execute("DELETE FROM context WHERE run_id=?1", [run])?;
+    } else {
+        db.execute("DELETE FROM context", [])?;
+    }
+    Ok(records.len())
+}
+
+fn recall_from_cold(db: &Connection, run: &str) -> Result<usize> {
+    let mut stmt = db.prepare(
+        "SELECT id,run_id,agent,tier,body,source,created FROM context_archive WHERE run_id=?1",
+    )?;
+    let records: Vec<(String, String, String, String, String, String, i64)> = stmt
+        .query_map([run], |row| {
+            Ok((
+                row.get(0)?,
+                row.get(1)?,
+                row.get(2)?,
+                row.get(3)?,
+                row.get(4)?,
+                row.get(5)?,
+                row.get(6)?,
+            ))
+        })?
+        .collect::<rusqlite::Result<_>>()?;
+    for (id, run_id, agent, tier, body, source, created) in &records {
+        let active_tier = if tier.starts_with("EVIDENCE") {
+            "EVIDENCE"
+        } else {
+            "PSTC"
+        };
+        db.execute(
+            "INSERT OR REPLACE INTO context VALUES (?1,?2,?3,?4,?5,?6,?7)",
+            params![id, run_id, agent, active_tier, body, source, created],
+        )?;
+    }
+    db.execute("DELETE FROM context_archive WHERE run_id=?1", [run])?;
+    Ok(records.len())
 }
 
 pub fn operation(root: &Path, company: &str, owner: &str, input: &Value) -> Result<Value> {
@@ -169,6 +274,7 @@ pub fn operation(root: &Path, company: &str, owner: &str, input: &Value) -> Resu
             ] {
                 text(intake, field, 10000)?;
             }
+            crate::security::require_persistable(&serde_json::to_string(intake)?)?;
             if !intake["task_evidence"].is_null() {
                 let binding = &intake["task_evidence"];
                 if company != "we-need-gents-lc"
@@ -221,11 +327,7 @@ pub fn operation(root: &Path, company: &str, owner: &str, input: &Value) -> Resu
                 "INSERT OR IGNORE INTO operator_recalls VALUES (?1)",
                 [target],
             )?;
-            let changed = db.execute(
-                "UPDATE context SET tier='PSTC' WHERE run_id=?1 AND tier IN ('ALTC','PLTC')",
-                [target],
-            )?;
-            db.execute("UPDATE context SET tier='EVIDENCE' WHERE run_id=?1 AND tier IN ('EVIDENCE_ALTC','EVIDENCE_PLTC')",[target])?;
+            let changed = recall_from_cold(&db, target)?;
             audit(
                 &db,
                 run,
@@ -257,9 +359,10 @@ pub fn operation(root: &Path, company: &str, owner: &str, input: &Value) -> Resu
                 if accepted == 0 {
                     bail!("only an accepted job can enter ALTC");
                 }
-                tx.execute("UPDATE context SET tier=CASE WHEN tier='EVIDENCE' THEN 'EVIDENCE_ALTC' ELSE 'ALTC' END WHERE run_id=?1", [run])?;
+                move_to_cold(&tx, Some(run), ContextLifecycle::Completed)?;
             } else {
-                tx.execute("UPDATE context SET tier=CASE WHEN tier LIKE 'EVIDENCE%' THEN 'EVIDENCE_PLTC' ELSE 'PLTC' END", [])?;
+                tx.execute("UPDATE context_archive SET tier=CASE WHEN tier LIKE 'EVIDENCE%' THEN 'EVIDENCE_PLTC' ELSE 'PLTC' END", [])?;
+                move_to_cold(&tx, None, ContextLifecycle::Inactive)?;
                 tx.execute("UPDATE jobs SET state='inactive'", [])?;
                 tx.execute("DELETE FROM operator_recalls", [])?;
             }
@@ -290,7 +393,16 @@ pub fn operation(root: &Path, company: &str, owner: &str, input: &Value) -> Resu
         "dream" => {
             let tx = db.transaction()?;
             // Deterministic housekeeping only. A model cannot promote executable capabilities.
-            tx.execute("UPDATE context SET tier='ALTC' WHERE tier='PSTC' AND run_id IN (SELECT run_id FROM jobs WHERE state='completed')",[])?;
+            let completed_runs: Vec<String> = {
+                let mut stmt=tx.prepare("SELECT DISTINCT c.run_id FROM context c JOIN jobs j ON c.run_id=j.run_id WHERE j.state='completed'")?;
+                let rows = stmt
+                    .query_map([], |row| row.get(0))?
+                    .collect::<rusqlite::Result<_>>()?;
+                rows
+            };
+            for completed in completed_runs {
+                move_to_cold(&tx, Some(&completed), ContextLifecycle::Completed)?;
+            }
             let proposals=tx.execute("INSERT OR IGNORE INTO training_proposals(id,run_id,agent,body) SELECT id,run_id,agent,body FROM context WHERE source='model_output' AND run_id IN (SELECT run_id FROM jobs WHERE state='completed')",[])?;
             audit(
                 &tx,
@@ -508,7 +620,7 @@ fn status(db: &Connection, company: &str) -> Result<Value> {
     let mut stmt =
         db.prepare("SELECT run_id,intake,digest,approval,state FROM jobs ORDER BY rowid DESC")?;
     let jobs:Vec<Value>=stmt.query_map([],|r|Ok(json!({"run_id":r.get::<_,String>(0)?,"intake":serde_json::from_str::<Value>(&r.get::<_,String>(1)?).unwrap_or(Value::Null),"digest":r.get::<_,String>(2)?,"approval":r.get::<_,Option<String>>(3)?,"state":r.get::<_,String>(4)?})))?.collect::<rusqlite::Result<_>>()?;
-    let mut stmt = db.prepare("SELECT tier,COUNT(*) FROM context GROUP BY tier")?;
+    let mut stmt = db.prepare("SELECT tier,COUNT(*) FROM (SELECT tier FROM context UNION ALL SELECT tier FROM context_archive) GROUP BY tier")?;
     let tiers: Vec<Value> = stmt
         .query_map([], |r| {
             Ok(json!({"tier":r.get::<_,String>(0)?,"records":r.get::<_,i64>(1)?}))
@@ -693,11 +805,24 @@ pub fn directive(root: &Path, company: &str, owner: &str, run: Uuid, agent: &str
         )
         .ok();
     if let Some((id, body)) = latest {
+        // The frozen task already travels in the model envelope. Do not repeat
+        // it inside every directive and consume the model's evidence budget.
+        let brief = body
+            .split_once("\n\nCEO brief:\n")
+            .map(|(_, brief)| {
+                brief
+                    .split_once("\n\nThis brief cannot change")
+                    .map(|(text, _)| text)
+                    .unwrap_or(brief)
+            })
+            .unwrap_or(&body);
         let new_ack = db.execute(
             "INSERT OR IGNORE INTO meeting_acks VALUES (?1,?2)",
             params![id, agent],
         )? != 0;
-        return Ok(json!({"meeting_id":id,"brief":body,"acknowledged_by":agent,"new_ack":new_ack}));
+        return Ok(
+            json!({"meeting_id":id,"brief":brief,"scope":"advisory execution guidance within the frozen task; no new authority","acknowledged_by":agent,"new_ack":new_ack}),
+        );
     }
     Ok(Value::Null)
 }
@@ -729,6 +854,58 @@ pub fn admit(root: &Path, company: &str, owner: &str, run: Uuid, task: &str) -> 
     )?;
     tx.commit()?;
     Ok(())
+}
+
+/// Explicit owner-authorized continuation of the same frozen contract. Pending
+/// effects remain in the autonomy checkpoint and are never replayed here.
+pub fn resume(
+    root: &Path,
+    company: &str,
+    owner: &str,
+    run: Uuid,
+    task: &str,
+) -> Result<Vec<String>> {
+    let mut db = connect(root, company, owner, false)?;
+    let tx = db.transaction()?;
+    let (intake, digest, approval, state): (String, String, Option<String>, String) = tx
+        .query_row(
+            "SELECT intake,digest,approval,state FROM jobs WHERE run_id=?1",
+            [run.to_string()],
+            |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)),
+        )?;
+    if !["cancelled", "failed", "interrupted"].contains(&state.as_str()) {
+        bail!("only a stopped existing job may be resumed");
+    }
+    let frozen: Value = serde_json::from_str(&intake)?;
+    let approval: Value = serde_json::from_str(&approval.context("original approval missing")?)?;
+    if frozen["idea"] != task
+        || format!("{:x}", Sha256::digest(intake.as_bytes())) != digest
+        || approval["sha256"] != digest
+        || approval["owner"] != owner
+    {
+        bail!("resume requires the unchanged originally approved contract and its owner");
+    }
+    if !frozen["task_evidence"].is_null() {
+        audit_artifacts(root, company, run, &frozen["task_evidence"])?;
+    }
+    let criteria = frozen["acceptance"]
+        .as_str()
+        .unwrap_or("")
+        .lines()
+        .map(str::to_owned)
+        .collect();
+    tx.execute(
+        "UPDATE jobs SET state='running' WHERE run_id=?1",
+        [run.to_string()],
+    )?;
+    audit(
+        &tx,
+        &run.to_string(),
+        "job_resumed",
+        json!({"company_id":company,"original_contract_sha256":digest,"checkpoint_retained":true}),
+    )?;
+    tx.commit()?;
+    Ok(criteria)
 }
 
 /// Verify operator tool attestations against the actual frozen files, not an LLM verdict.
@@ -831,6 +1008,7 @@ pub fn retrieve(
     query: &str,
 ) -> Result<Value> {
     let db = connect(root, company, owner, false)?;
+    let browse_company_reference = query.trim().is_empty();
     let terms: std::collections::BTreeSet<_> = query
         .split(|c: char| !c.is_ascii_alphanumeric())
         .filter(|s| s.len() > 3 && s.len() < 40)
@@ -847,8 +1025,8 @@ pub fn retrieve(
         let mut stmt=db.prepare("SELECT c.id,c.body,c.source,c.tier FROM knowledge JOIN context c ON knowledge.id=c.id WHERE knowledge MATCH ?3 AND ((c.tier='ASTC' AND c.run_id=?1 AND c.agent=?2) OR (c.tier='PSTC' AND (c.run_id=?1 OR c.run_id='onboarding' OR c.run_id IN (SELECT run_id FROM operator_recalls))) OR (c.tier='EVIDENCE' AND c.run_id=?1)) ORDER BY bm25(knowledge) LIMIT 10")?;
         ranked=stmt.query_map(params![run.to_string(),agent,query],|r|Ok(json!({"id":r.get::<_,String>(0)?,"text":r.get::<_,String>(1)?,"source":r.get::<_,String>(2)?,"tier":r.get::<_,String>(3)?})))?.collect::<rusqlite::Result<_>>()?;
     }
-    let mut stmt=db.prepare("SELECT id,body,source,tier FROM context WHERE (tier='ASTC' AND run_id=?1 AND agent=?2) OR (tier='PSTC' AND (run_id=?1 OR run_id='onboarding' OR run_id IN (SELECT run_id FROM operator_recalls))) OR (tier='EVIDENCE' AND run_id=?1) ORDER BY created DESC LIMIT 16")?;
-    let rows:Vec<Value>=stmt.query_map(params![run.to_string(),agent],|r|Ok(json!({"id":r.get::<_,String>(0)?,"text":r.get::<_,String>(1)?,"source":r.get::<_,String>(2)?,"tier":r.get::<_,String>(3)?})))?.collect::<rusqlite::Result<_>>()?;
+    let mut stmt=db.prepare("SELECT id,body,source,tier FROM context WHERE (tier='ASTC' AND run_id=?1 AND agent=?2) OR (tier='PSTC' AND (run_id=?1 OR (run_id='onboarding' AND ?3) OR run_id IN (SELECT run_id FROM operator_recalls))) OR (tier='EVIDENCE' AND run_id=?1) ORDER BY created DESC LIMIT 16")?;
+    let rows:Vec<Value>=stmt.query_map(params![run.to_string(),agent,browse_company_reference],|r|Ok(json!({"id":r.get::<_,String>(0)?,"text":r.get::<_,String>(1)?,"source":r.get::<_,String>(2)?,"tier":r.get::<_,String>(3)?})))?.collect::<rusqlite::Result<_>>()?;
     let mut seen = std::collections::HashSet::new();
     let rows = ranked
         .into_iter()
@@ -907,13 +1085,14 @@ pub fn outcome(root: &Path, company: &str, owner: &str, run: Uuid, state: &str) 
         "UPDATE jobs SET state=?2 WHERE run_id=?1",
         params![run.to_string(), state],
     )?;
-    tx.execute(
-        "UPDATE context SET tier=CASE WHEN tier='EVIDENCE' THEN CASE WHEN ?2='ALTC' THEN 'EVIDENCE_ALTC' ELSE 'EVIDENCE' END ELSE ?2 END WHERE run_id=?1",
-        params![
-            run.to_string(),
-            if state == "completed" { "ALTC" } else { "PSTC" }
-        ],
-    )?;
+    if state == "completed" {
+        move_to_cold(&tx, Some(&run.to_string()), ContextLifecycle::Completed)?;
+    } else {
+        tx.execute(
+            "UPDATE context SET tier=CASE WHEN tier LIKE 'EVIDENCE%' THEN 'EVIDENCE' ELSE 'PSTC' END WHERE run_id=?1",
+            [run.to_string()],
+        )?;
+    }
     let intake: Option<String> = tx
         .query_row(
             "SELECT intake FROM jobs WHERE run_id=?1",
@@ -1213,7 +1392,7 @@ mod tests {
                 .unwrap()
                 .to_string();
             assert!(!context.contains("Old contractor"));
-            assert!(context.contains("Company reference"));
+            assert_eq!(context.contains("Company reference"), query.is_empty());
         }
         assert!(
             retrieve(&root, "one", "alice", old, "Engineer Gent", "contractor")
@@ -1264,6 +1443,48 @@ mod tests {
         std::fs::remove_dir_all(root).unwrap();
     }
     #[test]
+    fn resume_retains_the_original_approved_contract_and_rejects_changes() {
+        let root = std::env::temp_dir().join(format!("gents-resume-{}", Uuid::new_v4()));
+        std::fs::create_dir_all(&root).unwrap();
+        operation(
+            &root,
+            "one",
+            "alice",
+            &json!({"op":"register","name":"One"}),
+        )
+        .unwrap();
+        let run = Uuid::new_v4();
+        operation(&root,"one","alice",&json!({"op":"intake","run_id":run,"intake":{"idea":"Original task","acceptance":"Evidence required","exclusions":"paid services","timeline":"unknown","company_signer":"A","provider_signer":"B","budget_usd":0}})).unwrap();
+        outcome(&root, "one", "alice", run, "cancelled").unwrap();
+        assert!(resume(&root, "one", "alice", run, "Original task").is_err());
+        outcome(&root, "one", "alice", run, "draft").unwrap();
+        let digest = operation(&root, "one", "alice", &json!({"op":"status"})).unwrap()["jobs"][0]
+            ["digest"]
+            .clone();
+        operation(
+            &root,
+            "one",
+            "alice",
+            &json!({"op":"approve","run_id":run,"digest":digest}),
+        )
+        .unwrap();
+        admit(&root, "one", "alice", run, "Original task").unwrap();
+        outcome(&root, "one", "alice", run, "cancelled").unwrap();
+        assert!(resume(&root, "one", "bob", run, "Original task").is_err());
+        assert!(resume(&root, "one", "alice", run, "A different task").is_err());
+        assert_eq!(
+            resume(&root, "one", "alice", run, "Original task").unwrap(),
+            vec!["Evidence required"]
+        );
+        assert!(resume(&root, "one", "alice", run, "Original task").is_err());
+        outcome(&root, "one", "alice", run, "failed").unwrap();
+        let db = connect(&root, "one", "alice", false).unwrap();
+        db.execute("UPDATE jobs SET intake=replace(intake,'Evidence required','Different acceptance') WHERE run_id=?1",[run.to_string()]).unwrap();
+        drop(db);
+        assert!(resume(&root, "one", "alice", run, "Original task").is_err());
+        std::fs::remove_dir_all(root).unwrap();
+    }
+    #[test]
     fn tenant_owner_path_and_lifecycle() {
         let root = std::env::temp_dir().join(format!("gents-test-{}", Uuid::new_v4()));
         std::fs::create_dir_all(&root).unwrap();
@@ -1294,6 +1515,37 @@ mod tests {
             .contains("tenant-one-secret"));
         outcome(&root, "one", "alice", run, "completed").unwrap();
         assert!(!context(&root, "one", "alice", run, "recipient")
+            .unwrap()
+            .to_string()
+            .contains("tenant-one-secret"));
+        let state = operation(&root, "one", "alice", &json!({"op":"status"})).unwrap();
+        assert!(state["tiers"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|tier| tier["tier"] == "ALTC" && tier["records"] == 1));
+        let db = connect(&root, "one", "alice", false).unwrap();
+        assert_eq!(
+            db.query_row("SELECT COUNT(*) FROM context", [], |row| row
+                .get::<_, i64>(0))
+                .unwrap(),
+            0
+        );
+        assert_eq!(
+            db.query_row("SELECT COUNT(*) FROM context_archive", [], |row| row
+                .get::<_, i64>(0))
+                .unwrap(),
+            1
+        );
+        drop(db);
+        operation(
+            &root,
+            "one",
+            "alice",
+            &json!({"op":"recall","target_run_id":run}),
+        )
+        .unwrap();
+        assert!(context(&root, "one", "alice", run, "recipient")
             .unwrap()
             .to_string()
             .contains("tenant-one-secret"));

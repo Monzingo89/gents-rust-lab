@@ -56,7 +56,7 @@ try{
   if(!opened){openOffice();opened=true;}
   console.log('\nThe Gents office is ready at '+office+'.');
   console.log('Keep this terminal open and the Mac connected to power.');
-  console.log('Ask For a Task in the browser. Questions turn the company light yellow.');
+  console.log('Ask For a Task in the browser. Stalled work calls the Codex red phone for guidance.');
   console.log('Browser restarts reload .env.local and .env.company and recover saved work. Ctrl-C stops the office.\n');
   const result=await exited;
   if(inbox&&!inbox.killed)inbox.kill('SIGTERM');inbox=null;

@@ -29,6 +29,18 @@
       "review_status": "candidate_requires_hr_law_and_owner_approval"
     },
     {
+      "key": "phi-1-mlx-4bit",
+      "display": "Phi-1 MLX 4-bit",
+      "repository": "microsoft/phi-1",
+      "revision": "d4c0adcb065e84e00ca814e35cba3012ea9841ab",
+      "path": "models/phi-1-mlx-4bit",
+      "license": "MIT",
+      "quantization": "MLX affine 4-bit",
+      "purpose": "Fast worker-only completion of small, well-specified coding tasks with deterministic tests",
+      "limitations": "Base code model; never use for planning, judging, security review, ambiguous changes, or unverified delivery",
+      "review_status": "downloaded_checksum_verified_chat_smoke_passed_candidate"
+    },
+    {
       "key": "qwen3-coder-30b-a3b",
       "display": "Qwen3-Coder-30B-A3B-Instruct",
       "repository": "unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF",

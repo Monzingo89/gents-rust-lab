@@ -26,6 +26,8 @@ Setup creates ignored `.venv-inference` with pinned MLX LM. Your existing `uv`, 
 
 A GGUF model slot uses `{"provider":"local","model":"Phi-4","path":"models/phi-4/phi-4-Q4_K.gguf"}`. To try your Gemma Safetensors download, change a slot in `config/company.local.json` to `{"provider":"mlx","model":"Gemma-4-E4B-it","path":"models/gemma-4-E4B-it"}` and restart. MLX needs the complete directory with weights, config, tokenizer and chat template. The extension alone does not establish model compatibility. MLX LM uses Gemma's text component. Vision/audio are separate capabilities.
 
+Phi-1 is pinned from `microsoft/phi-1` revision `d4c0adcb065e84e00ca814e35cba3012ea9841ab`. The verified source checkpoint is stored in ignored `models/phi-1-safetensors`; the runnable 4-bit MLX conversion is `models/phi-1-mlx-4bit` and can be selected with `{"provider":"mlx","model":"Phi-1 MLX 4-bit","path":"models/phi-1-mlx-4bit"}`. It is a base code model intended only for small worker completions followed by deterministic tests, not planning, judging, security review, or complex delivery.
+
 The Qwen VL GGUF projector is paired automatically, but the current company API submits text only. Screenshot input still needs implementation. Keep the smaller GGUF models as default routing/PM roles, rather than loading the roughly 16 GB Gemma file for every small request.
 
 ## 2. Start server and office
@@ -108,7 +110,11 @@ Click **Connect** in the office, enter the company ID and select **Watch company
 | ALTC | Completed job for an ongoing customer | Excluded from ordinary prompts until recall |
 | PLTC | Inactive customer's archive | Excluded from working prompts and backend caches |
 
-The next role's admission acknowledges a durable handoff and transactionally promotes prior-role ASTC to PSTC. Canonical documents never move into cache or get deleted. Completed text jobs move their run context to ALTC; incomplete work stays PSTC. Onboarding remains PSTC while the company is active.
+The next role's admission acknowledges a durable handoff and transactionally promotes prior-role ASTC to PSTC. Canonical documents never move into cache or get deleted. Completed text jobs move their run context to ALTC in a private non-indexed SQLite archive; inactive company context moves to PLTC there. Incomplete work stays in searchable PSTC. Explicit recall restores only the selected run to searchable PSTC/EVIDENCE. Onboarding remains PSTC while the company is active.
+
+Approved shared skills are loaded through a phase-scoped skill repository. Planner/onboarding calls receive only skills cataloged for `planner`; worker/judge/tool calls receive only `worker` skills. Skills remain procedural context and cannot grant tools, change policy, or expand the approved task.
+
+Safe unattended operation resolves discoverable integration, schedule, resource, and installed-model questions through read-only tools and bounded local recovery. When ordinary replanning is exhausted, the Executive Gent selects a materially different catalog action from verified evidence and sends that exact proposal through the Admin Judge; invalid proposals and model-load failures retain the checkpoint, rotate installed models, and retry without opening a yellow panel. Missing business intent, destructive actions, uncertain interrupted side effects, and external authorization that cannot be inspected still require the operator; the company never fabricates an answer to remain unattended.
 
 For follow-up work, use `python3 scripts/gents.py recall OLD_RUN_ID`, then create a new approved intake. When a customer becomes inactive, stop active jobs and use `python3 scripts/gents.py archive`. This moves context to PLTC and clears the owned backend cache without deleting history. Returning customers need recall or re-onboarding.
 

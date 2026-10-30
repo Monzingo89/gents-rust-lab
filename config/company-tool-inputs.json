@@ -1,0 +1,23 @@
+{
+  "resources": {"type":"object","properties":{},"required":[],"additionalProperties":false},
+  "image_review": {"type":"object","properties":{"paths":{"type":"array","minItems":1,"maxItems":2,"items":{"type":"string","minLength":1,"maxLength":2000}},"question":{"type":"string","minLength":1,"maxLength":2000},"max_tokens":{"type":"integer","minimum":64,"maximum":1024}},"required":["paths","question"],"additionalProperties":false},
+  "skill_list": {"type":"object","properties":{},"required":[],"additionalProperties":false},
+  "web_search": {"type":"object","properties":{"query":{"type":"string","minLength":1,"maxLength":500}},"required":["query"],"additionalProperties":false},
+  "web_read": {"type":"object","properties":{"url":{"type":"string","minLength":8,"maxLength":4000}},"required":["url"],"additionalProperties":false},
+  "files": {"oneOf":[
+    {"type":"object","properties":{"op":{"const":"list"},"path":{"type":"string","maxLength":2000}},"required":["op","path"],"additionalProperties":false},
+    {"type":"object","properties":{"op":{"const":"read"},"path":{"type":"string","minLength":1,"maxLength":2000}},"required":["op","path"],"additionalProperties":false},
+    {"type":"object","properties":{"op":{"const":"write"},"path":{"type":"string","minLength":1,"maxLength":2000},"content":{"type":"string","maxLength":1000000}},"required":["op","path","content"],"additionalProperties":false}
+  ]},
+  "shell": {"type":"object","properties":{"command":{"type":"string","minLength":1,"maxLength":100000},"timeout_seconds":{"type":"integer","minimum":1,"maximum":3600}},"required":["command"],"additionalProperties":false},
+  "pdf_inspect": {"type":"object","properties":{"path":{"type":"string","minLength":1,"maxLength":2000},"page_start":{"type":"integer","minimum":1},"page_count":{"type":"integer","minimum":1,"maximum":8}},"required":["path"],"additionalProperties":false},
+  "journal_read": {"type":"object","properties":{"step":{"type":"integer","minimum":0,"maximum":100000}},"required":["step"],"additionalProperties":false},
+  "hf_dataset_search": {"type":"object","properties":{"query":{"type":"string","minLength":1,"maxLength":200}},"required":["query"],"additionalProperties":false},
+  "hf_dataset_inspect": {"type":"object","properties":{"repo":{"type":"string","minLength":3,"maxLength":200},"revision":{"type":"string","minLength":1,"maxLength":200}},"required":["repo"],"additionalProperties":false},
+  "hf_dataset_files": {"type":"object","properties":{"repo":{"type":"string","minLength":3,"maxLength":200},"revision":{"type":"string","minLength":40,"maxLength":40},"query":{"type":"string","maxLength":200},"offset":{"type":"integer","minimum":0},"limit":{"type":"integer","minimum":1,"maximum":20}},"required":["repo","revision"],"additionalProperties":false},
+  "hf_dataset_download": {"type":"object","properties":{"repo":{"type":"string","minLength":3,"maxLength":200},"revision":{"type":"string","minLength":40,"maxLength":40},"files":{"type":"array","minItems":1,"maxItems":200,"items":{"type":"string","minLength":1,"maxLength":2000}},"destination":{"type":"string","minLength":1,"maxLength":2000}},"required":["repo","revision","files"],"additionalProperties":false},
+  "source_read": {"type":"object","properties":{"path":{"type":"string","minLength":1,"maxLength":2000}},"required":["path"],"additionalProperties":false},
+  "source_patch": {"type":"object","properties":{"path":{"type":"string","minLength":1,"maxLength":2000},"expected_sha256":{"type":"string","minLength":64,"maxLength":64},"content":{"type":"string","maxLength":1000000}},"required":["path","expected_sha256","content"],"additionalProperties":false},
+  "ask_user": {"type":"object","properties":{"question":{"type":"string","minLength":1,"maxLength":8000}},"required":["question"],"additionalProperties":false},
+  "harness_restart": {"type":"object","properties":{"reason":{"type":"string","minLength":1,"maxLength":2000}},"required":["reason"],"additionalProperties":false}
+}

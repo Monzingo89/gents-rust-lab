@@ -2,9 +2,11 @@
 use crate::{company, emit, model_call, provider::Model, Shared};
 use anyhow::{Context, Result};
 use serde_json::{json, Value};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 use std::sync::{atomic::AtomicBool, Arc};
 use uuid::Uuid;
+
+const REVIEW_CADENCE: std::time::Duration = std::time::Duration::from_secs(3 * 60 * 60);
 
 pub fn risk(state: &Value, run: Uuid, now: u64, last_progress: u64) -> Value {
     let blocked: Vec<_> = state["milestones"]
@@ -39,8 +41,10 @@ pub fn risk(state: &Value, run: Uuid, now: u64, last_progress: u64) -> Value {
 }
 
 pub async fn monitor(app: Shared) {
-    let mut timer = tokio::time::interval(std::time::Duration::from_secs(30));
-    let mut reviewed: HashMap<Uuid, (usize, u64, bool)> = HashMap::new();
+    // The first review is three hours after startup. The worker and tool events
+    // continue normally between reviews without polling or cloud usage.
+    let mut timer =
+        tokio::time::interval_at(tokio::time::Instant::now() + REVIEW_CADENCE, REVIEW_CADENCE);
     let pending = Arc::new(tokio::sync::Mutex::new(HashSet::new()));
     loop {
         timer.tick().await;
@@ -56,23 +60,12 @@ pub async fn monitor(app: Shared) {
                         r.owner.clone(),
                         r.task.clone(),
                         progress.map(|e| e.timestamp_ms).unwrap_or(r.created_at_ms),
-                        r.events
-                            .iter()
-                            .filter(|e| {
-                                e.agent != "CEO"
-                                    && ["agent_completed", "completion_review", "plan_accepted"]
-                                        .contains(&e.kind.as_str())
-                            })
-                            .count(),
                         r.cancel.clone(),
                     )
                 })
                 .collect()
         };
-        reviewed.retain(|id, _| jobs.iter().any(|j| j.0 == *id));
-        for (id, company, owner, task, last, stages, cancel) in jobs {
-            let now = crate::now_ms();
-            let old = reviewed.get(&id).copied().unwrap_or((0, 0, false));
+        for (id, company, owner, task, last, cancel) in jobs {
             let Ok(root) = std::env::current_dir() else {
                 continue;
             };
@@ -84,29 +77,9 @@ pub async fn monitor(app: Shared) {
             if snapshot["waiting_for_operator"] == true || snapshot["pending_tool"] == true {
                 continue;
             }
-            let Ok(state) = company::operation(&root, &company, &owner, &json!({"op":"status"}))
-            else {
-                continue;
-            };
-            let observed = risk(&state, id, now, last);
-            let alert = observed["blocked_milestones"]
-                .as_array()
-                .is_some_and(|m| !m.is_empty())
-                || observed["deadline_missed"] == true
-                || observed["stalled"] == true
-                || observed["overdue_milestones"]
-                    .as_array()
-                    .is_some_and(|m| !m.is_empty());
-            if stages == old.0
-                && ((!alert && now.saturating_sub(last) < 300_000)
-                    || (alert == old.2 && now.saturating_sub(old.1) < 300_000))
-            {
-                continue;
-            }
             if !pending.lock().await.insert(id) {
                 continue;
             }
-            reviewed.insert(id, (stages, now, alert));
             let (app, pending) = (app.clone(), pending.clone());
             tokio::spawn(async move {
                 if let Err(error) = review(&app, id, &company, &owner, &task, last, &cancel).await {
@@ -155,16 +128,16 @@ async fn review(
         .config
         .agents
         .iter()
-        .find(|a| a.id == "CTO")
+        .find(|a| a.id == "Engineer Gent")
         .or_else(|| app.config.agents.first())
         .context("CEO requires local model")?
-        .planner
+        .worker
         .clone();
     let snapshot = crate::autonomy::work_snapshot(&root, company_id, id)?;
     if snapshot["waiting_for_operator"] == true || snapshot["pending_tool"] == true {
         return Ok(());
     }
-    let reply=model_call(app,id,("CEO","oversight"),&model,("COMPANY_CEO: Return bare JSON {all_hands:boolean,next_actions:[string]}. Suggest concrete FUTURE corrective actions from the actual tool-result index. Do not summarize accomplishments or claim anything prepared, sent, queued, delivered or completed. A schedule is NOT evidence of a report or email. Model outputs/plans are not executed actions. Unknown deadlines remain unknown. Call all hands only for observed missed deadlines, stalled work or documented blockers. Do not change scope, approve work/tools, spend money, override isolation or expose private chain-of-thought.",&json!({"approved_task":task,"risk":risk,"verified_progress":snapshot["progress"]}).to_string()),cancel).await?;
+    let reply=model_call(app,id,("Local Executive","oversight"),&model,("COMPANY_CEO: This is the three-hour checkpoint. Return bare JSON {all_hands:boolean,next_actions:[string]}. Diagnose only observed blockers and propose a concise FUTURE repair plan for the local worker to implement. Do not supply task-domain answers, claim execution, change scope, approve tools, spend money, or expose private reasoning. Call all hands only when the evidence shows a real issue; otherwise return no actions.",&json!({"approved_task":task,"risk":risk,"verified_progress":snapshot["progress"],"implementation_owner":"strongest installed local worker"}).to_string()),cancel).await?;
     let raw: Value = serde_json::from_str(&reply.text)?;
     let decision = evidence_review(&snapshot["progress"], &raw);
     emit(
@@ -187,7 +160,8 @@ async fn review(
             .is_some_and(|m| !m.is_empty());
     let recent_meeting = state["meetings"].as_array().into_iter().flatten().any(|m| {
         m["run_id"] == id.to_string()
-            && crate::now_ms().saturating_sub(m["created_at_ms"].as_u64().unwrap_or(0)) < 900_000
+            && crate::now_ms().saturating_sub(m["created_at_ms"].as_u64().unwrap_or(0))
+                < REVIEW_CADENCE.as_millis() as u64
     });
     if decision["all_hands"] == true && observed && !recent_meeting {
         let brief = decision["summary"].as_str().context("CEO status missing")?;
@@ -217,6 +191,10 @@ fn evidence_review(progress: &Value, raw: &Value) -> Value {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn review_cadence_is_three_hours() {
+        assert_eq!(REVIEW_CADENCE.as_secs(), 10_800);
+    }
     #[test]
     fn ceo_status_does_not_publish_model_completion_claims_as_evidence() {
         let review = evidence_review(

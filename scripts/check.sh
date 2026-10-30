@@ -13,6 +13,8 @@ python3 scripts/task_evidence_smoke.py
 python3 -m unittest discover -s scripts -p 'test_training.py'
 python3 -m unittest discover -s scripts -p 'test_gents.py'
 python3 -m unittest discover -s scripts -p 'test_company_tools.py'
+python3 -m unittest discover -s scripts -p 'test_pdf_tools.py'
+python3 -m unittest discover -s scripts -p 'test_vision_tools.py'
 python3 -m unittest discover -s scripts -p 'test_company_schedule.py'
 python3 -m unittest discover -s scripts -p 'test_task_evidence.py'
 node --test scripts/company-env.test.mjs

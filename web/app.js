@@ -22,8 +22,8 @@ function assignCrewLooks(){crewLooks=uniqueCrewLooks(sprites,avatarChoices);}
 // A phone's localhost is the phone, not the laptop. Always use this page's origin.
 let base=['http:','https:'].includes(location.protocol)?location.origin:'http://127.0.0.1:8788';
 $('base').value=base;
-let config=null,runId=null,events=[],seen=0,poll=null,token='',sprites=[],working=false,pending=null,runStarted=0,runHistory=[],activeGent=null,hoverGent=null,drawerPinned=false;
-let companyId='we-need-gents-lc',companyState=null,attention=null,attentionRun=null,backendOnline=false,followCompany=true,mobileAccessMode=false;
+let config=null,runId=null,events=[],observability=null,seen=0,poll=null,token='',sprites=[],working=false,pending=null,runStarted=0,runHistory=[],activeGent=null,hoverGent=null,drawerPinned=false;
+let companyId='we-need-gents-lc',companyState=null,attention=null,attentionRun=null,backendOnline=false,followCompany=true,mobileAccessMode=false,conferenceUntil=0;
 const lines=id=>$(id).value.split('\n').map(x=>x.trim()).filter(Boolean);
 const runKey=()=>`gents-run:${base}:${companyId}`;
 const rooms={planning:[3,3],library:[7.5,3],training:[10.4,3],meeting:[3,8.5],workshop:[3,9],review:[9,9],sleep:[6,6],done:[6,6],routing:[5,2],judging:[10,9],operations:[6,6]};
@@ -36,7 +36,7 @@ document.querySelector('.floor-kicker').textContent='THE GENTS / VERTICAL CAMPUS
 document.querySelector('.office-title h2').textContent='A higher standard of work.';
 document.querySelector('.floor-chip').hidden=true;
 document.querySelector('.rotate-hint').textContent='SELECT A WINDOW BAND TO ENTER A FLOOR';
-canvas.setAttribute('aria-label','Glass-windowed Gents skyscraper. Select a floor to enter an elevated angled view of distinct luxury rooms with large animated sprites.');
+canvas.setAttribute('aria-label','Open-front eleven-floor Gents tower with distinct lobby, laboratory, conference, recharge, operations, engineering, libraries, CFO, CEO, and Codex rooms.');
 const floorControl=document.createElement('nav');floorControl.className='tower-floor-controls';floorControl.setAttribute('aria-label','Skyscraper floors');
 for(const [value,label]of [['all','← Building exterior'],...towerFloors.map(f=>[String(f.id),`${String(f.id).padStart(2,'0')} ${f.name}`])]){
  const button=document.createElement('button');button.type='button';button.textContent=label;button.dataset.floor=value;button.setAttribute('aria-pressed',String(value==='all'));
@@ -48,12 +48,13 @@ const walkingControls=document.createElement('div');walkingControls.className='w
 function selectTowerFloor(value){
  towerFilter=String(value);walkingPreview=false;clearHover();
  floorControl.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.floor===towerFilter)));
- $('preview-walking').disabled=!(Number(value)>=3);$('preview-walking').setAttribute('aria-pressed','false');$('walking-preview-warning').hidden=true;
- $('walking-note').textContent=value==='all'?'Select a window band or floor to enter the building.':Number(value)>=3?'Elevated angled view · distinct luxury rooms. Working Gents walk; preview is visual only.':'Elevated angled view · matching individual recharge pods.';
+ const canPreview=!['all','1','4'].includes(String(value));$('preview-walking').disabled=!canPreview;$('preview-walking').setAttribute('aria-pressed','false');$('walking-preview-warning').hidden=true;
+ $('walking-note').textContent=value==='all'?'Select a window band or floor to enter the building.':String(value)==='4'?'Deep recharge gallery · every sleeping Gent has a visible pod.':String(value)==='1'?'Grand hotel lobby · Peacock Reception is always staffed.':'Deep purpose-built floor · active Gents are shown in their assigned room.';
  const zoom=value!=='all'&&matchMedia('(max-width:760px)').matches?200:100;
  $('office-zoom').value=String(zoom);$('office-zoom-value').textContent=`${zoom}%`;canvas.style.width=`${zoom}%`;
  canvas.parentElement.scrollLeft=0;document.querySelector('.rotate-hint').textContent=value==='all'?'SELECT A WINDOW BAND TO ENTER A FLOOR':'SELECT A GENT / POD TO INSPECT';
  if(value!=='all')canvas.parentElement.scrollIntoView({behavior:motionPreference.matches?'instant':'smooth',block:'start'});
+ observabilityFloor.hidden=value!=='10';
 }
 $('preview-walking').onclick=()=>{walkingPreview=!walkingPreview;$('preview-walking').setAttribute('aria-pressed',String(walkingPreview));$('walking-preview-warning').hidden=!walkingPreview;clearHover();};
 const crewManifest=document.createElement('details');crewManifest.className='crew-manifest';crewManifest.innerHTML='<summary>Crew manifest · select a Gent</summary><div class="crew-manifest-list"></div>';canvas.parentElement.after(crewManifest);
@@ -73,6 +74,19 @@ zoomControl.innerHTML='Scene scale <input id="office-zoom" type="range" min="100
 canvas.parentElement.before(zoomControl);
 const mobileMission=document.createElement('details');mobileMission.className='mobile-mission';mobileMission.innerHTML='<summary>Current mission</summary><p id="mobile-task-text">No active job</p>';
 zoomControl.before(mobileMission);
+const observabilityFloor=document.createElement('section');observabilityFloor.className='observability-floor';observabilityFloor.hidden=true;observabilityFloor.innerHTML='<div class="observability-heading"><div><small>FLOOR 10 / CEO ENTERPRISE ASSURANCE</small><h3>Observability, failures, compliance, bias & drift</h3></div><span id="assurance-state">Controls enforced · certification not asserted</span></div><div id="trace-summary" class="trace-summary"></div><div class="trace-columns"><section><h4>Model calls</h4><div id="trace-calls"></div></section><section><h4>Context handoffs</h4><div id="trace-handoffs"></div></section><section><h4>Issues → feedback</h4><div id="trace-issues"></div></section></div>';
+canvas.parentElement.after(observabilityFloor);
+const codexPhone=document.createElement('button');codexPhone.type='button';codexPhone.className='codex-phone';codexPhone.setAttribute('aria-label','Open the local executive escalation office');codexPhone.innerHTML='<span aria-hidden="true">☎</span><strong>LOCAL EXECUTIVE</strong><small>30B first · OpenAI last</small>';codexPhone.onclick=()=>{selectTowerFloor('11');if(attention)$('attention-panel').scrollIntoView({behavior:motionPreference.matches?'instant':'smooth',block:'start'});};canvas.parentElement.append(codexPhone);
+function renderObservability(){
+ const trace=observability;if(!trace){$('trace-summary').textContent='Select an active or saved run to inspect its harness trace.';for(const id of ['trace-calls','trace-handoffs','trace-issues'])$(id).textContent='No trace loaded.';return;}
+ const calls=trace.calls||[],handoffs=trace.context_handoffs||[],issues=trace.issues||[],feedback=trace.feedback_loops||[],classification=trace.assurance?.data_classification?.level||'standard';
+ $('trace-summary').innerHTML=`<article><small>CALLS</small><strong>${calls.length}</strong></article><article><small>HANDOFFS</small><strong>${handoffs.length}</strong></article><article><small>ISSUES</small><strong>${issues.length}</strong></article><article><small>REPAIR LOOPS</small><strong>${feedback.length}</strong></article><article><small>DATA</small><strong>${esc(classification)}</strong></article>`;
+ $('trace-calls').replaceChildren(...(calls.slice(-18).reverse().map(call=>{const row=document.createElement('p');row.dataset.state=call.state;row.textContent=`${call.agent} / ${call.role} · ${call.model||'system'} · ${call.state}${call.latency_ms!=null?` · ${call.latency_ms} ms`:''}`;return row;})));
+ $('trace-handoffs').replaceChildren(...(handoffs.slice(-18).reverse().map(event=>{const row=document.createElement('p');let detail={};try{detail=JSON.parse(event.message);}catch{}row.textContent=`#${event.seq} ${event.agent} · ${event.kind} · ${detail.records??detail.tier??'metadata only'}${detail.tiers?` · ${JSON.stringify(detail.tiers)}`:''}`;return row;})));
+ const combined=[...issues.map(event=>({event,type:'issue'})),...feedback.map(event=>({event,type:'feedback'}))].sort((a,b)=>(b.event.seq||0)-(a.event.seq||0));
+ $('trace-issues').replaceChildren(...(combined.slice(0,20).map(({event,type})=>{const row=document.createElement('p');row.dataset.state=type;row.textContent=`#${event.seq} ${type.toUpperCase()} · ${event.kind} · ${event.agent}`;return row;})));
+ for(const id of ['trace-calls','trace-handoffs','trace-issues'])if(!$(id).children.length)$(id).textContent='None recorded.';
+}
 ctx.imageSmoothingEnabled=true;
 function error(e){if(e?.name==='AbortError')return;$('error').textContent=e.message||String(e);}
 const pendingRequests=new Set();
@@ -237,7 +251,7 @@ function decorateRoster(){
 }
 $('close-gent').onclick=()=>{drawerPinned=false;activeGent=null;activeGentPhase=null;clearHover();$('gent-drawer').hidden=true;};
 function applyEvents(){for(const e of events.slice(seen)){if(e.kind==='round_started')$('judgement').textContent=e.message;if(e.kind==='completion_review'){const v=JSON.parse(e.message);$('judgement').textContent=`Compliance Security & QA: ${v.verdict} · ${v.summary}`;}if(e.kind==='workspace_ready'){try{$('artifact').textContent=`Artifact: ${JSON.parse(e.message).artifact}`;}catch{}}if(e.kind==='route_accepted'){const route=JSON.parse(e.message);const assigned=route.deployments||route.assignments||[];document.querySelectorAll('.badge').forEach(b=>{const d=assigned.find(x=>sameAgent(x.agent_id||x.agent,b.dataset.agent));b.textContent=d?`${gentName(d.agent_id||d.agent)} · assigned`:`${gentName(b.dataset.agent)} · open dossier`;b.style.opacity=d?'1':'.68';});for(const d of assigned){for(const sprite of sprites.filter(s=>sameAgent(s.id,d.agent_id||d.agent))){sprite.tx=3+sprite.index*.45+(sprite.role==='worker'?.25:-.25);sprite.ty=3+(sprite.role==='worker'?.38:-.3);}}}const together=['planner','onboarding'].includes(e.role),targets=e.role==='dreamer'||together?sprites.filter(s=>sameAgent(s.id,e.agent)):sprites.filter(s=>sameAgent(s.id,e.agent)&&s.role===e.role);for(const sprite of targets){const [x,y]=rooms[e.room]||rooms.done;sprite.tx=x+sprite.index*.38+(sprite.role==='worker'?.25:-.25);sprite.ty=y+(sprite.role==='worker'?.42:-.32);sprite.waiting=['call_started','loading','sleep_started'].includes(e.kind);}}seen=events.length;updateJobBoard();updateGentPanel();}
-async function tick(){try{const r=await api(`/api/runs/${runId}`);backendOnline=true;events=r.events;applyEvents();render();await refreshAttention();const elapsed=Math.max(0,Math.round((Date.now()-runStarted)/1000)),latest=events.at(-1);$('status').textContent=`Run ${r.status}${latest?` · ${latest.kind}`:''}`;$('run-info').textContent=`Run ${runId} · ${r.status} · ${elapsed}s${latest?.model?` · ${latest.agent}/${latest.role} · ${latest.model}`:''}`;if(r.status==='running')poll=setTimeout(tick,1500);else{finish();await refreshHistory();}updateSignal();}catch(e){if(e?.name==='AbortError')return;backendOnline=false;error(e);updateSignal();poll=setTimeout(tick,3000);}}
+async function tick(){try{const [r,trace]=await Promise.all([api(`/api/runs/${runId}`),api(`/api/runs/${runId}/observability`).catch(()=>observability)]);backendOnline=true;$('error').textContent='';events=r.events;observability=trace;applyEvents();render();renderObservability();await refreshAttention();const elapsed=Math.max(0,Math.round((Date.now()-runStarted)/1000)),latest=events.at(-1);$('status').textContent=`Run ${r.status}${latest?` · ${latest.kind}`:''}`;$('run-info').textContent=`Run ${runId} · ${r.status} · ${elapsed}s${latest?.model?` · ${latest.agent}/${latest.role} · ${latest.model}`:''}`;if(r.status==='running')poll=setTimeout(tick,1500);else{finish();await refreshHistory();}updateSignal();}catch(e){if(e?.name==='AbortError')return;backendOnline=false;error(e);updateSignal();poll=setTimeout(tick,3000);}}
 function finish(){working=false;clearTimeout(poll);$('run').disabled=false;$('cancel').disabled=true;}
 $('cancel').onclick=async()=>{try{await api(`/api/runs/${runId}/cancel`,{method:'POST'});$('status').textContent=config?.poc?'Cancel requested · owned local work will stop':'Cancel requested · active call may finish and be billed';}catch(e){if(e?.name==='AbortError')return;error(e);}};
 const n=x=>x===null||x===undefined?'unknown':x;
@@ -266,7 +280,7 @@ function renderLearning(){
  if(!sprites.some(s=>s.id==='CEO'))sprites.push({id:'CEO',role:'oversight',color:'#f0ca75',x:2,y:2,tx:2,ty:2,index:0,waiting:false,roamAt:Infinity});
  if(jobs.length&&!sprites.some(s=>s.id==='Training Gent'))sprites.push({id:'Training Gent',role:'training',color:'#c4b2ed',x:10.3,y:3.1,tx:10.3,ty:3.1,index:1,waiting:false,roamAt:Infinity});
  const trainee=sprites.find(s=>s.id==='Training Gent');if(trainee){trainee.waiting=jobs.some(j=>j.state==='queued'&&j.progress?.phase&&j.progress.phase!=='candidate');trainee.tx=10.3;trainee.ty=3.1;}
- if(meeting&&meeting.id!==lastMeeting){lastMeeting=meeting.id;for(const [i,s] of sprites.filter(s=>s.role!=='training').entries()){s.tx=1.7+(i%5)*.55;s.ty=8.5+Math.floor(i/5)*.7;s.roamAt=performance.now()+15000;}}
+ if(meeting&&meeting.id!==lastMeeting){lastMeeting=meeting.id;conferenceUntil=Date.now()+15000;for(const [i,s] of sprites.filter(s=>s.role!=='training').entries()){s.tx=1.7+(i%5)*.55;s.ty=8.5+Math.floor(i/5)*.7;s.roamAt=performance.now()+15000;}}
 }
 async function followLatestRun(){
  if(!config?.company_mode||!followCompany||working)return;
@@ -294,7 +308,7 @@ async function mobileStatus(){
 $('restart-company').onclick=async()=>{try{await api('/api/company/restart',{method:'POST',body:'{}'});backendOnline=false;updateSignal();}catch(e){$('attention-error').textContent=e.message;}};
 async function refreshAttention(){
  if(!config?.company_tools)return;
- const ids=[...new Set([runId,...(companyState?.jobs||[]).filter(j=>j.state==='running').map(j=>j.run_id)].filter(Boolean))];
+ const ids=[...new Set([working?runId:null,...(companyState?.jobs||[]).filter(j=>j.state==='running').map(j=>j.run_id)].filter(Boolean))];
  attention=null;attentionRun=null;
  for(const id of ids){try{const state=await api(`/api/runs/${id}/attention`);if(state.attention&&!state.attention.answer){attention=state.attention;attentionRun=id;break;}}catch(e){if(e.status!==404)throw e;}}
  $('attention-panel').hidden=!attention;
@@ -309,10 +323,11 @@ $('attention-form').onsubmit=async e=>{
 function updateSignal(){
  const active=(companyState?.jobs||[]).some(j=>j.state==='running')||working;
  const training=(companyState?.training||[]).some(j=>['running','queued'].includes(j.state));
- const state=attention||config&&!backendOnline?'yellow':active||training?'green':'red';
+ const state=attention||config&&!backendOnline?'phone':active||training?'green':'red';
  $('company-signal').dataset.state=state;
- $('signal-title').textContent=state==='yellow'?'NEEDS YOU':state==='green'?'COMPANY AT WORK':'OFF DUTY';
- $('signal-detail').textContent=attention?'A question is waiting below':config&&!backendOnline?'Reconnecting to the office…':state==='green'?'The Gents are on the case':'Ready for the next mission';
+ $('signal-title').textContent=state==='phone'?'CODEX HOTLINE':state==='green'?'COMPANY AT WORK':'OFF DUTY';
+ $('signal-detail').textContent=attention?'Red phone ringing · advisory escalation':config&&!backendOnline?'Reconnecting to the office…':state==='green'?'The Gents are on the case':'Ready for the next mission';
+ codexPhone.dataset.ringing=String(!!attention||events.slice(-12).some(e=>['local_executive_ringing','codex_phone_ringing'].includes(e.kind)&&!events.slice(-12).some(done=>done.seq>e.seq&&['question_resolved_locally','question_resolved_by_openai','codex_phone_unanswered','cloud_escalation_failed'].includes(done.kind))));
  const cards=[['THE MISSION',attention?'Your answer unlocks the next step':active?'Work in progress':'Your next big idea goes here',active?'active':'rest'],['ADMIN DESK',config?.admin_judge||'Local judgment',attention?'waiting':'rest'],['TRAINING & OPERATIONS',training?'Local training in progress':'One model · one shared GPU',training?'active':'rest']];
  $('job-cards').replaceChildren(...cards.map(([title,text,state])=>{const card=document.createElement('article');card.className='job-card';card.dataset.state=state;const label=document.createElement('small');label.textContent=title;const content=document.createElement('strong');content.textContent=text;const rail=document.createElement('span');rail.className='job-rail';card.append(label,content,rail);return card;}));
 }
@@ -321,8 +336,8 @@ function updateSpriteActivity(){
  for(const sprite of sprites){
   const matching=events.filter(e=>sameAgent(e.agent,sprite.id)&&(e.role===sprite.role||sprite.role==='worker'&&e.role==='judge'||['Operations Gent','Training Gent','CEO'].includes(sprite.id)));
   const latest=matching.at(-1);
-  sprite.busy=backendOnline&&working&&!attention&&!!latest&&(['loading','tool_started'].includes(latest.kind)||latest.kind==='call_started'&&!resolved.has(latest.call_id));
-  sprite.activity=latest?.kind==='loading'?'Loading local model':latest?.kind==='call_started'?(sprite.role==='admin'?'Reviewing the next action':sprite.role==='planner'?'Planning the next step':'Working on the mission'):latest?.kind==='tool_started'?(()=>{try{return JSON.parse(latest.message).action.replaceAll('_',' ');}catch{return 'Running a tool';}})():'';
+  sprite.busy=backendOnline&&working&&!attention&&!!latest&&(['loading','tool_started','context_retrieved'].includes(latest.kind)||latest.kind==='call_started'&&!resolved.has(latest.call_id));
+  sprite.activity=latest?.kind==='loading'?'Loading local model':latest?.kind==='context_retrieved'?'Reading handoff context':latest?.kind==='call_started'?(sprite.role==='admin'?'Reviewing the next action':sprite.role==='planner'?'Planning the next step':'Working on the mission'):latest?.kind==='tool_started'?(()=>{try{return JSON.parse(latest.message).action.replaceAll('_',' ');}catch{return 'Running a tool';}})():'';
   if(sprite.busy&&latest){const home=rooms[latest.room]||rooms.operations;sprite.tx=home[0]+(sprite.role==='planner'?-.35:.25);sprite.ty=home[1]+(sprite.index%3)*.32;}
   if(sprite.id==='Training Gent'&&backendOnline){sprite.busy=(companyState?.training||[]).some(j=>j.state==='running');sprite.activity=sprite.busy?'Training local adapter':'';}
  }
@@ -363,7 +378,8 @@ window.addEventListener('resize',clearHover);window.addEventListener('scroll',cl
 let lastTowerFrame=0;
 function frame(now=performance.now()){
  if(now-lastTowerFrame<33){requestAnimationFrame(frame);return;}lastTowerFrame=now;
- const stats=renderTower(ctx,{crew:sprites,characterFor:(id,phase)=>crewLooks.get(appearanceKey(id,phase)),spriteFrames,filter:towerFilter,hoverGent,hoverFloor,time:now,preview:walkingPreview,reducedMotion:motionPreference.matches});
+ const phoneActive=codexPhone.dataset.ringing==='true',conferenceActive=Date.now()<conferenceUntil;
+ const stats=renderTower(ctx,{crew:sprites,characterFor:(id,phase)=>crewLooks.get(appearanceKey(id,phase)),spriteFrames,filter:towerFilter,hoverGent,hoverFloor,time:now,preview:walkingPreview,reducedMotion:motionPreference.matches,conferenceActive,phoneActive});
  const summary=`${stats.active} working · ${stats.resting} in recharge · ${sprites.length-stats.unassigned} unique Gents${stats.unassigned?' · More character art required':''}`;
  if(towerSummary.textContent!==summary)towerSummary.textContent=summary;
  canvas.dataset.active=String(stats.active);canvas.dataset.resting=String(stats.resting);

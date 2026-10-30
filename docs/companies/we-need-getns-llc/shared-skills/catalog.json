@@ -4,25 +4,50 @@
       "id": "source-onboarding",
       "version": "1.0.0",
       "status": "approved-demo",
+      "roles": ["planner"],
       "path": "approved/source-onboarding/SKILL.md"
     },
     {
       "id": "timestamped-media-evidence",
       "version": "1.0.0",
       "status": "approved-demo",
+      "roles": ["worker"],
       "path": "approved/timestamped-media-evidence/SKILL.md"
     },
     {
       "id": "identifier-reconciliation",
       "version": "1.0.0",
       "status": "approved-demo",
+      "roles": ["worker"],
       "path": "approved/identifier-reconciliation/SKILL.md"
     },
     {
       "id": "independent-verification",
       "version": "1.0.0",
       "status": "approved-demo",
+      "roles": ["worker"],
       "path": "approved/independent-verification/SKILL.md"
+    },
+    {
+      "id": "fetch-web-content",
+      "version": "1.0.0",
+      "status": "approved-demo",
+      "roles": ["planner", "worker"],
+      "path": "approved/fetch-web-content/SKILL.md"
+    },
+    {
+      "id": "local-code-repair",
+      "version": "1.0.0",
+      "status": "approved-demo",
+      "roles": ["planner", "worker"],
+      "path": "approved/local-code-repair/SKILL.md"
+    },
+    {
+      "id": "document-workflow",
+      "version": "1.2.0",
+      "status": "approved-demo",
+      "roles": ["planner", "worker"],
+      "path": "approved/document-workflow/SKILL.md"
     }
   ],
   "intentionally_missing": "A company-specific contractor-release reconciliation skill is not supplied. Agents should identify this gap and create it through the Skill Generator Room."

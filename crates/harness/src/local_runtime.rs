@@ -140,13 +140,28 @@ impl LocalRuntime {
         if let Some(error) = last_error {
             return Err(error.context("GPU, reduced GPU offload, and CPU load attempts exhausted"));
         }
+        let mut portable_input = input.to_owned();
+        if model.provider == "local" {
+            // Count the selected model's actual chat template and tokenizer;
+            // reserve output space before dispatching expensive inference.
+            loop {
+                let messages = crate::context::messages(system, &portable_input);
+                let count = self.prompt_tokens(&messages).await?;
+                if count + max_tokens as usize + 256 <= 16384 {
+                    break;
+                }
+                let smaller = portable_input.len().saturating_mul(3) / 4;
+                let compacted = crate::context::trim_optional(&portable_input, smaller)?;
+                if compacted == portable_input {
+                    bail!("Required context uses {count} native prompt tokens; the selected model permits {} after output reservation. Retrieve smaller evidence pages or delegate a focused subtask; the frozen task was not truncated.",16384_usize.saturating_sub(max_tokens as usize+256));
+                }
+                portable_input = compacted;
+            }
+        }
         let start = Instant::now();
         let mut body = json!({
             "model": model.model,
-            "messages": [
-                {"role":"system","content":system},
-                {"role":"user","content":input}
-            ],
+            "messages": crate::context::messages(system,&portable_input),
             "max_tokens": max_tokens,
             "temperature": 0.1,
             "stream": false
@@ -231,6 +246,38 @@ impl LocalRuntime {
                 ),
             },
         })
+    }
+
+    async fn prompt_tokens(&self, messages: &Value) -> Result<usize> {
+        let template: Value = self
+            .client
+            .post(format!("http://127.0.0.1:{}/apply-template", self.port))
+            .bearer_auth(&self.api_key)
+            .timeout(Duration::from_secs(20))
+            .json(&json!({"messages":messages,"chat_template_kwargs":{"enable_thinking":false}}))
+            .send()
+            .await?
+            .error_for_status()?
+            .json()
+            .await?;
+        let prompt = template["prompt"]
+            .as_str()
+            .context("local model chat template returned no prompt")?;
+        let tokens: Value = self
+            .client
+            .post(format!("http://127.0.0.1:{}/tokenize", self.port))
+            .bearer_auth(&self.api_key)
+            .timeout(Duration::from_secs(20))
+            .json(&json!({"content":prompt,"add_special":false,"parse_special":true}))
+            .send()
+            .await?
+            .error_for_status()?
+            .json()
+            .await?;
+        Ok(tokens["tokens"]
+            .as_array()
+            .context("local tokenizer returned no tokens")?
+            .len())
     }
 
     pub async fn stop_owned(&self) {
@@ -616,26 +663,34 @@ fn schema_for(system: &str) -> Option<Value> {
             json!({"decision":{"type":"string","enum":["allow","ask","deny"]},"reason":{"type":"string"},"question":{"type":"string"}}),
             vec!["decision", "reason", "question"],
         ))
-    } else if system.starts_with("COMPANY_OPERATOR") {
-        let mut schema = object(
-            json!({"action":{"type":"string","enum":["web_search","web_read","browser","files","journal_read","shell","resources","models_search","model_download","model_quantize","model_select","email_list","email_send","email_status","schedule","training_prepare","training_run","training_status","training_promote","process_stop","ask_user","finish"]},"arguments_json":{"type":"string"},"summary":{"type":"string"}}),
-            vec!["action", "arguments_json", "summary"],
-        );
-        if system.contains("LOOP RECOVERY:") {
-            if let Some(cooldown) = system
+    } else if system.starts_with("COMPANY_OPERATOR") || system.starts_with("EXECUTIVE_RECOVERY") {
+        let cooldown = if system.contains("LOOP RECOVERY:") {
+            system
                 .split_once("\nRECOVERY_TOOL_COOLDOWN=")
                 .and_then(|(_, v)| serde_json::from_str::<Vec<String>>(v).ok())
-            {
-                if let Some(actions) = schema["properties"]["action"]["enum"].as_array_mut() {
-                    actions.retain(|v| !cooldown.iter().any(|blocked| v == blocked));
-                }
-            }
-        }
-        Some(schema)
+                .unwrap_or_default()
+        } else {
+            Vec::new()
+        };
+        Some(if system.starts_with("COMPANY_OPERATOR") {
+            crate::contracts::assessed_operator_schema(&cooldown)
+        } else {
+            crate::contracts::operator_schema(&cooldown)
+        })
+    } else if system.starts_with("LOCAL_EXECUTIVE_HOTLINE") {
+        Some(object(
+            json!({"decision":{"type":"string","enum":["answer","unable","operator_required"]},"answer":{"type":"string"},"reason":{"type":"string"}}),
+            vec!["decision", "answer", "reason"],
+        ))
     } else if system.starts_with("COMPANY_CEO") {
         Some(object(
             json!({"all_hands":{"type":"boolean"},"next_actions":{"type":"array","maxItems":6,"items":{"type":"string"}}}),
             vec!["all_hands", "next_actions"],
+        ))
+    } else if system.starts_with("DOCUMENT_CONTENT_REVIEW") {
+        Some(object(
+            json!({"verdict":{"type":"string","enum":["pass","revise","uncertain"]},"summary":{"type":"string"},"observed_facts":{"type":"array","maxItems":24,"items":{"type":"string"}},"issues":{"type":"array","maxItems":24,"items":{"type":"string"}}}),
+            vec!["verdict", "summary", "observed_facts", "issues"],
         ))
     } else if system.starts_with("COMPANY_JUDGE") {
         Some(object(
@@ -670,6 +725,15 @@ fn schema_for(system: &str) -> Option<Value> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn allowed_actions(schema: &Value) -> Vec<Value> {
+        let schema = schema.pointer("/properties/proposal").unwrap_or(schema);
+        schema["oneOf"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter_map(|branch| branch.pointer("/properties/action/const").cloned())
+            .collect()
+    }
     #[tokio::test]
     async fn finishing_a_job_does_not_wait_for_a_training_lease() {
         let runtime = LocalRuntime::new(std::env::temp_dir()).unwrap();
@@ -716,25 +780,77 @@ mod tests {
         assert!(args.windows(2).any(|pair| pair == ["--reasoning", "off"]));
     }
     #[test]
+    fn operator_decoder_exposes_every_approved_capability() {
+        let catalog: serde_json::Map<String, Value> =
+            serde_json::from_str(include_str!("../../../config/company-tools.json")).unwrap();
+        let schema = schema_for("COMPANY_OPERATOR: Next action").unwrap();
+        let actions = allowed_actions(&schema);
+        assert_eq!(actions.len(), catalog.len());
+        for action in catalog.keys() {
+            assert!(actions.contains(&json!(action)), "missing {action}");
+        }
+    }
+    #[test]
     fn recovery_decoder_cannot_emit_cooled_tools_or_change_admin_authorization() {
         let schema=schema_for("COMPANY_OPERATOR: LOOP RECOVERY:\nRECOVERY_TOOL_COOLDOWN=[\"web_search\",\"schedule\"]").unwrap();
-        let actions = schema["properties"]["action"]["enum"].as_array().unwrap();
+        let actions = allowed_actions(&schema);
         assert!(!actions.contains(&json!("web_search")));
         assert!(!actions.contains(&json!("schedule")));
         assert!(actions.contains(&json!("web_read")));
         assert!(actions.contains(&json!("resources")));
         let regular = schema_for("COMPANY_OPERATOR: Next action").unwrap();
-        assert!(regular["properties"]["action"]["enum"]
-            .as_array()
-            .unwrap()
-            .contains(&json!("web_search")));
+        assert!(allowed_actions(&regular).contains(&json!("web_search")));
         assert_eq!(
             schema_for("COMPANY_ADMIN: LOOP RECOVERY:\nRECOVERY_TOOL_COOLDOWN=[\"allow\"]")
                 .unwrap()["properties"]["decision"]["enum"],
             json!(["allow", "ask", "deny"])
         );
     }
+    #[test]
+    fn local_executive_has_a_bounded_resolution_contract() {
+        let schema = schema_for("LOCAL_EXECUTIVE_HOTLINE: resolve").unwrap();
+        assert_eq!(
+            schema["properties"]["decision"]["enum"],
+            json!(["answer", "unable", "operator_required"])
+        );
+        assert_eq!(schema["additionalProperties"], false);
+    }
 
+    #[tokio::test]
+    #[ignore = "loads installed Qwen3-8B and tests the tool-input decoder"]
+    async fn actual_operator_emits_valid_arguments_for_catalog_tool() {
+        use crate::contracts::{EmbeddedContracts, ToolContracts};
+        let runtime =
+            LocalRuntime::new(Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")).unwrap();
+        let model = Model {
+            provider: "local".into(),
+            model: "Qwen3-8B input contract smoke".into(),
+            path: Some("models/qwen3-8b/Qwen3-8B-Q4_K_M.gguf".into()),
+            adapter: None,
+            url: None,
+            key_env: None,
+        };
+        let input=json!({"task":"Inspect filenames in the already observed source inventory. Select exactly one hf_dataset_files call; query is example and limit is 1. Use the observed source ID and immutable revision.","verified_handoff":{"sources":[{"repo":"fixture/examples","revision":"a".repeat(40),"inspected_step":2}]},"input_schema":EmbeddedContracts.input_schema("hf_dataset_files")}).to_string();
+        let result=runtime.complete(&model,"COMPANY_OPERATOR: Return {assessment:{completed_prerequisites:string,next_unmet_requirement:string},proposal:{action,arguments,summary}}. Choose hf_dataset_files using the supplied input_schema. This is only a synthetic tool-selection test; do not execute anything.",&input,512,&AtomicBool::new(false)).await;
+        runtime.stop_owned().await;
+        let reply = result.unwrap();
+        let call: Value = serde_json::from_str(&reply.text).unwrap();
+        assert!(call["assessment"]["next_unmet_requirement"]
+            .as_str()
+            .is_some_and(|s| !s.is_empty()));
+        let call = crate::contracts::unassessed_proposal(&call);
+        assert_eq!(call["action"], "hf_dataset_files", "{call}");
+        let arguments = crate::contracts::arguments(call).unwrap();
+        EmbeddedContracts
+            .validate("hf_dataset_files", &arguments)
+            .unwrap();
+        assert_eq!(arguments["repo"], "fixture/examples");
+        assert_eq!(arguments["revision"], "a".repeat(40));
+        println!(
+            "Real Qwen tool argument contract passed; latency {} ms",
+            reply.latency_ms
+        );
+    }
     #[tokio::test]
     #[ignore = "loads installed Qwen3-8B admin weights"]
     async fn actual_admin_judge_returns_structured_decision() {
@@ -748,7 +864,8 @@ mod tests {
             url: None,
             key_env: None,
         };
-        let result=runtime.complete(&model,"COMPANY_ADMIN: Review a requested read-only public website visit. Return bare JSON {decision:allow|ask|deny,reason:string,question:string}. Allow an authorized public page read.","The operator requested reading https://example.com. Proposed action: web_read https://example.com. No credentials or writes.",128,&AtomicBool::new(false)).await;
+        let input = json!({"task_input":{"task":"The operator requested reading https://example.com. Proposed action: web_read https://example.com. No credentials or writes.","recent_evidence":["obsolete observation\n".repeat(9000)]}}).to_string();
+        let result=runtime.complete(&model,"COMPANY_ADMIN: Review a requested read-only public website visit. Return bare JSON {decision:allow|ask|deny,reason:string,question:string}. Allow an authorized public page read.",&input,128,&AtomicBool::new(false)).await;
         runtime.stop_owned().await;
         let reply = result.unwrap();
         let value: Value = serde_json::from_str(&reply.text).unwrap();

@@ -138,20 +138,19 @@ impl LanguageModel for Gateway {
                 let denied = input.contains("deny-admin-smoke");
                 json!({"decision":if denied{"deny"}else{"allow"},"reason":"SIMULATED admin fixture; not real-model validation","question":""}).to_string()
             } else if system.starts_with("COMPANY_OPERATOR") {
-                let outer: Value = serde_json::from_str(input)?;
-                let value: Value = if let Some(nested) = outer["task_input"].as_str() {
-                    serde_json::from_str(nested)?
-                } else if outer["task_input"].is_object() {
-                    outer["task_input"].clone()
-                } else {
-                    outer
-                };
+                let value = crate::context::task_input(input)?;
                 let evidence = value["recent_evidence"]
                     .as_array()
                     .context("mock evidence missing")?;
                 let loop_fixture = value["task"]
                     .as_str()
                     .is_some_and(|s| s.contains("autonomy-loop-smoke"));
+                let stalled_fixture = value["task"]
+                    .as_str()
+                    .is_some_and(|s| s.contains("autonomy-stall-smoke"));
+                let tool_failure_fixture = value["task"]
+                    .as_str()
+                    .is_some_and(|s| s.contains("autonomy-tool-failure-smoke"));
                 let answered = loop_fixture
                     || evidence.iter().any(|e| e.get("operator_answer").is_some())
                     || value["operator_answers"]
@@ -161,7 +160,11 @@ impl LanguageModel for Gateway {
                     .iter()
                     .any(|e| e["action"] == "files" && e["arguments"]["op"] == "write");
                 let tested = evidence.iter().any(|e| e["action"] == "shell");
-                let (action, args) = if loop_fixture
+                let (action, args) = if tool_failure_fixture {
+                    ("files", json!({"op":"read","path":"missing-fixture.txt"}))
+                } else if stalled_fixture {
+                    ("missing-capability-fixture", json!({}))
+                } else if loop_fixture
                     && value["recovery_attempt"].as_u64().unwrap_or(0) == 0
                     && value["verified_progress"]["tool_results"]
                         .as_u64()
@@ -191,12 +194,7 @@ impl LanguageModel for Gateway {
             } else if system.starts_with("COMPANY_JUDGE")
                 && input.contains("SIMULATED model fixture")
             {
-                let outer: Value = serde_json::from_str(input)?;
-                let value: Value = if let Some(nested) = outer["task_input"].as_str() {
-                    serde_json::from_str(nested)?
-                } else {
-                    outer
-                };
+                let value = crate::context::task_input(input)?;
                 let checks=value["criteria"].as_array().context("mock criteria missing")?.iter().enumerate().map(|(i,_)|json!({"criterion_index":i,"passed":true,"evidence":"SIMULATED semantic review; real file/shell output checked separately by smoke script"})).collect::<Vec<_>>();
                 json!({"verdict":"accepted","summary":"SIMULATED QA fixture","checks":checks})
                     .to_string()
@@ -296,7 +294,7 @@ impl LanguageModel for Gateway {
         }
         let key = std::env::var(m.key_env.as_deref().context("missing key_env")?)
             .context("missing provider credential")?;
-        let mut body = json!({"model":m.model,"messages":[{"role":"system","content":system},{"role":"user","content":input}],"max_tokens":max_tokens,"stream":false});
+        let mut body = json!({"model":m.model,"messages":crate::context::messages(system,input),"max_tokens":max_tokens,"stream":false});
         if m.provider == "openrouter" {
             body["usage"] = json!({"include":true});
         }

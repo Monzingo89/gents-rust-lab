@@ -22,3 +22,15 @@ export function createCompanyEnvLoader({ root = process.cwd(), env = process.env
     return env;
   };
 }
+
+// The shell launcher owns these process settings. Local integration files may
+// contain defaults for other launch modes and must not redirect this runtime.
+export function loadCompanyRuntimeEnv({ root = process.cwd(), env = process.env } = {}) {
+  const pinned = Object.fromEntries([
+    'AUTH_MODE', 'BIND', 'CONFIG', 'RUN_STORE', 'GENTS_SUPERVISED',
+    'GENTS_LOCAL_ONLY', 'HF_HUB_OFFLINE', 'HF_HUB_DISABLE_TELEMETRY', 'TRANSFORMERS_OFFLINE',
+  ].filter(key => key in env).map(key => [key, env[key]]));
+  createCompanyEnvLoader({ root, env })();
+  Object.assign(env, pinned);
+  return env;
+}
