@@ -1,0 +1,30 @@
+{
+  "scope": "media training preparation; no model loaded or trained",
+  "installed_media_pins_verified": {
+    "image": {
+      "pinned_files": 12,
+      "bytes": 4619700690,
+      "revision": "1cebb9b45c21ece14a42615b16bf5fa4de9b56da"
+    },
+    "audio": {
+      "pinned_files": 3,
+      "bytes": 114204494,
+      "revision": "2f358b6a560e3a913ebf509b2f3344f20b367f94"
+    }
+  },
+  "image_configuration_dry_run": "passed with installed mflux 0.24.0",
+  "training_images": 12,
+  "evaluation_seeds": 4,
+  "evaluation_scope": "geometric conformity on known color/shape concepts; no novel concept or general quality claim",
+  "weights_modified": false,
+  "baseline_generated": false,
+  "provider_cost_usd": 0,
+  "audio_gap": "local ONNX inference artifact; separate trainable checkpoint and licensed paired speech data required",
+  "video_gap": "no registered generation/training engine",
+  "source_sha256": {
+    "scripts/prepare_image_weight_experiment.py": "e1f95ffb663cf0c2860308e17fad3c6c44ee459f7e4dfef91bcacc23502fcadd",
+    "scripts/image_geometry_evaluation.py": "f245e555255f5115388ff169291d67b13fd8bcfe587aeb18543d4e3369bb7333",
+    "mcp/media/requirements.lock": "107b00a89a1c2bd928121c711d32424e77c17935afa30f288447b32996c03432",
+    "config/media.local.json": "d463c1e8b7c89e49de16ee72a7840793f4bea4eec094d80c0f208e66102853f0"
+  }
+}

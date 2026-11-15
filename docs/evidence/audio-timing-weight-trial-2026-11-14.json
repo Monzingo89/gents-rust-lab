@@ -1,0 +1,51 @@
+{
+  "steps": 96,
+  "changed_duration_tensors": 284,
+  "elapsed_seconds": 18.221540208905935,
+  "candidate_sha256": "c723d00f10dd10ecd65f74f36eff5a69944de60e65040269ffba52d7c5697de5",
+  "base_unchanged": true,
+  "reload_exact": true,
+  "provider_cost_usd": 0,
+  "promoted": false,
+  "results": {
+    "validation": {
+      "baseline_mean_absolute_relative_duration_error": 0.08816445033485362,
+      "candidate_mean_absolute_relative_duration_error": 0.08132941601321853,
+      "relative_reduction": 0.07752596761705252,
+      "improved": 7,
+      "unchanged": 0,
+      "any_regressions": [
+        {
+          "id": "LJ034-0079",
+          "error_increase": 0.012076326155152504
+        }
+      ]
+    },
+    "test": {
+      "baseline_mean_absolute_relative_duration_error": 0.08557353775097858,
+      "candidate_mean_absolute_relative_duration_error": 0.07828840013390341,
+      "relative_reduction": 0.08513306576473587,
+      "improved": 6,
+      "unchanged": 1,
+      "any_regressions": [
+        {
+          "id": "LJ046-0120",
+          "error_increase": 0.004541234766463426
+        }
+      ]
+    }
+  },
+  "native_speech_outputs_verified": 16,
+  "clipped_samples": 0,
+  "scope": "Reference-duration matching on fine-tuning holdout clips from a likely pretraining dataset; not general intelligibility or speech quality.",
+  "decision": "Quarantined. Average timing improved, but individual regressions remain; speech intelligibility and naturalness not qualified.",
+  "source_hashes": {
+    "audio_timing_experiment.py": "28c7b5d102b6124455a827796e3c03693c197457a4d10dac29d9476b1e093eb0",
+    "audio_monotonic_alignment.py": "a60ca2804ef4d32ea5b5a50cb32cb72a28bd6240b5499581df47b427a9c13ed0",
+    "run_audio_timing_experiment.py": "cd506fb78eb23e001abfe7032cb86557fab2a5d0f42ef2e188f5008868b9b3bd",
+    "audio_timing_synthesis.py": "0b52e81958009efb37ef9aa4d1f1edd901e9cf715a0f180d25bedbef1d4cc8af",
+    "run_audio_timing_synthesis.py": "264c73ae9ba190043397bc0098f19f1724cf9b7794c80862b26d29bb80b7ade9"
+  },
+  "report_sha256": "7e58d25b9710f574342cfdf1178a274813dfd28e1c9a8937ae32732dc5ca1a79",
+  "synthesis_report_sha256": "1e998ad81ef68711e7623932151524433ba474ecfc166e25165b82322cf44726"
+}

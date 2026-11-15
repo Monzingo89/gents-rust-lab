@@ -1,0 +1,76 @@
+{
+  "method": "theta = theta_base + alpha * (theta_candidate - theta_base), duration predictor only",
+  "trials": [
+    {
+      "scale": 0.25,
+      "sha256": "b56d5808fc2bcb21ac555617c7092c47bd08427fecf2429e3ac0c35afb81f33d",
+      "gate": {
+        "baseline_mean_error": 0.08816445033485362,
+        "candidate_mean_error": 0.08554853328839691,
+        "regressions": [
+          "LJ034-0079"
+        ],
+        "measured_improvement": false,
+        "production_qualified": false
+      }
+    },
+    {
+      "scale": 0.5,
+      "sha256": "c7cb2e30ff6a9e346ae492fc7f1b197e9e7be14fb0ea914c10f592c668295efe",
+      "gate": {
+        "baseline_mean_error": 0.08816445033485362,
+        "candidate_mean_error": 0.08424501292776636,
+        "regressions": [
+          "LJ034-0079"
+        ],
+        "measured_improvement": false,
+        "production_qualified": false
+      }
+    },
+    {
+      "scale": 0.75,
+      "sha256": "b30993036d0ef02ba328d80b8d702c843a9e2c051e55882baac8b1449151a407",
+      "gate": {
+        "baseline_mean_error": 0.08816445033485362,
+        "candidate_mean_error": 0.0825716531206315,
+        "regressions": [
+          "LJ034-0079"
+        ],
+        "measured_improvement": false,
+        "production_qualified": false
+      }
+    }
+  ],
+  "original_candidate_strict_gate": {
+    "validation": {
+      "baseline_mean_error": 0.08816445033485362,
+      "candidate_mean_error": 0.08132941601321853,
+      "regressions": [
+        "LJ034-0079"
+      ],
+      "measured_improvement": false,
+      "production_qualified": false
+    },
+    "test": {
+      "baseline_mean_error": 0.08557353775097858,
+      "candidate_mean_error": 0.07828840013390341,
+      "regressions": [
+        "LJ046-0120"
+      ],
+      "measured_improvement": false,
+      "production_qualified": false
+    }
+  },
+  "selected_scale": null,
+  "base_unchanged": true,
+  "provider_cost_usd": 0,
+  "promoted": false,
+  "test_split_evaluated_for_interpolation": false,
+  "tests_passed": 8,
+  "source_hashes": {
+    "audio_timing_gate.py": "021ac32445641a500a4107622b6715c95356ab701f4f500e068f606df4b0baee",
+    "audio_weight_interpolation.py": "bb15b8de101cc798070f9a0f2bee614fb5e3be375d45d5a82824b1735c1957d3",
+    "run_audio_weight_interpolation.py": "a7ed57925259a7074c678e2f13a4f57b392d24368d6c3e54267976352304a61d"
+  },
+  "native_report_sha256": "c18facd90728aa59a7390220bef47f26daa5ea779bafbb3e4f67490a9b49db82"
+}

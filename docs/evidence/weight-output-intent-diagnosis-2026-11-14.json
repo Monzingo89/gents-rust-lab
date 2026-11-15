@@ -1,0 +1,17 @@
+{
+  "scope": "Post hoc diagnosis only; frozen strict benchmark scores unchanged; label decoding is not an accepted production parser",
+  "stages": {
+    "baseline": {
+      "strict_passed": 0,
+      "valid_intent_schema": 0,
+      "diagnostic_label_set_correct": 23,
+      "total": 24
+    },
+    "candidate": {
+      "strict_passed": 11,
+      "valid_intent_schema": 15,
+      "diagnostic_label_set_correct": 23,
+      "total": 24
+    }
+  }
+}

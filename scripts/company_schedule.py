@@ -6,7 +6,7 @@ import datetime as dt
 import json
 import os
 import re
-import sqlite3
+import local_sqlite as sqlite3
 import time
 import uuid
 from zoneinfo import ZoneInfo

@@ -1,0 +1,44 @@
+# Extend all default provider and generic rules. Only reviewed public literals
+# on their exact source paths are exempted from the generic rule.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Reviewed public hash or validation prose"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "secret"
+paths = ['''^docs/70\-keyed\-completion\-review\-and\-v2\-qualification\.md$''']
+regexes = ['''^missing/unexpected$''']
+
+[[allowlists]]
+description = "Reviewed public hash or validation prose"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "secret"
+paths = ['''^scripts/fixtures/mcp\-owned\-weighted\-reuse\.mjs$''']
+regexes = ['''^337a6eec5e59505b1527dcd712998c03f2357ae7697c0b29089a4c40d075f487$''']
+
+[[allowlists]]
+description = "Reviewed public hash or validation prose"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "secret"
+paths = ['''^scripts/fixtures/mcp\-owned\-multi\-library\-v1\.mjs$''']
+regexes = ['''^68df0a91377cabc8ddac45691a8a61abe28b49061f6bad0a6dbc795f38e4ae1e$''']
+
+[[allowlists]]
+description = "Reviewed public hash or validation prose"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "secret"
+paths = ['''^scripts/fixtures/mcp\-owned\-mixed\-batch\.mjs$''']
+regexes = ['''^337a6eec5e59505b1527dcd712998c03f2357ae7697c0b29089a4c40d075f487$''','''^e18404ea206d3698e32629da19dfcbef766c261bc0d338e9c7e2677463e19c52$''']
+
+[[allowlists]]
+description = "Reviewed public hash or validation prose"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "secret"
+paths = ['''^scripts/fixtures/mcp\-owned\-allocation\-chain\.mjs$''']
+regexes = ['''^363c8080343c39321d76c6282755aed0de37ae533cbc693b22146d39a61d3826$''']

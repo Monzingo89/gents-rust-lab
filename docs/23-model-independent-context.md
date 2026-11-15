@@ -1,6 +1,22 @@
 # Model-independent context and evidence
 
+Completion/archive storage now has a separate local adapter, atomic per-agent checkpoints and transactional owner recall. Unqualified candidate submissions remain passive. See [the archive checkpoint contract](67-local-memory-archive-checkpoints.md) for the current lifecycle and evidence boundaries.
+
 The harness retains its existing Rust provider adapters. All calls use a shared role/content message format and a versioned envelope carrying the frozen task, acceptance criteria, role capabilities, and a run-scoped verified handoff. This is a portable application contract, not a promise that different models have interchangeable tokenizers or inference caches.
+
+`memory::SnapshotRepository` now stores versioned reference-only indexes in
+private company SQLite. Raw context and dirty-generation updates commit
+atomically; housekeeping flushes after 30 seconds of quiet with a 120-second
+maximum dirty interval. These bounds depend on host scheduling. Source IDs,
+hashes, tiers, recipient, contract and policy versions are bound together;
+advisory model text is not copied into a second authority source. Live retrieval
+still enforces current ACLs and returns fresh records during debounce. Permission
+changes invalidate indexes and native cache identity immediately. Process-local
+notifications cancel stale calls; final database checks and atomic staging also
+reject stale output. Terminal checkpoints capture before cold archival. This
+is not yet semantic summarization, distributed revocation, encryption, or
+transitive information-flow tracking. See the campaign document for tested
+boundaries and remaining enterprise gates.
 
 `evidence::EvidenceProjection` separates executed facts from plans and advisory text. Its ledger records discovered dataset IDs and immutable revisions, inspected file inventories, downloaded file hashes, written-but-unverified artifacts, recent tool failures, and PDF inspection receipts. The checkpoint stores the full ledger privately under the run; numbered tool journals retain the full original results. A bounded projection goes to each model. Startup rebuilds older checkpoints from their journals. Switching models discards inference cache without discarding task evidence.
 

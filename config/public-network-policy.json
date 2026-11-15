@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "scheme": "https",
+  "port": 443,
+  "ipv6_allowed": ["2000::/3"],
+  "deny_ipv4": ["0.0.0.0/8", "10.0.0.0/8", "100.64.0.0/10", "127.0.0.0/8", "169.254.0.0/16", "172.16.0.0/12", "192.0.0.0/24", "192.0.2.0/24", "192.88.99.0/24", "192.168.0.0/16", "198.18.0.0/15", "198.51.100.0/24", "203.0.113.0/24", "224.0.0.0/3", "168.63.129.16/32"],
+  "deny_ipv6": ["2001::/23", "2001:db8::/32", "2002::/16", "3fff::/20"],
+  "reviewed_on": "2026-11-04",
+  "scope": "Conservative public native HTTP transport only. Reject all mapped/translated IPv6 and special-purpose prefixes, including some globally reachable special services. Not an OS firewall or complete egress authorization.",
+  "sources": ["https://www.iana.org/assignments/iana-ipv4-special-registry/", "https://www.iana.org/assignments/iana-ipv6-special-registry/", "https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html"]
+}

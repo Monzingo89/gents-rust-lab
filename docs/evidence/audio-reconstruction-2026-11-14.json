@@ -1,0 +1,69 @@
+{
+  "strict_generator_parameter_match": true,
+  "generator_tensor_count": 838,
+  "source_sha256": "f49e9af70265433aa03d403efc2fe161e0c42b9083c3768a17338be4b0af720a",
+  "safetensors_sha256": "f7fb2fc74c4f59ff91b32cc7559865b57f9f65990e2d1a92a8d6eea804bd6443",
+  "architecture": {
+    "inter_channels": 192,
+    "hidden_channels": 192,
+    "filter_channels": 768,
+    "n_heads": 2,
+    "n_layers": 6,
+    "kernel_size": 3,
+    "p_dropout": 0.1,
+    "resblock": "1",
+    "resblock_kernel_sizes": [
+      3,
+      7,
+      11
+    ],
+    "resblock_dilation_sizes": [
+      [
+        1,
+        3,
+        5
+      ],
+      [
+        1,
+        3,
+        5
+      ],
+      [
+        1,
+        3,
+        5
+      ]
+    ],
+    "upsample_rates": [
+      8,
+      8,
+      2,
+      2
+    ],
+    "upsample_initial_channel": 512,
+    "upsample_kernel_sizes": [
+      16,
+      16,
+      4,
+      4
+    ],
+    "gin_channels": 0,
+    "use_sdp": true,
+    "n_vocab": 256,
+    "n_speakers": 1,
+    "spec_channels": 513,
+    "segment_size": 32
+  },
+  "text": "The local company is ready.",
+  "samples": 37888,
+  "sample_rate": 22050,
+  "duration_seconds": 1.7182766439909296,
+  "peak_amplitude": 0.6693500876426697,
+  "inference_seconds": 0.188,
+  "wav_sha256": "814a526f53d4f09ed4fa394e8cf891ef602f361c4dffe6e6874f59b9b99e5e32",
+  "device": "cpu",
+  "provider_cost_usd": 0,
+  "weights_modified": false,
+  "admitted": false,
+  "scope": "Strict reconstruction and finite waveform only; intelligibility, quality and production ONNX parity unverified"
+}

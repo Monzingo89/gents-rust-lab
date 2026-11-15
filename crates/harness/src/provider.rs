@@ -17,9 +17,38 @@ pub struct Model {
     pub path: Option<String>,
     #[serde(default)]
     pub adapter: Option<String>,
+    /// Operator/registry-selected native context budget; never inferred from an alias.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub context_tokens: Option<u32>,
+    /// Trusted local role configuration only; absent or zero keeps thinking off.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub local_reasoning_tokens: Option<u32>,
+    /// Trusted native profile override of the call's default final allowance.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub local_final_tokens: Option<u32>,
 }
 impl Model {
     pub fn validate(&self) -> Result<()> {
+        if self
+            .local_final_tokens
+            .is_some_and(|v| self.provider != "local" || !(1..=4096).contains(&v))
+        {
+            bail!("local_final_tokens requires native local inference and 1..4096 tokens");
+        }
+        if self
+            .local_reasoning_tokens
+            .is_some_and(|v| self.provider != "local" || v > 4096)
+        {
+            bail!("local_reasoning_tokens requires native local inference and 0..4096 tokens");
+        }
+        if self
+            .context_tokens
+            .is_some_and(|tokens| self.provider != "local" || !(2048..=16384).contains(&tokens))
+        {
+            bail!(
+                "context_tokens currently requires native local inference and 2048..16384 tokens"
+            );
+        }
         if self.adapter.is_some() && self.provider != "mlx" {
             bail!("role adapters currently require MLX");
         }
@@ -104,6 +133,29 @@ pub struct Reply {
     pub usage: Usage,
     pub latency_ms: u64,
     pub response_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub local_execution: Option<LocalExecution>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub struct LocalExecution {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub finish_reason: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub task_input_sha256: Option<String>,
+    pub backend_pid: u32,
+    pub port: u16,
+    pub dispatched_at_ms: u64,
+    pub received_at_ms: u64,
+    pub resident_kib: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub launch_policy: Option<crate::runtime_fit::LaunchPolicy>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub observed_context_tokens: Option<usize>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub generation_budget: Option<crate::local_generation::GenerationBudget>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub separated_reasoning_observed: Option<bool>,
 }
 #[async_trait]
 pub trait LanguageModel: Send + Sync {
@@ -118,7 +170,7 @@ pub trait LanguageModel: Send + Sync {
 }
 pub struct Gateway {
     pub client: reqwest::Client,
-    pub local: crate::local_runtime::LocalRuntime,
+    pub local: crate::runtime_pool::RuntimePool,
 }
 #[async_trait]
 impl LanguageModel for Gateway {
@@ -135,6 +187,9 @@ impl LanguageModel for Gateway {
         if m.provider == "mock" {
             tokio::time::sleep(std::time::Duration::from_millis(1000)).await;
             let text = if system.starts_with("COMPANY_ADMIN") {
+                if m.model == "mock-invalid-authorization" {
+                    bail!("SIMULATED authorization preparation failure; no verdict or tool effect");
+                }
                 let denied = input.contains("deny-admin-smoke");
                 json!({"decision":if denied{"deny"}else{"allow"},"reason":"SIMULATED admin fixture; not real-model validation","question":""}).to_string()
             } else if system.starts_with("COMPANY_OPERATOR") {
@@ -160,7 +215,30 @@ impl LanguageModel for Gateway {
                     .iter()
                     .any(|e| e["action"] == "files" && e["arguments"]["op"] == "write");
                 let tested = evidence.iter().any(|e| e["action"] == "shell");
-                let (action, args) = if tool_failure_fixture {
+                let artifact_stall = value["task"]
+                    .as_str()
+                    .is_some_and(|s| s.contains("autonomy-artifact-stall-smoke"));
+                let (action, args) = if m.model == "mock-proposal-feedback" {
+                    let feedback = &value["proposal_feedback"][0];
+                    anyhow::ensure!(
+                        feedback["executed"] == false
+                            && feedback["proposed_source_policy"]["passed"] == false
+                            && feedback["proposed_source_policy"]["diagnostic"]
+                                .as_str()
+                                .is_some_and(|s| s.contains("todo!"))
+                            && feedback.get("content").is_none(),
+                        "SIMULATED worker did not receive bounded parser feedback"
+                    );
+                    (
+                        "ask_user",
+                        json!({"question":"Which synthetic recovery marker should the fixture record?"}),
+                    )
+                } else if artifact_stall {
+                    (
+                        "finish",
+                        json!({"deliverable":"SIMULATED premature finish; required report is intentionally absent","evidence":"No workspace output created"}),
+                    )
+                } else if tool_failure_fixture {
                     ("files", json!({"op":"read","path":"missing-fixture.txt"}))
                 } else if stalled_fixture {
                     ("missing-capability-fixture", json!({}))
@@ -192,10 +270,42 @@ impl LanguageModel for Gateway {
                 };
                 json!({"action":action,"arguments_json":args.to_string(),"summary":"SIMULATED next action"}).to_string()
             } else if system.starts_with("COMPANY_JUDGE")
+                && (m.model == "mock-review-protocol"
+                    || m.model == "mock-review-protocol-always-invalid")
+            {
+                let value = crate::context::task_input(input)?;
+                let count = crate::completion_review::count(&value["criteria"])?;
+                let corrected = value["review_protocol_feedback"].is_object()
+                    && m.model != "mock-review-protocol-always-invalid";
+                let checks = if corrected {
+                    (0..count)
+                        .map(|i| {
+                            (
+                                i.to_string(),
+                                json!({"passed":true,"evidence":"SIMULATED protocol fixture only"}),
+                            )
+                        })
+                        .collect::<serde_json::Map<String, Value>>()
+                } else {
+                    [(
+                        count.to_string(),
+                        json!({"passed":true,"evidence":"SIMULATED missing/extra key fault"}),
+                    )]
+                    .into_iter()
+                    .collect()
+                };
+                json!({"verdict":"accepted","summary":"SIMULATED review protocol fixture; not real-model task validation","checks":checks}).to_string()
+            } else if system.starts_with("COMPANY_JUDGE") && m.model == "mock-qa-revise" {
+                let value = crate::context::task_input(input)?;
+                let count = crate::completion_review::count(&value["criteria"])?;
+                let checks=(0..count).map(|i|(i.to_string(),json!({"passed":false,"evidence":"SIMULATED repeated QA failure; no competence claimed"}))).collect::<serde_json::Map<String,Value>>();
+                json!({"verdict":"revise","summary":"SIMULATED final review rejection","checks":checks}).to_string()
+            } else if system.starts_with("COMPANY_JUDGE")
                 && input.contains("SIMULATED model fixture")
             {
                 let value = crate::context::task_input(input)?;
-                let checks=value["criteria"].as_array().context("mock criteria missing")?.iter().enumerate().map(|(i,_)|json!({"criterion_index":i,"passed":true,"evidence":"SIMULATED semantic review; real file/shell output checked separately by smoke script"})).collect::<Vec<_>>();
+                let count = crate::completion_review::count(&value["criteria"])?;
+                let checks=(0..count).map(|i|(i.to_string(),json!({"passed":true,"evidence":"SIMULATED semantic review; actual file/shell output checked separately"}))).collect::<serde_json::Map<String,Value>>();
                 json!({"verdict":"accepted","summary":"SIMULATED QA fixture","checks":checks})
                     .to_string()
             } else if system.starts_with("CTO_ROUTER") {
@@ -275,6 +385,7 @@ impl LanguageModel for Gateway {
                 },
                 latency_ms: start.elapsed().as_millis() as u64,
                 response_id: None,
+                local_execution: None,
             });
         }
         if matches!(m.provider.as_str(), "local" | "mlx") {
@@ -341,6 +452,7 @@ impl LanguageModel for Gateway {
             usage: parse_usage(&v),
             latency_ms: start.elapsed().as_millis() as u64,
             response_id: v["id"].as_str().map(str::to_string),
+            local_execution: None,
         })
     }
 }
@@ -364,6 +476,62 @@ fn parse_usage(v: &Value) -> Usage {
 mod tests {
     use super::*;
     #[test]
+    fn final_allowance_override_is_explicit_bounded_and_native_only() {
+        let mut model: Model = serde_json::from_value(
+            json!({"provider":"local","model":"fixture","path":"models/fixture.gguf"}),
+        )
+        .unwrap();
+        assert!(model.local_final_tokens.is_none());
+        assert!(serde_json::to_value(&model)
+            .unwrap()
+            .get("local_final_tokens")
+            .is_none());
+        for cap in [1, 2048, 4096] {
+            model.local_final_tokens = Some(cap);
+            model.validate().unwrap();
+        }
+        for cap in [0, 4097, u32::MAX] {
+            model.local_final_tokens = Some(cap);
+            assert!(model.validate().is_err());
+        }
+        model.local_final_tokens = Some(2048);
+        for provider in ["mock", "mlx", "azure", "databricks"] {
+            model.provider = provider.into();
+            assert!(model.validate().is_err());
+        }
+    }
+    #[test]
+    fn reasoning_is_a_bounded_native_host_setting() {
+        let original =
+            json!({"provider":"local","model":"candidate","path":"models/candidate.gguf"});
+        let mut model: Model = serde_json::from_value(original).unwrap();
+        assert!(model.local_reasoning_tokens.is_none());
+        for cap in [0, 512, 4096] {
+            model.local_reasoning_tokens = Some(cap);
+            model.validate().unwrap();
+        }
+        model.local_reasoning_tokens = Some(4097);
+        assert!(model.validate().is_err());
+        model.local_reasoning_tokens = Some(512);
+        for provider in ["mock", "mlx", "azure", "databricks"] {
+            model.provider = provider.into();
+            assert!(model.validate().is_err());
+        }
+    }
+    #[test]
+    fn model_specific_context_budget_is_explicit_and_native_only() {
+        let model = json!({"provider":"local","model":"candidate","path":"models/candidate.gguf","context_tokens":8192});
+        let mut value: Model = serde_json::from_value(model).unwrap();
+        value.validate().unwrap();
+        for cap in [0, 1024, 16385] {
+            value.context_tokens = Some(cap);
+            assert!(value.validate().is_err());
+        }
+        value.context_tokens = Some(8192);
+        value.provider = "mlx".into();
+        assert!(value.validate().is_err());
+    }
+    #[test]
     fn missing_usage_is_unknown() {
         let u = parse_usage(&json!({}));
         assert_eq!(u.input, None);
@@ -386,6 +554,9 @@ mod tests {
             key_env: Some("TEST_KEY".into()),
             path: None,
             adapter: None,
+            context_tokens: None,
+            local_reasoning_tokens: None,
+            local_final_tokens: None,
         };
         assert!(m.validate().is_ok());
         m.url = Some("https://user:secret@openrouter.ai/api/v1/chat/completions".into());

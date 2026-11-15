@@ -4,6 +4,7 @@ node_modules/
 .env.*
 !.env.example
 !.env.company.example
+!.env.local.example
 config/local.json
 src-tauri/gen/
 .DS_Store
@@ -19,3 +20,17 @@ models/
 __pycache__/
 # Private local company integrations
 .env.company
+
+/site/deploy/
+!.env.website.local.example
+
+# Standalone validation locks for retained source backports
+/src-tauri/vendor/*/Cargo.lock
+.vercel/
+# Model checkpoints and private signing material are never release source
+*.ckpt
+*.onnx
+*.pt
+*.pth
+*.pem
+*.key

@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "scope": "One actual local synthetic writing task continued from prior native CEO planning. Native source/policy gates and a separate model review accepted it; an independent exact-text fixture oracle also passed. Not arbitrary task, all-pattern, enterprise/compliance or benchmark qualification.",
+  "run": "bcc33ea9-9f11-4f31-b301-9ffd2d5c17aa",
+  "prior_native_planning_probe": "c1e3e8d3-2aec-4f1d-a8a0-1043a5a20531",
+  "user_messages": [
+    "I need a short update from a synthetic launch note, using one local writer and no tools, files, web or code. Ask me one question to confirm the desired output before planning.",
+    "Confirm the definition of done: return two concise sentences using only this synthetic note: the rehearsal is scheduled for Tuesday; the checklist remains under review. Do not invent facts. Use exactly one assigned local writer with no tools, files, web or code. The final answer must preserve both facts. Independent acceptance will be separate."
+  ],
+  "definition_of_done": [
+    "Return two concise sentences using only the synthetic note: the rehearsal is scheduled for Tuesday; the checklist remains under review.",
+    "Do not invent facts.",
+    "Use exactly one assigned local writer with no tools, files, web or code.",
+    "The final answer must preserve both facts."
+  ],
+  "worker_model_sha256": "fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad",
+  "reviewer_model_sha256": "322e194ff79741c7baa497c240f677f54b201b0efab44ca8e50f122b39123482",
+  "approved_intake_sha256": "394e1c23ff35b6b7825fea676377dcd0195cdf3e61eef796b278f4349eed964c",
+  "program_sha256": "fd6717265737e010c0c2bb6502a8d35bca9d89080cdc1d0d658e2f745c2788b7",
+  "snapshot_sha256": "1bdb635feac72775cd01a0d49dc88154a33e5d4b0139d09c4bf519e83ee341cd",
+  "worker_native_reply": {
+    "text": "{\"deliverable\":\"The rehearsal is scheduled for Tuesday. The checklist remains under review.\",\"evidence\": [\"input:96217472252a61514899bcad187dc345ea90f36c4fa0c815349733bd266c58eb\"], \"unknowns\": []}",
+    "usage": {
+      "input": 644,
+      "output": 88,
+      "cached_input": 0,
+      "reasoning": null,
+      "cost_usd": 0.0,
+      "source": "local local response; provider charge is zero, electricity excluded"
+    },
+    "latency_ms": 1418,
+    "response_id": "chatcmpl-a5f3XgqKR2OQfPz3Y2VeJUvbR536IAFT",
+    "local_execution": {
+      "finish_reason": "stop",
+      "task_input_sha256": "c1f5845d715446a3aeed621ed277a858caae456c925f92f07743e61ddd943e97",
+      "backend_pid": 81424,
+      "port": 8791,
+      "dispatched_at_ms": 1794589223745,
+      "received_at_ms": 1794589225163,
+      "resident_kib": 19867472,
+      "launch_policy": {
+        "configured_context_tokens": 16384,
+        "requested_gpu_layers": "auto",
+        "fit_margin_mib": 4096
+      },
+      "observed_context_tokens": 16384,
+      "generation_budget": {
+        "reasoning_tokens": 0,
+        "final_tokens_reserved": 1024,
+        "total_generation_tokens": 1024
+      },
+      "separated_reasoning_observed": false
+    }
+  },
+  "independent_review_packet": {
+    "candidate": {
+      "deliverable": "The rehearsal is scheduled for Tuesday. The checklist remains under review.",
+      "evidence": [
+        "input:96217472252a61514899bcad187dc345ea90f36c4fa0c815349733bd266c58eb"
+      ],
+      "unknowns": []
+    },
+    "candidate_actor": "Engineer Gent",
+    "candidate_lineage": [],
+    "candidate_sha256": "545a3cffb6964054634653b95997e04311efa970ebf94e330015d78c24ccd110",
+    "criteria": {
+      "0": "Return two concise sentences using only the synthetic note: the rehearsal is scheduled for Tuesday; the checklist remains under review.",
+      "1": "Do not invent facts.",
+      "2": "Use exactly one assigned local writer with no tools, files, web or code.",
+      "3": "The final answer must preserve both facts."
+    },
+    "history_sha256": "b80dc228ccccd0e782d3b877da1baeaabcd7001cfe87b72786ab65b9010f0327",
+    "input": {
+      "user_conversation": [
+        "I need a short update from a synthetic launch note, using one local writer and no tools, files, web or code. Ask me one question to confirm the desired output before planning.",
+        "Confirm the definition of done: return two concise sentences using only this synthetic note: the rehearsal is scheduled for Tuesday; the checklist remains under review. Do not invent facts. Use exactly one assigned local writer with no tools, files, web or code. The final answer must preserve both facts. Independent acceptance will be separate."
+      ]
+    },
+    "objective": "I need a short update from a synthetic launch note, using one local writer and no tools, files, web or code. Ask me one question to confirm the desired output before planning.\n\nConfirm the definition of done: return two concise sentences using only this synthetic note: the rehearsal is scheduled for Tuesday; the checklist remains under review. Do not invent facts. Use exactly one assigned local writer with no tools, files, web or code. The final answer must preserve both facts. Independent acceptance will be separate.",
+    "scope": "Original task input and final reasoning candidate only. No historical memory, tool evidence or authority in worker prose. Citations identify available content, not verified truth.",
+    "tools_executed": []
+  },
+  "reviewer_native_reply": {
+    "text": "{\n  \"verdict\": \"accepted\",\n  \"summary\": \"The candidate returns exactly two concise sentences that preserve both supplied facts and introduce no new facts; the supplied metadata identifies one writer and no executed tools.\",\n  \"checks\": {\n    \"0\": {\n      \"passed\": true,\n      \"evidence\": \"Deliverable contains two sentences: 'The rehearsal is scheduled for Tuesday.' and 'The checklist remains under review.'\"\n    },\n    \"1\": {\n      \"passed\": true,\n      \"evidence\": \"Both sentences restate only the facts provided in the input; no additional facts are added.\"\n    },\n    \"2\": {\n      \"passed\": true,\n      \"evidence\": \"candidate_actor is a single writer, Engineer Gent, and tools_executed is empty; the deliverable does not invoke files, web, or code.\"\n    },\n    \"3\": {\n      \"passed\": true,\n      \"evidence\": \"The final text preserves the rehearsal/Tuesday fact and the checklist/under review fact.\"\n    }\n  }\n}",
+    "usage": {
+      "input": 774,
+      "output": 1820,
+      "cached_input": 0,
+      "reasoning": null,
+      "cost_usd": 0.0,
+      "source": "local local response; provider charge is zero, electricity excluded"
+    },
+    "latency_ms": 101219,
+    "response_id": "chatcmpl-oXNrhXvf68j0KDLZckB8otDBTDfXgUo2",
+    "local_execution": {
+      "finish_reason": "stop",
+      "task_input_sha256": "5daee0eb1aa324993fdafc2ca6b53619e04a1b0cf58f18af053584a2d21cb886",
+      "backend_pid": 82003,
+      "port": 8791,
+      "dispatched_at_ms": 1794589290184,
+      "received_at_ms": 1794589391404,
+      "resident_kib": 17362864,
+      "launch_policy": {
+        "configured_context_tokens": 16384,
+        "requested_gpu_layers": "auto",
+        "fit_margin_mib": 4096
+      },
+      "observed_context_tokens": 16384,
+      "generation_budget": {
+        "reasoning_tokens": 2048,
+        "final_tokens_reserved": 1024,
+        "total_generation_tokens": 3072
+      },
+      "separated_reasoning_observed": true
+    }
+  },
+  "memory_checkpoints": [
+    {
+      "agent": "Engineer Gent",
+      "policy_revision": 1,
+      "contract_sha256": "394e1c23ff35b6b7825fea676377dcd0195cdf3e61eef796b278f4349eed964c",
+      "record_count": 1,
+      "records_sha256": "07e7199ddbbb91f97bdf38f8557519b6c9fcdcca47ace214f2e66c5f76d726b8"
+    }
+  ],
+  "measurements": {
+    "status": "PASS",
+    "run": "bcc33ea9-9f11-4f31-b301-9ffd2d5c17aa",
+    "company": "architecture-native-c1e3e8d32aec4f1da8a01043a5a20531",
+    "runtime_status": "completed",
+    "private_exact_text_oracle_passed": true,
+    "deliverable": "The rehearsal is scheduled for Tuesday. The checklist remains under review.",
+    "actual_model_calls": 2,
+    "local_input_tokens": 1418,
+    "local_output_tokens": 1908,
+    "provider_fees_usd": 0,
+    "elapsed_ms": 231010,
+    "scope": "Continues an earlier actual native CEO clarification/plan and architecture assessment. Starts a new real text task, independent local final review and lifecycle gate. No new planning inference or architecture choice is implied. One synthetic note; not a held-out benchmark, arbitrary-task guarantee, tool task or compliance qualification."
+  },
+  "read_only_verification": {
+    "status": "PASS",
+    "run": "bcc33ea9-9f11-4f31-b301-9ffd2d5c17aa",
+    "company": "architecture-native-c1e3e8d32aec4f1da8a01043a5a20531",
+    "canonical_approval_program_worker_and_review_packets_verified": true,
+    "actual_pinned_weight_bytes_verified": true,
+    "private_exact_text_oracle_passed": true,
+    "completed_agent_memory_checkpoints": 1,
+    "provider_fees_usd": 0,
+    "scope": "Independent read-only verification of one actual local one-writer synthetic-note task continued from prior real CEO planning. Not arbitrary task, tool execution, three-pattern or compliance qualification."
+  },
+  "public_replay": {
+    "path": "assets/demos/local-ceo-task-replay.gif",
+    "kind": "Labeled visualization of actual retained event prefixes. No model calls or task mutation during replay. Room telemetry unavailable rather than invented.",
+    "duration_ms": 8000,
+    "frames": 40,
+    "recorded_run_sha256": "57e333507ea76418bda031b1fe4c77ce16394b44118ca9c366b131a7f67cec05",
+    "gif_sha256": "d42cac0f914bf11af8100459195c06950916ebb1c2cb241c2b3640e666c1241e"
+  },
+  "known_limits": [
+    "Three separate development sorted-ID JSON attempts failed.",
+    "Hub and peer execution have host protocol tests but no completed-task qualification from this writing trial.",
+    "No SOC, industry compliance, broad security or general capability certification."
+  ]
+}

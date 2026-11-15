@@ -82,7 +82,7 @@ export const positionStyles={
 export function positionKey(id=''){
  const key=String(id).trim().toLowerCase().split(/\s+-\s+/)[0]
   .replace(/\s+gent$/,'').replace(/&/g,' ').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
- return ({'routing-judge':'cto','completion-judge':'compliance-security-qa',
+ return ({'routing-judge':'cto','completion-judge':'compliance-security-qa','independent-reviewer':'compliance-security-qa',
   'compliance-security-qa-engineer':'compliance-security-qa','engineer':'web-engineer'})[key]||key||'unassigned';
 }
 export const appearanceKey=(id,phase=null)=>`${positionKey(id)}:${phase||'position'}`;
@@ -114,3 +114,6 @@ export function uniqueCrewLooks(crew,overrides={}){
  }
  return result;
 }
+
+// Display aliases only. Native actor IDs, roles and permissions stay unchanged.
+export const activityRole=role=>role==='coordination'?'worker':role==='reasoning_acceptance'?'judge':role;

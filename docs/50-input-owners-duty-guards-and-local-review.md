@@ -1,0 +1,53 @@
+# Input owners, owner duty guards and bounded local review
+
+The company has completed an outcome-only reconciliation using a CEO-designed transformation graph. It has also completed a harder three-file, two-match workflow, first after documented review-context maintenance and then in a fresh run without execution maintenance. These are synthetic task results, not evidence that the company can solve arbitrary tasks or that model weights were trained.
+
+## Fixed inputs and explicit human requirements
+
+Fixed-input planning now uses `native_graph_v2`. The CEO selects an actor for every attached input in `input_owners`, or selects null when an input is unused. The host expands those selections into the existing immutable input declarations. The transformation array contains only the model's derived computations. Tests and independent review check that root ownership matches the actual CEO map and that transformations remain unchanged. Input contents, paths and hashes cannot be replaced by this compilation.
+
+An optional owner requirement, `planning_constraints: {separate_source_writers: true}`, requires all native source actors to be distinct from every artifact writer. The owner can select it in the CEO floor UI. It is immutable within the conversation and copied into the frozen plan. Decoder constraints require sufficient distinct stages, but the CEO chooses their actors, transformations and ownership. Native validation enforces the requirement during planning and intake. Removing artifact checks or introducing source/writer overlap through binding edits cannot bypass it. Other conversations retain the ability to use one actor when separation was not requested.
+
+The UI shows the host-expanded input roots and draft capabilities separately from the raw CEO message. These remain unapproved requests until exact scope approval and policy installation. Browser verification confirmed the new control after refreshing the office; the screenshot is `data/mcp-basement-verification/input-duty-ui.png`. No task was submitted during that browser check.
+
+## Outcome-only reconciliation passed
+
+The earlier version of the outcome-only fixture remains in failure history. Its source data and expected results were retained; the already-written independent analysis/output requirement was also supplied as the explicit owner constraint. This changes the fixture hash to `03b21cbed588b7c699c4e77ce3fdd9e3dd12533bb6f332d9518d34493cdcbd8e`. The two older curriculum fixture hashes remain unchanged.
+
+Actual run `faaffaea-1741-411b-a3b9-e6a71540414d` passed with two planning replies and no rejected draft. The CEO chose a match and summary graph, source ownership, output writer and projections. The host supplied the fixed file-read definitions already attached by the fake user. The native MCP pipeline imported both pinned files, matched their actual rows and aggregated the actual result. All six output files were written and read once; all source bytes remained unchanged. Independent verification checked current policy, frozen approval, canonical native receipts, exact result arrays and output bytes, actor separation, ordered handoff and final review.
+
+Result: thirteen matched/output rows, nine selected rows, four excluded rows, total `6` and one unmatched left row. Cancelled and zero-total groups retained their multiplicities. The full evidence is in `data/mcp-workflow-check/c7d14599-10e4-487c-84f1-0b59e0022a2d/`, including the fake-user/CEO conversation and every public execution event in `transcript.html`.
+
+Measured execution: 23 completed local replies, 105745 input tokens and 2980 output tokens; zero worker-model calls and zero provider charges. Local inference consumes tokens and electricity. The original failed owner-map trial and its last-turn metadata rejection remain in `65bbacfc-690e-4d67-8702-662230f2d1ca/` and `15cf6a41-f950-4aa8-ac98-2b68bec0db45/`.
+
+## Harder three-file task
+
+`depot-reconciliation` adds three pinned inputs with different field names, a product match that discards missing products, a dependent depot match that preserves missing depots, and a signed family summary. Duplicate matches, nulls, integer/boolean/string distinctions, a string-valued enabled flag and zero-total groups are deliberate adversarial cases. The fake user supplies desired behavior and outputs, not a transformation graph or numeric answers. Only the evaluator retains the literal expected arrays and source contracts.
+
+The reviewed task requires six native source calls, five receipt-bound dependency edges and nine files. The model initially introduced an unused computation. Naming the actual unused source ID in the compiler diagnostic allowed it to repair its graph without receiving the evaluator's expected graph.
+
+Run `0a8d89ac-d156-4f54-8792-6bccf86d7aec` generated the correct outputs, then failed final QA preflight because the local review packet exceeded the installed 8192-token context. Generic recovery moved into a worker path without broader capabilities; those resource requests were denied. Both this failure and the subsequent unsuccessful profile-only repair remain recorded.
+
+## Review context and maintenance fidelity
+
+Final judges now receive the complete explicit task, criteria, current artifact/receipt gates and supplied deliverable, without a duplicate company-guidance envelope. Flat optional evidence is removable only when the packet also contains the canonical native proof gates; other flat task evidence remains required and cannot be silently discarded.
+
+Repeated SHA-256 values in native proof fields may use a lossless dictionary encoding: `{$h: index}` points to the complete digest in `_native_proof_hashes`. Every proof field and full digest remains available. The task and criteria remain literal. Reserved marker collisions are rejected, roundtrip tests prove equality, and the original packet is retained when encoding would increase its byte size. Canonical receipts, filesystem checks and post-review completion gates are not compressed or rewritten. Native token preflight still rejects an oversized required packet.
+
+Two controlled maintenance snapshots are in `depot-maintenance.json` and `depot-maintenance-2.json` under `data/mcp-basement-verification/`. Maintenance occurred after identifying and testing actual failures, not because observation timed out. The same UUID, installed policy, approval, accepted first-stage handoff, 24 tool journals and all twelve source/output files were retained. Only the stalled attention/recovery state and the current uncommitted finish marker were cleared. Their hashes were compared before and after recovery. No input, computation or file write/read was replayed.
+
+The final QA completed with 5963 measured input tokens. The recovered run passed independent verification: ten product-associated rows, fifteen depot-associated rows, eight selected rows, seven excluded rows, total `7`, one missing product and one missing depot. The parts group retained four rows with total zero. Final evidence and the full conversation/actions are in `data/mcp-workflow-check/b5e9701b-df31-470a-9562-ec1422fb969c/`. Earlier cancelled/failed snapshots remain unchanged in their report directories.
+
+Recovery measurements include 41 completed local replies, 202328 input tokens and 13533 output tokens. There were 74 terminal failed model calls without a reply and two recorded resumes. Their local token usage remains unknown; no token estimates were invented. Call accounting now uses correlation IDs to distinguish those failures from unresolved/in-flight calls: unresolved count is zero. All completed responses have native local execution provenance, and provider charges are zero. The recovered result was admitted as existing evidence rather than presented as an uninterrupted new execution.
+
+## Regression and remaining scope
+
+The curriculum supports an explicit `--retest QUALIFIED_CASE` after a harness change. It requires a currently qualified fixture and prerequisites and uses the same durable single-active-attempt lease and independent admission checks. It does not replace `--next`, loop over passed tasks by default, or rewrite old attempts. A fresh depot retest checks the fixed context path from planning through completion without manual checkpoint maintenance.
+
+The first post-fix retest failed planning without issuing a run. Its source array added three unused aggregates, and its final repaired plan selected the wrong first-match kind. These reports remain in `1621ecc2-e8e8-4442-98ed-a282ba66b795/` and `a2907e1a-2fdb-468a-8501-45dba8b5571d/`. Compiler diagnostics now identify unused IDs before reporting graph-size limits, explain that fixed roots count toward those limits, and document source reuse across result projections. The native join catalog now explicitly distinguishes discarding unmatched rows from retaining them and explains unmatched counts for both modes. No fixture data, expected result or scope limit was relaxed.
+
+The subsequent fresh run `ae716b0d-a1ab-4736-b6a0-af6ac7dd0fec` passed from planning through final QA without execution maintenance. It required six planning replies (including three native-validation failures and an additional scope-review rejection), then executed all six source calls and all nine write/readback pairs exactly once. There were no post-planning questions, failed execution-model calls, unresolved model calls, worker-model calls or resumes. Measured usage, including every planning reply, was 35 completed local replies, 168790 input tokens and 9785 output tokens, with zero provider charges. Its complete conversation and execution transcript is `data/mcp-workflow-check/4221efda-bdfb-4de4-a3b5-70afd8641cdf/transcript.html`. It was admitted as a newly executed post-change retest, separately from the historical recovered proof.
+
+Task qualification records verified evidence at admission time. Four current reviewed fixture levels are qualified; their retained failures are still visible. Broader domains, owner-file staging in the browser, native development/build tools, robust typed recovery of a failed review phase, and general local task competence remain unfinished. The overarching goal remains active.
+
+Final verification passed the full repository check, with 281 Rust tests passed and 17 ignored, strict Clippy, Python/Node checks, smoke checks and the web build. Focused Rust and Node checks passed again after the final diagnostic and catalog changes. Logs, source hashes, exact usage limits and proof paths are indexed in `data/mcp-basement-verification/input-duty-summary.json`. The running office at `http://127.0.0.1:8788` was checked in local-only mode with the SSE MCP transport and nine catalog functions.

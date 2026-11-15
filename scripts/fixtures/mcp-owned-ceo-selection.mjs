@@ -1,0 +1,19 @@
+// Frozen owner data and private acceptance, never a supplied invocation graph.
+import libraries from './mcp-owned-multi-library.mjs';
+import {finiteScheduling} from './mcp-owned-mixed-batch.mjs';
+import {allocateOracle} from './mcp-owned-allocation-chain.mjs';
+const requests=[['0','3','7'],['3','5','8'],['0','5','15'],['5','8','9'],['8','11','6'],['5','11','15'],['11','13','5'],['0','13','34']];
+const data={requests,budget:'1009'};
+const selected=finiteScheduling(requests),weights={some:selected.some.map(i=>String(BigInt(i)+1n))};
+const roles=[{role:'schedule',function:'select_slots',arguments:[{kind:'data',data:'requests',pointer:''}]},{role:'weights',function:'index_weights',arguments:[{kind:'result',source_role:'schedule',pointer:'/some'}]},{role:'allocate',function:'allocate_cents',arguments:[{kind:'data',data:'budget',pointer:''},{kind:'result',source_role:'weights',pointer:'/some'}]}];
+export default {
+ ...libraries,id:'owned-ceo-selection',title:'CEO selects owned functions and inputs from a catalog',ownerPreparation:'catalog_selection_v1',complexity:'medium',
+ complexity_basis:'New autonomy dimension: no owner-prepared invocation IDs/functions. CEO selects three functions and owner-data/result references before existing source custody and graph planning. Fewer nodes than the previous eight-node benchmark; no universal harder-task, general mastery or compliance claim.',
+ initial:'Use our owned local libraries and named data to prepare a fair distribution report from compatible scheduling requests. Ask me to confirm exact output and done criteria, then propose the necessary local calls yourself.',
+ requirements:'From the supplied requests, select a nonoverlapping subset with maximum exact total priority; intervals are half-open, and ties choose the lexicographically smallest increasing vector of original indices. Turn those selected zero-based indices into positive one-based u64 weights using our owned checked adapter. Distribute the supplied budget by exact weighted quotas and largest fractional remainders, breaking ties by smaller original recipient index. Use actual earlier native results as inputs; keep owner data unchanged and never use an implicit numeric cast or invented vector. Choose the required functions and argument references from the inspected owned catalog yourself; I am not supplying invocation IDs, function selections or a prepared graph. Propose the minimum calls for review first. After I adopt the exact preparatory calls, choose one computation actor followed by a distinct publication actor and minimum tools. All three valid operations must succeed with present results. Publish only the complete native /output of the final allocation to distribution.json, compact canonical JSON with sorted object keys and no newline; read it back and compare to its own native result. No intermediate files, source edits, reimplementation, shell, network, downloads, credentials, memory tools, paid services or source promotion. Source bodies remain in owner custody until approved staging. The fictional data is synthetic scheduling and arithmetic only, with no actual bookings, payments, accounts, clinical advice or compliance certification.',
+ selection:{data,roles,adoption_message:'I adopt your reviewed calls unchanged for source preparation. Continue planning the same requested result, choosing your own actors, exact result references and publication mapping. This preparation does not approve execution.'},
+ sourceInputs:[],planningInputs:[],dependencies:{},
+ ownedComponents:roles.map(role=>{const {input,...spec}=libraries.ownedComponents.find(c=>c.function===role.function);return spec;}),
+ artifacts:[{path:'distribution.json',input:'allocate',pointer:'/output',encoding:'json'}],
+ expectedResults:new Map([['schedule',{output:selected}],['weights',{output:weights}],['allocate',{output:allocateOracle(data.budget,weights.some)}]])
+};

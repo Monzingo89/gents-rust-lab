@@ -1,0 +1,43 @@
+{
+  "criterion": {
+    "same_length": true,
+    "max_abs_error": 0.0001,
+    "rmse": 1e-05
+  },
+  "cases": [
+    {
+      "text": "The local company is ready.",
+      "torch_samples": 37888,
+      "onnx_samples": 37888,
+      "finite": true,
+      "max_abs_error": 2.15284526348114e-05,
+      "rmse": 1.3453028486765106e-06,
+      "passed": true
+    },
+    {
+      "text": "Please check the report.",
+      "torch_samples": 31488,
+      "onnx_samples": 31488,
+      "finite": true,
+      "max_abs_error": 2.1882355213165283e-05,
+      "rmse": 1.2479963515943382e-06,
+      "passed": true
+    },
+    {
+      "text": "Seven green squares are on the page.",
+      "torch_samples": 57088,
+      "onnx_samples": 57088,
+      "finite": true,
+      "max_abs_error": 5.622208118438721e-05,
+      "rmse": 1.8636748109202017e-06,
+      "passed": true
+    }
+  ],
+  "all_passed": true,
+  "source_safetensors_sha256": "f7fb2fc74c4f59ff91b32cc7559865b57f9f65990e2d1a92a8d6eea804bd6443",
+  "production_onnx_sha256": "5d4f08ba6a2a48c44592eed3ce56bf85e9de3dd4e20df90541ae68a8310c029a",
+  "provider_cost_usd": 0,
+  "weights_modified": false,
+  "admitted": false,
+  "scope": "Three deterministic zero-noise CPU cases; not a general numerical equivalence proof or speech-quality evaluation"
+}

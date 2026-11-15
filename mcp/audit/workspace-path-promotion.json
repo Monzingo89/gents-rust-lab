@@ -1,0 +1,15 @@
+{
+  "status":"component_accepted_after_host_gates_not_whole_company_goal_complete",
+  "initial_local_run":"97746e3a-0435-418d-afc7-0615d25759d9",
+  "revision_local_run":"c2d7a7e0-8223-474d-8ccb-8caf0331b359",
+  "candidate_sha256":"9af811c3516fef71cd412a6772f20c58e49188eb2fada96bf2cd5606ef43c129",
+  "promoted_path":"mcp/src/workspace_path.rs",
+  "promoted_sha256":"26dae950ad455bba42875292d2145d1d5f6fcc551e977a1b1e6165df58b6acc7",
+  "host_changes":"source attribution header and cargo fmt only",
+  "independent_tests_path":"mcp/tests/workspace_files.rs",
+  "independent_tests_sha256":"debc07f9926137a02724bb7308dd7f23a8662292bb0410dd7a35610d059054d2",
+  "host_gates":{"authored_tests":2,"independent_native_workspace_tests":8,"strict_all_target_clippy":"passed","locked_offline_workspace_tests":"passed","locked_offline_workspace_build":"passed"},
+  "review":{"pure_lexical_predicate":true,"io":false,"unsafe":false,"permission_expansion":false,"lint_waivers":false,"filesystem_authority":"independent descriptor-relative adapter, not this predicate"},
+  "provider_cost_usd":0,
+  "limits":"The initial draft was rejected after compiler failures and a contradictory boundary test. The corrected component passed host tests, but the generic authoring run was cancelled after subsequent review-loop stalls. That lifecycle failure remains retained; no whole-company autonomy or certification claim is made."
+}

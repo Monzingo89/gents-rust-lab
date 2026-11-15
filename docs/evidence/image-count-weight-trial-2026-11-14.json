@@ -1,0 +1,243 @@
+{
+  "before_passed": 2,
+  "after_passed": 2,
+  "total": 4,
+  "regressions": [],
+  "cases": [
+    {
+      "index": 0,
+      "sha256": "b49c1d0a91813fb3b406d991b3eb93f86c449b473af19fc749006085a7aa6cbf",
+      "passed": true,
+      "requested_count": 4,
+      "observed_count": 4,
+      "checks": {
+        "exact_count": true,
+        "foreground_area": true,
+        "white_background": true,
+        "square_components": true
+      },
+      "components": [
+        {
+          "pixels": 3375,
+          "fill": 0.9862653419053186,
+          "aspect": 1.0172413793103448
+        },
+        {
+          "pixels": 3316,
+          "fill": 0.985731272294887,
+          "aspect": 1.0
+        },
+        {
+          "pixels": 3476,
+          "fill": 0.9985636311404769,
+          "aspect": 1.0
+        },
+        {
+          "pixels": 3413,
+          "fill": 0.9973699590882524,
+          "aspect": 0.9830508474576272
+        }
+      ],
+      "white_fraction": 0.782379150390625
+    },
+    {
+      "index": 1,
+      "sha256": "541db6ef564d4c77e284c4e9fdee986491e0b3770f69605232395437ebfd4270",
+      "passed": false,
+      "requested_count": 5,
+      "observed_count": 4,
+      "checks": {
+        "exact_count": false,
+        "foreground_area": true,
+        "white_background": true,
+        "square_components": true
+      },
+      "components": [
+        {
+          "pixels": 1891,
+          "fill": 0.9787784679089027,
+          "aspect": 1.0952380952380953
+        },
+        {
+          "pixels": 1850,
+          "fill": 0.9575569358178054,
+          "aspect": 1.0952380952380953
+        },
+        {
+          "pixels": 2018,
+          "fill": 0.9970355731225297,
+          "aspect": 1.0454545454545454
+        },
+        {
+          "pixels": 1937,
+          "fill": 0.9782828282828283,
+          "aspect": 1.0227272727272727
+        }
+      ],
+      "white_fraction": 0.8744659423828125
+    },
+    {
+      "index": 2,
+      "sha256": "504fec55795f93733ff5e506a7e764bdb2037772e4871221c1eca3474ea97ccd",
+      "passed": true,
+      "requested_count": 6,
+      "observed_count": 6,
+      "checks": {
+        "exact_count": true,
+        "foreground_area": true,
+        "white_background": true,
+        "square_components": true
+      },
+      "components": [
+        {
+          "pixels": 1081,
+          "fill": 0.9935661764705882,
+          "aspect": 1.0625
+        },
+        {
+          "pixels": 1088,
+          "fill": 0.9990817263544536,
+          "aspect": 1.0
+        },
+        {
+          "pixels": 1056,
+          "fill": 1.0,
+          "aspect": 1.03125
+        },
+        {
+          "pixels": 1056,
+          "fill": 1.0,
+          "aspect": 1.03125
+        },
+        {
+          "pixels": 1117,
+          "fill": 0.9955436720142602,
+          "aspect": 1.0303030303030303
+        },
+        {
+          "pixels": 1089,
+          "fill": 1.0,
+          "aspect": 1.0
+        }
+      ],
+      "white_fraction": 0.8914947509765625
+    },
+    {
+      "index": 3,
+      "sha256": "5f9797324b0cd5f89048e0de06c74283cf5a5509db57c62f26622f1ab48ee6a1",
+      "passed": false,
+      "requested_count": 7,
+      "observed_count": 9,
+      "checks": {
+        "exact_count": false,
+        "foreground_area": true,
+        "white_background": true,
+        "square_components": true
+      },
+      "components": [
+        {
+          "pixels": 1581,
+          "fill": 0.988125,
+          "aspect": 1.0
+        },
+        {
+          "pixels": 1638,
+          "fill": 0.998780487804878,
+          "aspect": 0.975609756097561
+        },
+        {
+          "pixels": 1622,
+          "fill": 0.9890243902439024,
+          "aspect": 0.975609756097561
+        },
+        {
+          "pixels": 1599,
+          "fill": 1.0,
+          "aspect": 0.9512195121951219
+        },
+        {
+          "pixels": 1587,
+          "fill": 0.991875,
+          "aspect": 1.0
+        },
+        {
+          "pixels": 1560,
+          "fill": 1.0,
+          "aspect": 0.975
+        },
+        {
+          "pixels": 1659,
+          "fill": 0.9875,
+          "aspect": 0.9523809523809523
+        },
+        {
+          "pixels": 1676,
+          "fill": 0.9976190476190476,
+          "aspect": 0.9523809523809523
+        },
+        {
+          "pixels": 1637,
+          "fill": 0.9993894993894994,
+          "aspect": 0.9285714285714286
+        }
+      ],
+      "white_fraction": 0.760040283203125
+    }
+  ],
+  "adapter_sha256": "3166d982150a0db0083d494e98d8e6986ca3c409ddd7089f105ccb577b316d9f",
+  "checkpoint_sha256": "354007be0a78f3798e45cdb21a03af2cb31dbafb52a4fdd16c41d8a5927772cf",
+  "fresh_process_adapter_reload": true,
+  "elapsed_seconds": 13.95,
+  "provider_cost_usd": 0,
+  "promotion_authorized": false,
+  "measured_improvement": false,
+  "training": {
+    "exit_code": 0,
+    "elapsed_seconds": 167.96,
+    "base_pins_verified_after": true,
+    "provider_cost_usd": 0,
+    "promotion_authorized": false,
+    "training_success_is_not_quality_improvement": true
+  },
+  "weight_change_evidence": {
+    "checkpoints": [
+      {
+        "step": 12,
+        "tensor_payload_sha256": "1be46bd68ed5f8e8c2c038b612500a26648da08b4d407128a6d125e460e525f1",
+        "tensor_keys": [
+          "transformer.transformer_blocks.0.attn.to_q.lora_A.weight",
+          "transformer.transformer_blocks.0.attn.to_q.lora_B.weight"
+        ],
+        "adapter_bytes": 98618
+      },
+      {
+        "step": 90,
+        "tensor_payload_sha256": "f6b041df69fc2e130afa38e7a36524e035c02dda38df7f70cd94a503d29670f5",
+        "tensor_keys": [
+          "transformer.transformer_blocks.0.attn.to_q.lora_A.weight",
+          "transformer.transformer_blocks.0.attn.to_q.lora_B.weight"
+        ],
+        "adapter_bytes": 98618
+      }
+    ],
+    "tensor_payload_changed": true,
+    "scope": "Tensor payload changed between steps 12 and 90; not evidence of capability improvement"
+  },
+  "first_attempt_failed_before_optimization": {
+    "exit_code": 1,
+    "elapsed_seconds": 2.0,
+    "base_pins_verified_after": true,
+    "provider_cost_usd": 0,
+    "promotion_authorized": false,
+    "training_success_is_not_quality_improvement": true
+  },
+  "scope": "Four frozen same-concept counting cases; not general image quality. Separate sandboxed development adapter evaluation, not production MCP adapter admission.",
+  "decision": "not_promoted_no_measured_task_gain",
+  "changed_pixels_per_case": [
+    26958,
+    16847,
+    21700,
+    24452
+  ],
+  "candidate_artifact_hashes_verified": true
+}

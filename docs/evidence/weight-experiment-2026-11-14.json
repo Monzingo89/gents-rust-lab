@@ -1,0 +1,24 @@
+{
+  "training_id": "63e37c7a-13bc-4a01-95d7-1dd35151e453",
+  "verification": "source, base, adapter and dataset hashes independently rechecked; output scores recomputed",
+  "method": "LoRA rank 4, last transformer layer",
+  "task_comparison": {
+    "before_passed": 6,
+    "after_passed": 6,
+    "total": 6,
+    "regressions": 0,
+    "measured_improvement": false,
+    "promotion_authorized": false,
+    "scope": "Only these frozen cases; no general capability or statistical significance claim"
+  },
+  "baseline_test_loss": 3.6903927326202393,
+  "adapter_test_loss": 0.7596278190612793,
+  "iterations": 50,
+  "elapsed_seconds": 37.61,
+  "peak_memory_gb": 15.263597552,
+  "adapter_sha256": "349d7c579ea815f1cff551a0cf19aa52df18ba7d5ada6c6e20f1df053477f81a",
+  "base_fingerprint": "2c67bd27de2d6405554b4dd4b9f7da357529f8da4596414ae4475af6f9b4bb01",
+  "provider_cost_usd": 0,
+  "electricity_cost": "unmeasured",
+  "promoted": false
+}

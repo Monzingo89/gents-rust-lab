@@ -1,0 +1,63 @@
+name: Dependency advisory gates
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 9 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: dependency-advisories-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install pinned audit tool
+        run: |
+          rustup toolchain install 1.99.1 --profile minimal
+          cargo +1.99.1 install cargo-audit --locked --version 0.22.2
+      - name: Audit both independent Rust lockfiles, including warnings
+        shell: bash
+        run: |
+          result=0
+          cargo audit --deny warnings --file Cargo.lock || result=1
+          python3 scripts/audit-desktop-dependencies.py || result=1
+          exit "$result"
+  javascript:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - name: Audit the locked dependency graph without running package scripts
+        run: npm audit --audit-level=low
+
+  gtk-backports:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install GLib test headers and pinned Rust
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libglib2.0-dev pkg-config
+          rustup toolchain install 1.99.1 --profile minimal
+      - name: Check macros and optimized iterator regression tests
+        env:
+          CARGO_TARGET_DIR: ${{ github.workspace }}/target/vendor-check
+        run: |
+          cargo +1.99.1 check --manifest-path src-tauri/vendor/glib-macros-0.18.5/Cargo.toml
+          cargo +1.99.1 check --manifest-path src-tauri/vendor/gtk3-macros-0.18.2/Cargo.toml
+          cargo +1.99.1 test --release --manifest-path src-tauri/vendor/glib-0.18.5/Cargo.toml --lib variant_iter --config "patch.crates-io.glib-macros.path='$GITHUB_WORKSPACE/src-tauri/vendor/glib-macros-0.18.5'"

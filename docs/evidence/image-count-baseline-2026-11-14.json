@@ -1,0 +1,201 @@
+{
+  "scope": "Exact count and component shape/color on known concepts with new fixed seeds; not general visual quality",
+  "cases": [
+    {
+      "index": 0,
+      "color": "green",
+      "seed": 9504,
+      "image_sha256": "00a17e7b1dd4acdfdf5354a715e20c2b79793d9787d9de6f2f21b30fb3316395",
+      "elapsed_ms": 7706,
+      "passed": true,
+      "requested_count": 4,
+      "observed_count": 4,
+      "checks": {
+        "exact_count": true,
+        "foreground_area": true,
+        "white_background": true,
+        "square_components": true
+      },
+      "components": [
+        {
+          "pixels": 3378,
+          "fill": 0.9871420222092344,
+          "aspect": 1.0172413793103448
+        },
+        {
+          "pixels": 3329,
+          "fill": 0.972822910578609,
+          "aspect": 1.0172413793103448
+        },
+        {
+          "pixels": 3471,
+          "fill": 0.9971272622809537,
+          "aspect": 1.0
+        },
+        {
+          "pixels": 3432,
+          "fill": 0.9859235851766733,
+          "aspect": 1.0
+        }
+      ],
+      "white_fraction": 0.7803802490234375
+    },
+    {
+      "index": 1,
+      "color": "green",
+      "seed": 9505,
+      "image_sha256": "ee7b0737629f0e443f9cb58bf0b5e2f5d7b8081c314436d7748cbd69f9a3be3f",
+      "elapsed_ms": 7779,
+      "passed": false,
+      "requested_count": 5,
+      "observed_count": 4,
+      "checks": {
+        "exact_count": false,
+        "foreground_area": true,
+        "white_background": true,
+        "square_components": true
+      },
+      "components": [
+        {
+          "pixels": 1890,
+          "fill": 1.0,
+          "aspect": 1.0714285714285714
+        },
+        {
+          "pixels": 1874,
+          "fill": 0.9699792960662525,
+          "aspect": 1.0952380952380953
+        },
+        {
+          "pixels": 1979,
+          "fill": 0.9994949494949495,
+          "aspect": 1.0227272727272727
+        },
+        {
+          "pixels": 1961,
+          "fill": 0.9904040404040404,
+          "aspect": 1.0227272727272727
+        }
+      ],
+      "white_fraction": 0.8727874755859375
+    },
+    {
+      "index": 2,
+      "color": "green",
+      "seed": 9506,
+      "image_sha256": "da8432a56a72a8fb2aabda5c7296b0174f9dcc1686c55ed29f2e82ccb51bef58",
+      "elapsed_ms": 7780,
+      "passed": true,
+      "requested_count": 6,
+      "observed_count": 6,
+      "checks": {
+        "exact_count": true,
+        "foreground_area": true,
+        "white_background": true,
+        "square_components": true
+      },
+      "components": [
+        {
+          "pixels": 1087,
+          "fill": 0.9990808823529411,
+          "aspect": 1.0625
+        },
+        {
+          "pixels": 1086,
+          "fill": 0.9972451790633609,
+          "aspect": 1.0
+        },
+        {
+          "pixels": 1056,
+          "fill": 1.0,
+          "aspect": 1.03125
+        },
+        {
+          "pixels": 1056,
+          "fill": 1.0,
+          "aspect": 1.03125
+        },
+        {
+          "pixels": 1115,
+          "fill": 0.9937611408199644,
+          "aspect": 1.0303030303030303
+        },
+        {
+          "pixels": 1089,
+          "fill": 1.0,
+          "aspect": 1.0
+        }
+      ],
+      "white_fraction": 0.89117431640625
+    },
+    {
+      "index": 3,
+      "color": "green",
+      "seed": 9507,
+      "image_sha256": "cc7d9bc7545ac28e87c982e12d29fc7adba09d083c85c5c7c884a408d95780ef",
+      "elapsed_ms": 7782,
+      "passed": false,
+      "requested_count": 7,
+      "observed_count": 9,
+      "checks": {
+        "exact_count": false,
+        "foreground_area": true,
+        "white_background": true,
+        "square_components": true
+      },
+      "components": [
+        {
+          "pixels": 1599,
+          "fill": 0.999375,
+          "aspect": 1.0
+        },
+        {
+          "pixels": 1639,
+          "fill": 0.999390243902439,
+          "aspect": 0.975609756097561
+        },
+        {
+          "pixels": 1603,
+          "fill": 0.9774390243902439,
+          "aspect": 0.975609756097561
+        },
+        {
+          "pixels": 1599,
+          "fill": 1.0,
+          "aspect": 0.9512195121951219
+        },
+        {
+          "pixels": 1579,
+          "fill": 0.986875,
+          "aspect": 1.0
+        },
+        {
+          "pixels": 1560,
+          "fill": 1.0,
+          "aspect": 0.975
+        },
+        {
+          "pixels": 1675,
+          "fill": 0.9970238095238095,
+          "aspect": 0.9523809523809523
+        },
+        {
+          "pixels": 1674,
+          "fill": 0.9964285714285714,
+          "aspect": 0.9523809523809523
+        },
+        {
+          "pixels": 1637,
+          "fill": 0.9993894993894994,
+          "aspect": 0.9285714285714286
+        }
+      ],
+      "white_fraction": 0.7611541748046875
+    }
+  ],
+  "passed": 2,
+  "total": 4,
+  "provider_cost_usd": 0,
+  "weights_modified": false,
+  "decision": "baseline_has_failures_candidate_training_not_yet_run"
+}

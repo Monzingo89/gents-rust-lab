@@ -1,0 +1,21 @@
+{
+  "training_id": "9f248652-6009-42d9-b08d-aa547a1d69d4",
+  "verified": true,
+  "scope": "Local hashes, frozen prompts/oracles, persisted output scoring; not tamper-proof native execution attestation",
+  "task_comparison": {
+    "before_passed": 3,
+    "after_passed": 4,
+    "total": 24,
+    "regressions": 0,
+    "measured_improvement": true,
+    "promotion_authorized": false,
+    "scope": "Only these frozen cases; no general capability or statistical significance claim"
+  },
+  "adapter_sha256": "10ac34558443abae62b0749d1a64d9f507ab1a8ffd814d1fa508bb89265ea53b",
+  "persisted_adapter_reload_matches": true,
+  "iterations": 400,
+  "elapsed_seconds": 224.3,
+  "peak_memory_gb": 15.818193798,
+  "provider_cost_usd": 0,
+  "promoted": false
+}

@@ -1,0 +1,162 @@
+{
+  "version": 1,
+  "scope": "Reviewed synthetic fixture progression, not model mastery or code promotion",
+  "levels": [
+    {
+      "id": "reconciliation",
+      "level": 1,
+      "requires": []
+    },
+    {
+      "id": "reconciliation-edges",
+      "level": 2,
+      "requires": [
+        "reconciliation"
+      ]
+    },
+    {
+      "id": "outcome-only-reconciliation",
+      "level": 3,
+      "requires": [
+        "reconciliation-edges"
+      ]
+    },
+    {
+      "id": "depot-reconciliation",
+      "level": 4,
+      "requires": [
+        "outcome-only-reconciliation"
+      ]
+    },
+    {
+      "id": "rust-range-union",
+      "level": 5,
+      "requires": [
+        "depot-reconciliation"
+      ]
+    },
+    {
+      "id": "rust-cent-allocation",
+      "level": 6,
+      "requires": [
+        "rust-range-union"
+      ]
+    },
+    {
+      "id": "rust-dag-layers",
+      "level": 7,
+      "requires": [
+        "rust-cent-allocation"
+      ]
+    },
+    {
+      "id": "rust-weighted-slots",
+      "level": 8,
+      "requires": [
+        "rust-dag-layers"
+      ]
+    },
+    {
+      "id": "rust-minimum-settlement",
+      "level": 9,
+      "requires": [
+        "rust-weighted-slots"
+      ]
+    },
+    {
+      "id": "audio-inspection",
+      "level": 10,
+      "requires": [
+        "rust-minimum-settlement"
+      ]
+    },
+    {
+      "id": "audio-batch",
+      "level": 11,
+      "requires": [
+        "audio-inspection"
+      ]
+    },
+    {
+      "id": "audio-routing",
+      "level": 12,
+      "requires": [
+        "audio-batch"
+      ]
+    },
+    {
+      "id": "owned-weighted-reuse",
+      "level": 13,
+      "requires": [
+        "rust-weighted-slots",
+        "audio-routing"
+      ]
+    },
+    {
+      "id": "owned-prepared-reuse",
+      "level": 14,
+      "requires": [
+        "owned-weighted-reuse"
+      ]
+    },
+    {
+      "id": "owned-mixed-batch",
+      "level": 15,
+      "requires": [
+        "owned-prepared-reuse",
+        "rust-minimum-settlement"
+      ]
+    },
+    {
+      "id": "owned-mapped-batch",
+      "level": 16,
+      "requires": [
+        "owned-mixed-batch"
+      ]
+    },
+    {
+      "id": "owned-allocation-chain",
+      "level": 17,
+      "requires": [
+        "owned-mapped-batch",
+        "rust-cent-allocation"
+      ]
+    },
+    {
+      "id": "owned-branched-allocation",
+      "level": 18,
+      "requires": [
+        "owned-allocation-chain"
+      ]
+    },
+    {
+      "id": "rust-index-weights",
+      "level": 19,
+      "requires": [
+        "owned-branched-allocation"
+      ]
+    },
+    {
+      "id": "owned-multi-library",
+      "level": 20,
+      "requires": [
+        "rust-index-weights",
+        "owned-branched-allocation"
+      ]
+    },
+    {
+      "id": "owned-ceo-selection",
+      "level": 21,
+      "requires": [
+        "owned-multi-library"
+      ]
+    },
+    {
+      "id": "owned-ceo-branches",
+      "level": 22,
+      "requires": [
+        "owned-ceo-selection"
+      ]
+    }
+  ]
+}

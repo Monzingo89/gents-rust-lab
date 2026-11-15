@@ -1,0 +1,48 @@
+{
+  "company_mode": true,
+  "company_tools": true,
+  "admin_judge": {
+    "provider": "local",
+    "model": "Qwen3-Coder-30B",
+    "path": "models/qwen3-coder-30b-worker/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "context_tokens": 12288
+  },
+  "max_steps": 3,
+  "max_tokens": 1024,
+  "max_run_seconds": 86400,
+  "agents": [
+    {
+      "id": "PM Gent",
+      "assignment": "Plan bounded local Rust tool implementation using only installed tools, current policy and measured evidence.",
+      "planner": {
+        "provider": "local",
+        "model": "Qwen3-Coder-30B",
+        "path": "models/qwen3-coder-30b-worker/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+        "context_tokens": 8192
+      },
+      "worker": {
+        "provider": "local",
+        "model": "Qwen3-Coder-30B",
+        "path": "models/qwen3-coder-30b-worker/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+        "context_tokens": 8192
+      }
+    },
+    {
+      "id": "Engineer Gent",
+      "assignment": "Implement small isolated Rust functions with tests; use governed native memory, never expand permissions or use paid APIs.",
+      "planner": {
+        "provider": "local",
+        "model": "Qwen3-Coder-30B",
+        "path": "models/qwen3-coder-30b-worker/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+        "context_tokens": 8192
+      },
+      "worker": {
+        "provider": "local",
+        "model": "Qwen3.8-27B evaluation author",
+        "path": "models/qwen3.8-27b-planner-judge/Qwen3.8-27B-UD-Q4_K_M.gguf",
+        "context_tokens": 16384,
+        "local_reasoning_tokens": 2048
+      }
+    }
+  ]
+}

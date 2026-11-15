@@ -1,5 +1,9 @@
 {
   "skills": [
+    {"id":"security-governance","version":"1.0.0","status":"approved-local","domain":"security","roles":["planner","worker"],"path":"approved/security-governance/SKILL.md"},
+    {"id":"finance-reconciliation","version":"1.1.0","status":"approved-local","domain":"finance","roles":["planner","worker"],"path":"approved/finance-reconciliation/SKILL.md"},
+    {"id":"hr-model-assessment","version":"1.0.0","status":"approved-local","domain":"hr","roles":["planner","worker"],"path":"approved/hr-model-assessment/SKILL.md"},
+    {"id":"it-runtime-operations","version":"1.0.0","status":"approved-local","domain":"it","roles":["planner","worker"],"path":"approved/it-runtime-operations/SKILL.md"},
     {
       "id": "source-onboarding",
       "version": "1.0.0",
@@ -44,7 +48,7 @@
     },
     {
       "id": "document-workflow",
-      "version": "1.2.0",
+      "version": "1.3.0",
       "status": "approved-demo",
       "roles": ["planner", "worker"],
       "path": "approved/document-workflow/SKILL.md"

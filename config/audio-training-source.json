@@ -1,0 +1,13 @@
+{
+  "repo": "rhasspy/piper-checkpoints",
+  "revision": "005db054ce8f013d8213b7dd4b0917de3c9347fe",
+  "directory": "en/en_US/ljspeech/high",
+  "checkpoint": {"name":"ljspeech-2000.ckpt","bytes":998167044,"sha256":"f49e9af70265433aa03d403efc2fe161e0c42b9083c3768a17338be4b0af720a"},
+  "metadata": [
+    {"name":"MODEL_CARD","bytes":513,"git_blob_sha1":"ddd2c7524cadf38f78a9b268ad957079e9815383"},
+    {"name":"config.json","bytes":7087,"git_blob_sha1":"359c02eb480cd9f87bc6740c4e78025f77ba0a21"}
+  ],
+  "admission": "quarantined; not equivalent to installed ONNX until verified",
+  "restricted_loading_only": true,
+  "provider_budget_usd": 0
+}

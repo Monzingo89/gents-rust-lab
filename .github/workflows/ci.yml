@@ -8,7 +8,7 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -29,9 +29,21 @@ jobs:
         run: |
           python3 scripts/smoke.py
           python3 scripts/reliability_smoke.py
+          python3 scripts/company_factory_smoke.py
+          python3 scripts/coordination_smoke.py
+      - name: Verify offline public network boundaries
+        run: |
+          python3 -m unittest discover -s scripts -p 'test_company_tools.py'
+          python3 -m unittest discover -s scripts -p 'test_public_network.py'
+          node --test scripts/public-network.test.mjs
       - name: Web build and dependency advisory check
         run: |
           npm ci
           node --check web/app.js
           npm run build
+          npm run test:site
+          npm run site:build:production
+          python3 scripts/verify_introduction.py
+          node --test scripts/sync-vercel-website-env.test.mjs
+          python3 -m unittest discover -s scripts -p test_weight_prompt_formats.py
           npm audit --audit-level=high

@@ -1,0 +1,150 @@
+{
+  "scope": "Synthetic trusted-host local research; focused source and threat review, not an independent security certification",
+  "provider_cost_usd": 0,
+  "prohibited": [
+    "paid inference",
+    "tool-initiated external network access",
+    "subprocess tools",
+    "secret reads",
+    "policy installation",
+    "dynamic code loading"
+  ],
+  "common_controls": [
+    "owner-approved frozen job",
+    "process-bound actor and phase",
+    "canonical current policy transaction",
+    "bounded JSON-RPC and schemas",
+    "payload-free hashed audit receipts",
+    "Declared native result schemas validated before canonical receipt and binding capture; projection type checks belong to the MCP registry"
+  ],
+  "functions": [
+    {
+      "id": "integer_arithmetic",
+      "source": "src/functions/arithmetic.rs",
+      "effects": "pure bounded integer arithmetic",
+      "security_tests": [
+        "native_arithmetic_has_no_evaluation_or_boolean_coercion",
+        "shared_governance_filters_catalog_and_rejects_impersonation"
+      ]
+    },
+    {
+      "id": "memory_append",
+      "source": "src/functions/memory.rs",
+      "effects": "append bounded private SQLite record in active approved job",
+      "security_tests": [
+        "private_memory_shares_only_allowed_current_epoch_sources",
+        "corrupt_canonical_sources_cannot_be_laundered_into_a_derived_note",
+        "harness_adapter_uses_actual_stdio_and_prelaunch_cancel_cannot_mutate"
+      ]
+    },
+    {
+      "id": "memory_search",
+      "source": "src/functions/memory.rs",
+      "effects": "literal run/sender/current-epoch filtered SQLite read",
+      "security_tests": [
+        "private_memory_shares_only_allowed_current_epoch_sources",
+        "completion_requires_real_receipts_from_the_frozen_actor_and_current_epoch"
+      ]
+    },
+    {
+      "id": "skill_list",
+      "source": "src/functions/skills.rs",
+      "effects": "embedded assigned-phase metadata only",
+      "security_tests": [
+        "skills_are_shared_but_never_cross_the_assigned_phase_or_actor"
+      ]
+    },
+    {
+      "id": "skill_read",
+      "source": "src/functions/skills.rs",
+      "effects": "embedded assigned-phase procedure read; no new authority",
+      "security_tests": [
+        "skills_are_shared_but_never_cross_the_assigned_phase_or_actor"
+      ]
+    },
+    {
+      "id": "files",
+      "source": "src/functions/files.rs",
+      "adapter": "src/workspace.rs",
+      "effects": "bounded run-workspace read/list or atomic text replacement; granular operation grants; planner writes denied",
+      "security_tests": [
+        "independent_path_contract_checks_unicode_controls_and_exact_boundaries",
+        "native_write_list_and_paged_read_preserve_source_hash_and_private_modes",
+        "granular_catalog_and_execution_reject_ungranted_operations_and_planner_writes",
+        "symlinks_hard_links_fifo_and_traversal_cannot_escape_the_workspace",
+        "limits_sensitive_patterns_completed_jobs_and_revocation_fail_closed",
+        "actual_stdio_preserves_escaped_source_and_returns_a_bounded_page",
+        "admitted_write_errors_are_not_falsely_audited_as_effect_free",
+        "filesystem_write_surviving_audit_failure_is_reported_uncertain_not_success"
+      ]
+    },
+    {
+      "id": "table_aggregate",
+      "source": "src/functions/table.rs",
+      "effects": "pure bounded typed filtering, grouping and exact integer aggregation; no expressions, coercion or I/O",
+      "security_tests": [
+        "table_aggregate::typed_filter_grouping_zero_totals_and_duplicates_are_exact",
+        "table_aggregate::scalar_keys_keep_types_and_have_deterministic_json_order",
+        "table_aggregate::excluded_rows_cannot_hide_schema_errors_or_coercible_values",
+        "table_aggregate::native_result_projection_types_are_declared_by_tools"
+      ]
+    },
+    {
+      "id": "table_read_json",
+      "source": "src/functions/table_read.rs",
+      "effects": "bounded complete confined JSON table read; optional approved source SHA-256; no writes or executable content",
+      "security_tests": [
+        "table_read_json::complete_file_has_exact_hash_and_native_chained_rows",
+        "table_read_json::ambiguous_invalid_partial_and_sensitive_tables_fail_closed",
+        "table_read_json::read_authority_does_not_grant_general_files_or_other_actors",
+        "table_read_json::actual_stdio_import_preserves_types_and_rejects_duplicate_columns",
+        "table_read_json::approved_hash_rejects_changed_bytes_before_any_source_receipt",
+        "table_read_json::complete_reads_enforce_the_file_ceiling_before_page_decoding"
+      ]
+    },
+    {
+      "id": "table_join",
+      "source": "src/functions/table_join.rs",
+      "effects": "pure bounded typed inner/left join, explicit projection, stable source order; no I/O",
+      "security_tests": [
+        "table_join::join_keys_preserve_scalar_types_duplicates_nulls_and_source_order",
+        "table_join::malformed_unmatched_rows_and_ambiguous_projection_fail_closed",
+        "table_join::cardinality_and_byte_limits_reject_without_partial_success_receipts",
+        "table_join::fan_in_requires_both_actual_source_receipts_before_binding_join_results",
+        "table_join::actual_stdio_join_preserves_typed_keys_and_explicit_aliases"
+      ]
+    }
+  ],
+  "limits": [
+    "same-user hostile OS processes are outside this process binding",
+    "local SQLite is not encryption",
+    "known sensitive-pattern checks are not complete DLP",
+    "literal retrieval is not semantic RAG",
+    "dependency vulnerability and license review remains separate",
+    "filesystem changes and SQLite audit are not one distributed transaction; uncertain write effects require inspection",
+    "native filesystem execution tested on macOS, not Linux or Windows",
+    "unlisted legacy functions are not advertised as audited native functions"
+  ],
+  "native_data_flow_contracts": {
+    "source": "src/artifact_bindings.rs",
+    "scope": "owner-selected native projections and exact workspace artifacts, not general task correctness",
+    "retention": "selected projections and hash metadata in private versioned SQLite tables; receipt bodies stay payload-free",
+    "gates": [
+      "current process-bound source epoch",
+      "exact owner-approved arguments and source actor",
+      "canonical successful source receipt",
+      "projection integrity",
+      "writer-owned native write and complete readback receipts",
+      "current confined filesystem bytes"
+    ],
+    "tests": [
+      "artifact_requires_actual_approved_source_and_writer_write_readback",
+      "projection_cannot_survive_failed_audit_or_launder_modified_data",
+      "source_access_and_binding_contract_fail_closed",
+      "compiled_calls_use_approved_source_arguments_and_actual_projected_bytes_without_executing",
+      "selected_value_encodings_preserve_types_instead_of_coercing",
+      "utf8_projection_is_copied_without_model_rewriting",
+      "stale_source_epoch_cannot_write_even_when_the_tool_grant_is_unchanged"
+    ]
+  }
+}

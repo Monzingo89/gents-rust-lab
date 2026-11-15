@@ -43,9 +43,22 @@ impl TraceProjector for LocalTraceProjector {
                     span["state"] = json!("failed");
                 }
             }
+            if kind == "ceo_stage_accepted" {
+                let body = event["message"]
+                    .as_str()
+                    .and_then(|text| serde_json::from_str::<Value>(text).ok())
+                    .unwrap_or(Value::Null);
+                let mut metadata = event.clone();
+                metadata["message"]=json!({"stage":body["stage"],"actor":body["actor"],"policy_revision":body["policy_revision"],"accepted":body["accepted"],"native_result_projections":body["native_results"].as_array().map(Vec::len),"payload_logged":false}).to_string().into();
+                handoffs.push(metadata);
+            }
             if matches!(
                 kind,
-                "context_retrieved" | "context_staged" | "all_hands_acknowledged"
+                "context_retrieved"
+                    | "context_staged"
+                    | "all_hands_acknowledged"
+                    | "workflow_stage_checkpointed"
+                    | "workflow_checkpoint_reused"
             ) {
                 handoffs.push(event.clone());
             }
@@ -58,6 +71,12 @@ impl TraceProjector for LocalTraceProjector {
                     | "acceptance_veto"
                     | "admin_denied"
                     | "sensitive_data_blocked"
+                    | "delivery_stalled"
+                    | "executive_recovery_failed"
+                    | "memory_snapshot_failed"
+                    | "policy_epoch_cancelled"
+                    | "observation_rejected"
+                    | "workflow_stage_failed"
             ) {
                 issues.push(event.clone());
             }
@@ -68,6 +87,7 @@ impl TraceProjector for LocalTraceProjector {
                     | "loop_recovery"
                     | "loop_replanning"
                     | "question_resolved_locally"
+                    | "local_executive_ringing"
                     | "question_resolved_by_openai"
                     | "codex_phone_ringing"
                     | "codex_phone_unanswered"
@@ -102,6 +122,28 @@ impl TraceProjector for LocalTraceProjector {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn ceo_handoffs_publish_only_trace_metadata_and_do_not_invent_model_calls() {
+        let event = json!({"kind":"ceo_stage_accepted","agent":"A","message":json!({"stage":0,"actor":"A","policy_revision":1,"accepted":true,"deliverable":"private body","native_results":[{"value":"private value"}]}).to_string()});
+        let result = LocalTraceProjector.project("run", "running", &json!({}), &[event]);
+        assert_eq!(result["context_handoffs"].as_array().unwrap().len(), 1);
+        assert_eq!(result["calls"], json!([]));
+        assert!(!result["context_handoffs"].to_string().contains("private"));
+    }
+    #[test]
+    fn workflow_handoffs_and_failures_are_not_counted_as_new_model_calls() {
+        let events = vec![
+            json!({"kind":"workflow_stage_checkpointed","agent":"A","message":"stage=a; payload_logged=false"}),
+            json!({"kind":"workflow_checkpoint_reused","agent":"A","message":"stage=a; new_model_calls=0"}),
+            json!({"kind":"workflow_stage_failed","agent":"B","message":"stage=b; bounded_retry_only=true"}),
+        ];
+        let result =
+            LocalTraceProjector.project("run", "running", &json!({"level":"synthetic"}), &events);
+        assert_eq!(result["context_handoffs"].as_array().unwrap().len(), 2);
+        assert_eq!(result["issues"].as_array().unwrap().len(), 1);
+        assert_eq!(result["calls"], json!([]));
+    }
 
     #[test]
     fn projects_calls_handoffs_issues_and_feedback() {

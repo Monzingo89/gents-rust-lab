@@ -1,4 +1,9 @@
 [workspace]
-members = ["crates/harness"]
+members = ["crates/harness", "mcp"]
 exclude = ["src-tauri"]
 resolver = "2"
+
+# Weight/artifact integrity checks stream gigabytes even in local development.
+# Keep their compression rounds optimized without optimizing the whole harness.
+[profile.dev.package.sha2]
+opt-level = 3

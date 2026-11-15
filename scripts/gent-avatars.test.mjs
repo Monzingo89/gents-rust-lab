@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {characters,modelKey,avatarForModel,positionStyles,positionKey,appearanceKey,avatarForPosition,uniqueCrewLooks,spriteSheets,spriteCell,opaqueBounds,previewPosition,spriteContains} from '../web/gent-avatars.js';
-import {towerFloors,reserveTowerSeats,detailStationRect,detailPodRect,floorWalkPose,interiorPoint,interiorPodRect,roomDesigns,crewKey,rectsOverlap,facadeHeight,facadeTop} from '../web/assets/tower-layout.js';
+import {towerFloors,reserveTowerSeats,detailStationRect,photographicStationRect,detailPodRect,floorWalkPose,interiorPoint,interiorPodRect,roomDesigns,crewKey,rectsOverlap,facadeHeight,facadeTop} from '../web/assets/tower-layout.js';
 import {renderTower} from '../web/assets/tower-scene.js';
 
 test('all twenty supplied identities exist locally, including the eight new originals',()=>{
@@ -40,7 +40,7 @@ test('renderer separates the eleven-level cutaway, purpose floors and combined r
  const frames=new Map(characters.map(c=>[c.id,{image:c.id,x:0,y:0,w:100,h:180}]));
  const stats=renderTower(ctx,{crew,characterFor:avatarForPosition,spriteFrames:frames});
  assert.deepEqual(stats,{active:1,resting:1,unassigned:0});
- assert.equal(ctx.canvas.floorHits.length,11);assert.equal(ctx.canvas.gentLayout.length,0);assert.equal(ctx.canvas.height,facadeTop+facadeHeight+105);
+ assert.equal(ctx.canvas.floorHits.length,12);assert.equal(ctx.canvas.gentLayout.length,0);assert.equal(ctx.canvas.height,facadeTop+facadeHeight+105);
  assert.equal(ctx.canvas.facadeMode,'open-cutaway');
  assert.ok(calls.includes('OPEN CUTAWAY  /  LIVE FLOOR ACTIVITY'));
  calls.length=0;renderTower(ctx,{crew,characterFor:avatarForPosition,spriteFrames:frames,filter:'6',time:2000});
@@ -117,7 +117,7 @@ test('reserved stations, pods and room headers cannot overlap for idle, mixed or
  const runtime=JSON.parse(readFileSync(new URL('../config/company.local.json',import.meta.url),'utf8'));
  const crew=runtime.agents.flatMap(a=>['planner','worker'].map(role=>({id:a.id,role}))).concat(['CEO','Admin Judge','Operations Gent','Training Gent'].map(id=>({id,role:'special'})));
  const seats=reserveTowerSeats(crew);
- assert.equal(towerFloors.length,11);assert.equal(seats.size,crew.length);
+ assert.equal(towerFloors.length,12);assert.equal(seats.size,crew.length);
  for(const mode of ['idle','mixed','working']){
   const rects=crew.map((s,i)=>{const seat=seats.get(crewKey(s)),busy=mode==='working'||mode==='mixed'&&i%2===0;return{...busy?detailStationRect(seat):detailPodRect(seat.pod),floor:busy?seat.floor:seat.podFloor};});
   for(let i=0;i<rects.length;i++)for(let j=i+1;j<rects.length;j++)if(rects[i].floor===rects[j].floor)assert.equal(rectsOverlap(rects[i],rects[j]),false,`${mode}: ${i} and ${j}`);
@@ -139,10 +139,35 @@ test('walking preview never changes actual model activity counts or busy state',
  const stats=renderTower(ctx,{crew,characterFor:avatarForPosition,spriteFrames:new Map(),filter:'6',preview:true,time:1000});
  assert.deepEqual(stats,{active:0,resting:1,unassigned:0});assert.equal(crew[0].busy,false);assert.equal(ctx.canvas.gentLayout[0].preview,true);
 });
+test('the CEO is a single moving roster agent, never a stationary desk mannequin',()=>{
+ const labels=[],crew=[{id:'CEO',role:'special',busy:false}],ctx=new Proxy({canvas:{},fillText:value=>labels.push(value),createLinearGradient:()=>({addColorStop(){}}),createRadialGradient:()=>({addColorStop(){}})},{get:(t,p)=>p in t?t[p]:()=>{}});
+ renderTower(ctx,{crew,characterFor:avatarForPosition,spriteFrames:new Map(),filter:'10',time:1000});
+ assert.equal(ctx.canvas.gentLayout.length,1);assert.equal(crew[0].sleeping,false);
+ const before=crew[0].hit.x;
+ renderTower(ctx,{crew,characterFor:avatarForPosition,spriteFrames:new Map(),filter:'10',time:2000});
+ assert.notEqual(crew[0].hit.x,before);
+ assert.ok(!labels.some(value=>String(value).includes('CEO · ENTERPRISE ASSURANCE')));
+ const code=readFileSync(new URL('../web/assets/tower-scene.js',import.meta.url),'utf8');
+ assert.ok(!code.includes('seatedExecutive'));
+});
+test('all twelve realistic room assets have local prompts and full-resolution images',()=>{
+ const manifest=JSON.parse(readFileSync(new URL('../web/assets/rooms/manifest.json',import.meta.url),'utf8'));
+ assert.equal(manifest.rooms.length,12);
+ for(const floor of towerFloors){
+  const entry=manifest.rooms.find(room=>Number(room.id)===floor.id);assert.ok(entry);assert.ok(entry.prompt.includes('NO people'));
+  const png=readFileSync(new URL(`../web/assets/rooms/${entry.asset}`,import.meta.url));assert.equal(png.subarray(1,4).toString(),'PNG');const w=png.readUInt32BE(16),h=png.readUInt32BE(20);assert.ok(w*h>=1_500_000);assert.ok(w/h>1.5&&w/h<1.7);
+ }
+ const equipment=readFileSync(new URL('../web/assets/gents/equipment-realistic.png',import.meta.url));assert.equal(equipment.subarray(1,4).toString(),'PNG');
+});
+test('photo-space CEO walkways stay in front of the desk and do not overlap',()=>{
+ const reservations=[0,1].map(seat=>photographicStationRect({floor:10,seat}));
+ assert.equal(rectsOverlap(...reservations),false);
+ for(const [index,r]of reservations.entries())for(let time=0;time<10000;time+=100){const p=floorWalkPose(r,time,index);assert.ok(p.y>=870&&p.y<=880);assert.ok(p.x>=150&&p.x<=560);}
+});
 test('all eleven floors have distinct architecture and a shared deep oblique camera',()=>{
- assert.equal(new Set(Object.values(roomDesigns).map(d=>d.id)).size,11);
- assert.equal(new Set(Object.values(roomDesigns).map(d=>d.material)).size,11);
- assert.deepEqual(towerFloors.map(f=>f.name),['CODEX','CEO','CFO','INTELLIGENCE / ARCHIVE','INTELLIGENCE / READING','ENGINEERING','OPERATIONS','RECHARGE','CONFERENCE','TESTING','LOBBY']);
+ assert.equal(new Set(Object.values(roomDesigns).map(d=>d.id)).size,12);
+ assert.equal(new Set(Object.values(roomDesigns).map(d=>d.material)).size,12);
+ assert.deepEqual(towerFloors.map(f=>f.name),['LOCAL EXECUTIVE','CEO','CFO','INTELLIGENCE / ARCHIVE','INTELLIGENCE / READING','ENGINEERING','OPERATIONS','RECHARGE','CONFERENCE','TESTING','LOBBY','MCP / SERVER BASEMENT']);
  const a=interiorPoint(126,170),b=interiorPoint(1446,170),front=interiorPoint(126,880);
  assert.ok(b.x>a.x&&b.y<a.y&&front.x>a.x&&front.y>a.y,'Ground plane must visibly recede in both axes');
  assert.equal(interiorPoint(126,170,100).y,a.y-100,'Vertical walls and upright actors share the ground plane');

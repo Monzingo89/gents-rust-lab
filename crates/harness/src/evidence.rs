@@ -3,6 +3,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::collections::BTreeMap;
+pub const SCHEMA_VERSION: u8 = 5;
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Dataset {
@@ -55,7 +56,7 @@ pub trait EvidenceProjection {
 
 impl EvidenceProjection for Ledger {
     fn observe(&mut self, record: &Value) {
-        self.schema_version = 4;
+        self.schema_version = SCHEMA_VERSION;
         let (Some(action), Some(step)) = (record["action"].as_str(), record["step"].as_u64())
         else {
             return;
@@ -141,8 +142,26 @@ impl EvidenceProjection for Ledger {
                 if let Some(path) = record["arguments"]["path"].as_str() {
                     self.artifacts.insert(
                         path.into(),
-                        json!({"path":path,"step":step,"state":"written_unverified"}),
+                        crate::file_observations::written(record).unwrap_or_else(
+                            || json!({"path":path,"step":step,"state":"written_unverified"}),
+                        ),
                     );
+                }
+            }
+            "files" if record["arguments"]["op"] == "read" => {
+                if let Some(path) = record["arguments"]["path"].as_str() {
+                    if let Some(observation) = self
+                        .artifacts
+                        .get(path)
+                        .and_then(|write| crate::file_observations::readback(record, write))
+                    {
+                        self.artifacts.insert(path.into(), observation);
+                    }
+                }
+            }
+            "pdf_render" => {
+                if let Some(path) = data["path"].as_str() {
+                    self.artifacts.insert(path.into(), json!({"path":path,"step":step,"sha256":data["sha256"],"source":data["source"],"source_sha256":data["source_sha256"],"state":"written_unverified"}));
                 }
             }
             "pdf_inspect" => {

@@ -76,6 +76,10 @@ def atomic_json(path, value):
 def execute(manifest_path):
     manifest_path=Path(manifest_path).absolute()
     manifest=json.loads(manifest_path.read_text())
+    from weight_training_profiles import profile
+    training_profile=profile(manifest.get("training_profile","conservative-v1"))
+    from weight_prompt_formats import datasets, inference_prompt, validate_format
+    prompt_format=validate_format(manifest.get("prompt_format","chat-v1"))
     root=Path(manifest["repository_root"]).resolve()
     company=manifest["company_id"]
     if any(c not in "abcdefghijklmnopqrstuvwxyz0123456789-" for c in company) or not company:
@@ -98,9 +102,12 @@ def execute(manifest_path):
     from mlx_lm import load
     from mlx_lm.lora import CONFIG_DEFAULTS, train_model
     from mlx_lm.tuner.callbacks import TrainingCallback
-    from mlx_lm.tuner.datasets import ChatDataset, CacheDataset
+    from mlx_lm.tuner.datasets import CacheDataset
     from mlx_lm.tuner.trainer import evaluate
     from mlx_lm.tuner.utils import load_adapters
+    from mlx_lm import generate
+    from mlx_lm.sample_utils import make_sampler
+    from weight_task_evaluation import evaluate_tasks, compare
     started=time.monotonic()
     base_files={str(p.relative_to(model)):digest(p) for p in sorted(model.glob("*")) if p.suffix in (".safetensors",".json",".jinja")}
     base_fingerprint=hashlib.sha256(json.dumps(base_files,sort_keys=True).encode()).hexdigest()
@@ -109,10 +116,12 @@ def execute(manifest_path):
     if manifest.get("parent_training_id"):
         parent=confined(company_root,company_root/"training/runs"/manifest["parent_training_id"])
         parent_metrics=json.loads((parent/"metrics.json").read_text())
+        if parent_metrics.get("training_profile",profile()) != training_profile:
+            raise ValueError("parent adapter profile differs; start a separate base experiment")
         if parent_metrics["base_fingerprint"]!=base_fingerprint or digest(parent/"adapter/adapters.safetensors")!=manifest["parent_adapter_sha256"]:
             raise ValueError("incumbent adapter lineage changed")
         load_adapters(loaded,str(parent/"adapter"))
-    sets={split:ChatDataset(items,tokenizer,mask_prompt=True) for split,items in rows.items()}
+    sets=datasets(rows,tokenizer,prompt_format)
     # Reject truncation rather than accidentally train on an empty/partial completion.
     for split,items in rows.items():
         for index in range(len(items)):
@@ -127,6 +136,21 @@ def execute(manifest_path):
     progress["phase"]="baseline_evaluation"
     atomic_json(work/"progress.json",progress)
     baseline=loss()
+    def task_check():
+        def infer(messages):
+            mx.random.seed(17)
+            prompt=inference_prompt(tokenizer,messages,prompt_format)
+            if prompt_format=="completion-v1":
+                prompt=tokenizer.encode(prompt,add_special_tokens=False)
+            return generate(loaded,tokenizer,prompt=prompt,max_tokens=96,sampler=make_sampler(temp=0),verbose=False)
+        return evaluate_tasks(rows["test"],infer)
+    before_tasks=task_check()
+    atomic_json(work/"task-baseline.json",before_tasks)
+    if manifest.get("require_baseline_failure") is True and before_tasks["passed"] == before_tasks["total"]:
+        atomic_json(work/"experiment-decision.json",{
+            "decision":"skip_training_saturated_benchmark", "weights_trained":False,
+            "provider_cost_usd":0, "promotion_authorized":False})
+        raise ValueError("Training skipped: all frozen baseline tasks passed; harder benchmark required")
     if parent:
         import gc
         del loaded
@@ -141,21 +165,47 @@ def execute(manifest_path):
             progress.update(validation=info,updated_at_ms=int(time.time()*1000))
             atomic_json(work/"progress.json",progress)
     options=dict(CONFIG_DEFAULTS)
-    options.update(model=str(model),data=str(dataset),train=True,fine_tune_type="lora",num_layers=1,
+    options.update(model=str(model),data=str(dataset),train=True,fine_tune_type="lora",num_layers=training_profile["layers"],
         batch_size=1,iters=manifest["iterations"],max_seq_length=manifest["sequence_length"],
         val_batches=1,steps_per_report=1,steps_per_eval=25,save_every=25,seed=17,
-        learning_rate=1e-5,grad_checkpoint=True,mask_prompt=True,
-        lora_parameters={"rank":4,"dropout":0.0,"scale":8.0},adapter_path=str(work/"adapter"),
+        learning_rate=training_profile["learning_rate"],grad_checkpoint=True,mask_prompt=True,
+        lora_parameters={"rank":training_profile["rank"],"dropout":0.0,"scale":training_profile["scale"]},adapter_path=str(work/"adapter"),
         report_to=None,trust_remote_code=False)
     if parent:
         options["resume_adapter_file"]=str(parent/"adapter/adapters.safetensors")
     train_model(SimpleNamespace(**options),loaded,sets["train"],sets["valid"],Progress())
+    progress.update(phase="candidate_evaluation",updated_at_ms=int(time.time()*1000))
+    atomic_json(work/"progress.json",progress)
     adapted=loss()
+    after_tasks=task_check()
+    atomic_json(work/"task-candidate.json",after_tasks)
+    # Exercise the bytes that deployment would actually load, not just the
+    # in-memory module left by the optimizer. Release it before loading again.
+    import gc
+    del loaded
+    gc.collect()
+    mx.clear_cache()
+    progress.update(phase="adapter_reload_evaluation",updated_at_ms=int(time.time()*1000))
+    atomic_json(work/"progress.json",progress)
+    loaded,tokenizer=load(str(model),tokenizer_config={"trust_remote_code":False},trust_remote_code=False)
+    load_adapters(loaded,str(work/"adapter"))
+    reloaded_tasks=task_check()
+    atomic_json(work/"task-reloaded.json",reloaded_tasks)
+    reload_matches=all(a["output"]==b["output"] for a,b in zip(after_tasks["cases"],reloaded_tasks["cases"]))
+    if not reload_matches:
+        raise ValueError("persisted adapter outputs differ from in-memory candidate; promotion denied")
+    comparison=compare(before_tasks,after_tasks)
+    atomic_json(work/"task-comparison.json",comparison)
+    if any(digest(model/name)!=expected for name,expected in base_files.items()):
+        raise ValueError("base model changed during experiment; candidate rejected")
     adapter=work/"adapter/adapters.safetensors"
     metrics={"company_id":company,"training_id":manifest["training_id"],"role":manifest["role"],
-        "weights_trained":True,"method":"LoRA rank 4, last transformer layer", "base_fingerprint":base_fingerprint,
+        "weights_trained":True,"method":f"LoRA rank {training_profile['rank']}, last {training_profile['layers']} transformer layers",
+        "training_profile":training_profile, "base_fingerprint":base_fingerprint,
         "base_files":base_files,"adapter_sha256":digest(adapter),"baseline_test_loss":baseline,
         "adapter_test_loss":adapted,"loss_improved":adapted<baseline,"dataset_counts":{k:len(v) for k,v in rows.items()},
+        "task_comparison":comparison,
+        "persisted_adapter_reload_matches":reload_matches,
         "iterations":manifest["iterations"],"elapsed_seconds":round(time.monotonic()-started,2),
         "peak_memory_gb":mx.get_peak_memory()/1e9,"smoke":manifest.get("smoke",False),
         "promotion":"requires independent task/regression/privacy evaluation and operator review",

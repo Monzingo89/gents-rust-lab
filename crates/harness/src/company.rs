@@ -1,10 +1,13 @@
 //! Tenant boundary and durable context. Models never receive a database/file capability.
+use crate::memory_archive::{move_to_cold, recall_from_cold, ContextLifecycle};
 use anyhow::{bail, Context, Result};
-use rusqlite::{params, Connection};
+use rusqlite::{params, Connection, OptionalExtension};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::path::{Component, Path, PathBuf};
 use uuid::Uuid;
+#[path = "company_training_gate.rs"]
+mod training_gate;
 
 pub fn identifier(value: &str) -> Result<()> {
     if value.is_empty()
@@ -34,7 +37,7 @@ pub fn directory(root: &Path, company: &str) -> Result<PathBuf> {
     Ok(path)
 }
 
-fn connect(root: &Path, company: &str, owner: &str, create: bool) -> Result<Connection> {
+pub(crate) fn connect(root: &Path, company: &str, owner: &str, create: bool) -> Result<Connection> {
     let path = directory(root, company)?;
     if !create && !path.join("brain.sqlite3").is_file() {
         bail!("company is not registered");
@@ -45,8 +48,17 @@ fn connect(root: &Path, company: &str, owner: &str, create: bool) -> Result<Conn
     }
     #[cfg(unix)]
     {
-        use std::os::unix::fs::PermissionsExt;
+        use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
         std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o700))?;
+        // Set the database's mode before SQLite can create WAL sidecars. The
+        // private parent remains the primary same-host directory boundary.
+        let file = std::fs::OpenOptions::new()
+            .write(true)
+            .create(true)
+            .truncate(false)
+            .mode(0o600)
+            .open(path.join("brain.sqlite3"))?;
+        file.set_permissions(std::fs::Permissions::from_mode(0o600))?;
     }
     let db = Connection::open(path.join("brain.sqlite3"))?;
     db.busy_timeout(std::time::Duration::from_secs(5))?;
@@ -62,6 +74,7 @@ fn connect(root: &Path, company: &str, owner: &str, create: bool) -> Result<Conn
         CREATE TABLE IF NOT EXISTS meetings(id TEXT PRIMARY KEY,run_id TEXT NOT NULL,body TEXT NOT NULL,created INTEGER NOT NULL);
         CREATE TABLE IF NOT EXISTS meeting_acks(meeting_id TEXT NOT NULL,agent TEXT NOT NULL,PRIMARY KEY(meeting_id,agent));
         CREATE TABLE IF NOT EXISTS operator_recalls(run_id TEXT PRIMARY KEY);
+        CREATE TABLE IF NOT EXISTS run_governance(run_id TEXT PRIMARY KEY,revision INTEGER NOT NULL,manifest TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS training_proposals(id TEXT PRIMARY KEY,run_id TEXT NOT NULL,agent TEXT NOT NULL,body TEXT NOT NULL,state TEXT NOT NULL DEFAULT 'unreviewed');
         CREATE VIRTUAL TABLE IF NOT EXISTS knowledge USING fts5(id UNINDEXED,body,source UNINDEXED);
         CREATE TRIGGER IF NOT EXISTS index_context AFTER INSERT ON context BEGIN
@@ -82,6 +95,8 @@ fn connect(root: &Path, company: &str, owner: &str, create: bool) -> Result<Conn
     if existing.is_none() && !create {
         bail!("company is not registered");
     }
+    crate::memory::install(&db)?;
+    crate::memory_archive::install(&db)?;
     Ok(db)
 }
 
@@ -93,111 +108,39 @@ fn audit(db: &Connection, run: &str, kind: &str, body: Value) -> Result<()> {
     Ok(())
 }
 
-#[derive(Clone, Copy)]
-enum ContextLifecycle {
-    Completed,
-    Inactive,
-}
-
-trait ContextPlacementPolicy {
-    fn cold_tier(&self, current: &str, lifecycle: ContextLifecycle) -> &'static str;
-}
-
-/// Cheapest approved placement is local private disk: active context remains
-/// in the FTS-backed hot table; completed/inactive context moves to a private,
-/// non-indexed SQLite archive until an explicit operator recall.
-struct CheapestPrivatePlacement;
-
-impl ContextPlacementPolicy for CheapestPrivatePlacement {
-    fn cold_tier(&self, current: &str, lifecycle: ContextLifecycle) -> &'static str {
-        match (current.starts_with("EVIDENCE"), lifecycle) {
-            (true, ContextLifecycle::Completed) => "EVIDENCE_ALTC",
-            (true, ContextLifecycle::Inactive) => "EVIDENCE_PLTC",
-            (false, ContextLifecycle::Completed) => "ALTC",
-            (false, ContextLifecycle::Inactive) => "PLTC",
-        }
-    }
-}
-
-fn move_to_cold(db: &Connection, run: Option<&str>, lifecycle: ContextLifecycle) -> Result<usize> {
-    let policy = CheapestPrivatePlacement;
-    let predicate = if run.is_some() { "WHERE run_id=?1" } else { "" };
-    let mut select = db.prepare(&format!(
-        "SELECT id,run_id,agent,tier,body,source,created FROM context {predicate}"
-    ))?;
-    let records: Vec<(String, String, String, String, String, String, i64)> = select
-        .query_map(rusqlite::params_from_iter(run), |row| {
-            Ok((
-                row.get(0)?,
-                row.get(1)?,
-                row.get(2)?,
-                row.get(3)?,
-                row.get(4)?,
-                row.get(5)?,
-                row.get(6)?,
-            ))
-        })?
-        .collect::<rusqlite::Result<_>>()?;
-    for (id, run_id, agent, tier, body, source, created) in &records {
-        db.execute(
-            "INSERT OR REPLACE INTO context_archive VALUES (?1,?2,?3,?4,?5,?6,?7)",
-            params![
-                id,
-                run_id,
-                agent,
-                policy.cold_tier(tier, lifecycle),
-                body,
-                source,
-                created
-            ],
-        )?;
-    }
-    if let Some(run) = run {
-        db.execute("DELETE FROM context WHERE run_id=?1", [run])?;
-    } else {
-        db.execute("DELETE FROM context", [])?;
-    }
-    Ok(records.len())
-}
-
-fn recall_from_cold(db: &Connection, run: &str) -> Result<usize> {
-    let mut stmt = db.prepare(
-        "SELECT id,run_id,agent,tier,body,source,created FROM context_archive WHERE run_id=?1",
-    )?;
-    let records: Vec<(String, String, String, String, String, String, i64)> = stmt
-        .query_map([run], |row| {
-            Ok((
-                row.get(0)?,
-                row.get(1)?,
-                row.get(2)?,
-                row.get(3)?,
-                row.get(4)?,
-                row.get(5)?,
-                row.get(6)?,
-            ))
-        })?
-        .collect::<rusqlite::Result<_>>()?;
-    for (id, run_id, agent, tier, body, source, created) in &records {
-        let active_tier = if tier.starts_with("EVIDENCE") {
-            "EVIDENCE"
-        } else {
-            "PSTC"
-        };
-        db.execute(
-            "INSERT OR REPLACE INTO context VALUES (?1,?2,?3,?4,?5,?6,?7)",
-            params![id, run_id, agent, active_tier, body, source, created],
-        )?;
-    }
-    db.execute("DELETE FROM context_archive WHERE run_id=?1", [run])?;
-    Ok(records.len())
-}
-
 pub fn operation(root: &Path, company: &str, owner: &str, input: &Value) -> Result<Value> {
     let op = input["op"].as_str().context("op required")?;
     let mut db = connect(root, company, owner, op == "register")?;
     let run = input["run_id"].as_str().unwrap_or("onboarding");
     identifier(run)?;
     match op {
+        "memory_archive_status" => return crate::memory_archive::checkpoints(&db, run),
+        "memory_resolve" => {
+            // Owner-authenticated read, not an arbitrary SQL ID lookup or a
+            // model-supplied actor identity accepted by the tool broker.
+            let tx = db.transaction()?;
+            let mut value = crate::semantic_memory::resolve_in(
+                &tx,
+                company,
+                owner,
+                Uuid::parse_str(run)?,
+                text(input, "recipient", 200)?,
+                text(input, "input_sha256", 64)?,
+                text(input, "source_alias", 16)?,
+            )?;
+            if input.get("field").is_some() {
+                value["consumer_packet"] =
+                    crate::semantic_memory::extraction_packet(&value, text(input, "field", 40)?)?;
+            }
+            audit(
+                &tx,
+                run,
+                "semantic_source_resolved",
+                json!({"recipient":value["recipient"],"source_alias":value["source_alias"],"source_sha256":value["source_sha256"],"policy_revision":value["policy_revision"],"payload_logged":false}),
+            )?;
+            tx.commit()?;
+            return Ok(json!({"ok":true,"result":value}));
+        }
         "register" => {
             let name = text(input, "name", 200)?;
             if db.query_row("SELECT COUNT(*) FROM company", [], |r| r.get::<_, i64>(0))? == 0 {
@@ -213,6 +156,7 @@ pub fn operation(root: &Path, company: &str, owner: &str, input: &Value) -> Resu
         "ingest" => {
             let body = text(input, "text", 60000)?;
             let source = text(input, "source", 300)?;
+            crate::security::require_persistable(body)?;
             // Operator supplies text only. No server-side arbitrary path/URL ingestion.
             if source.contains("owner-evaluation") {
                 bail!("owner evaluation is excluded");
@@ -263,7 +207,121 @@ pub fn operation(root: &Path, company: &str, owner: &str, input: &Value) -> Resu
         }
         "intake" => {
             Uuid::parse_str(run).context("intake run_id must be a UUID")?;
-            let intake = &input["intake"];
+            let mut frozen_intake = input["intake"].clone();
+            if let Some(session) = frozen_intake["ceo_planning_id"].as_str() {
+                let session = Uuid::parse_str(session)?;
+                let planning = crate::ceo_planning::read(root, company, owner, session)?;
+                anyhow::ensure!(
+                    planning["status"] == "ready",
+                    "CEO conversation is not ready"
+                );
+                anyhow::ensure!(
+                    frozen_intake["ceo_planning_revision"].is_null()
+                        || frozen_intake["ceo_planning_revision"] == planning["revision"],
+                    "CEO planning revision changed; inspect the current proposal before approval"
+                );
+                frozen_intake["ceo_planning_revision"] = planning["revision"].clone();
+                frozen_intake["ceo_planning_mode"] = planning["planning_mode"].clone();
+                let proposal = &planning["proposal"];
+                let stages = crate::ceo_team::parse(proposal)?;
+                let proposed_bindings =
+                    crate::ceo_contracts::compile_for_session(proposal, &planning)?;
+                if frozen_intake["artifact_bindings"].is_null() {
+                    frozen_intake["artifact_bindings"] = proposed_bindings.clone();
+                }
+                crate::owned_inputs::freeze(
+                    &db,
+                    root,
+                    owner,
+                    session,
+                    &planning,
+                    &proposed_bindings,
+                    &mut frozen_intake,
+                )?;
+                for stage in &stages {
+                    if stage.tools.iter().any(|tool| tool == "rust_verify") {
+                        anyhow::ensure!(frozen_intake["required_rust_checks"].as_array().is_some_and(|checks|checks.iter().any(|check|check["actor"]==stage.actor)),"CEO-selected rust_verify requires owner-frozen required_rust_checks for its assigned actor before intake");
+                    }
+                    if stage.tools.iter().any(|tool| tool == "owned_rust_call") {
+                        anyhow::ensure!(frozen_intake["required_owned_rust_calls"].as_array().is_some_and(|calls|calls.iter().any(|call|call["actor"]==stage.actor)),"CEO-selected owned_rust_call requires owner-frozen invocation bindings for its assigned actor before intake");
+                    }
+                }
+
+                frozen_intake["ceo_source_inputs"] = planning["source_inputs"].clone();
+                frozen_intake["ceo_source_files"] = planning["source_files"].clone();
+                if frozen_intake["artifact_bindings"].is_null() {
+                    frozen_intake["artifact_bindings"] = proposed_bindings.clone();
+                }
+                frozen_intake["artifact_binding_origin"] =
+                    json!(if frozen_intake["artifact_bindings"] == proposed_bindings {
+                        "ceo_native_contracts"
+                    } else {
+                        "explicit_owner_binding_edit"
+                    });
+                let criteria = proposal["definition_of_done"]
+                    .as_array()
+                    .context("missing CEO acceptance")?
+                    .iter()
+                    .map(|v| v.as_str().context("invalid CEO acceptance"))
+                    .collect::<Result<Vec<_>>>()?
+                    .join("\n");
+                anyhow::ensure!(
+                    frozen_intake["acceptance"] == criteria,
+                    "Acceptance must match the local CEO proposal before approval"
+                );
+                anyhow::ensure!(
+                    frozen_intake["ceo_plan"].is_null() || frozen_intake["ceo_plan"] == *proposal,
+                    "Supplied CEO plan differs from retained proposal"
+                );
+                frozen_intake["ceo_host_controls"] = crate::ceo_team::controls(&stages);
+                if stages.len() > 1 {
+                    let mut required = frozen_intake["required_mcp_calls"]
+                        .as_array()
+                        .cloned()
+                        .unwrap_or_default();
+                    for stage in &stages {
+                        for tool in &stage.tools {
+                            let native = tool.split(':').next().unwrap_or(tool);
+                            if !gents_local_mcp::Registry::new().contains(native) {
+                                continue;
+                            }
+                            let requirement = json!({"actor":stage.actor,"tool":native});
+                            if !required.contains(&requirement) {
+                                required.push(requirement);
+                            }
+                        }
+                    }
+                    frozen_intake["required_mcp_calls"] = json!(required);
+                }
+                frozen_intake["ceo_plan"] = proposal.clone();
+                frozen_intake["ceo_plan_sha256"] =
+                    json!(gents_local_mcp::digest(proposal.to_string().as_bytes()));
+            } else {
+                anyhow::ensure!(
+                    frozen_intake["ceo_plan"].is_null()
+                        && frozen_intake["ceo_source_files"].is_null()
+                        && frozen_intake["ceo_owned_invocations"].is_null(),
+                    "CEO plan or source attachments require a retained planning session"
+                );
+            }
+            crate::company_factory::preparation::validate_frozen(&frozen_intake)?;
+            crate::company_factory::guided::validate_frozen(&frozen_intake)?;
+            crate::coordination::review::contract::from_intake(&frozen_intake)?;
+            crate::architecture_review::validate_intake(root, company, owner, &frozen_intake)?;
+            if let Some(contract) = crate::coordination::admission::from_intake(&frozen_intake)? {
+                frozen_intake["ceo_host_controls"] =
+                    crate::coordination::admission::controls(&contract)?;
+            }
+            let intake = &frozen_intake;
+            gents_local_mcp::completion::validate(intake)?;
+            let bindings = gents_local_mcp::artifact_bindings::parse(intake)?;
+            if !bindings.is_empty()
+                || intake["ceo_plan"]["planning_constraints"]["separate_source_writers"] == true
+            {
+                crate::ceo_team::validate_bindings(intake, &bindings)?;
+            }
+            let candidate = gents_local_mcp::proposals::from_intake(intake)?;
+            anyhow::ensure!(candidate.is_none()||intake["ceo_plan"].is_null(),"Candidate authoring and ordered CEO execution are distinct contracts; use one per approved job until their stage adapters are integrated");
             for field in [
                 "idea",
                 "acceptance",
@@ -323,17 +381,19 @@ pub fn operation(root: &Path, company: &str, owner: &str, input: &Value) -> Resu
         "recall" => {
             let target = text(input, "target_run_id", 80)?;
             identifier(target)?;
-            db.execute(
+            let tx = db.transaction()?;
+            tx.execute(
                 "INSERT OR IGNORE INTO operator_recalls VALUES (?1)",
                 [target],
             )?;
-            let changed = recall_from_cold(&db, target)?;
+            let changed = recall_from_cold(&tx, target)?;
             audit(
-                &db,
+                &tx,
                 run,
                 "context_recalled",
                 json!({"source_run_id":target,"records":changed,"authorized_by":owner}),
             )?;
+            tx.commit()?;
         }
         "finish" | "archive" => {
             let state = if op == "finish" {
@@ -361,7 +421,6 @@ pub fn operation(root: &Path, company: &str, owner: &str, input: &Value) -> Resu
                 }
                 move_to_cold(&tx, Some(run), ContextLifecycle::Completed)?;
             } else {
-                tx.execute("UPDATE context_archive SET tier=CASE WHEN tier LIKE 'EVIDENCE%' THEN 'EVIDENCE_PLTC' ELSE 'PLTC' END", [])?;
                 move_to_cold(&tx, None, ContextLifecycle::Inactive)?;
                 tx.execute("UPDATE jobs SET state='inactive'", [])?;
                 tx.execute("DELETE FROM operator_recalls", [])?;
@@ -507,6 +566,8 @@ pub fn operation(root: &Path, company: &str, owner: &str, input: &Value) -> Resu
             if metrics["smoke"] != false || metrics["loss_improved"] != true {
                 bail!("smoke or non-improving adapters cannot be promoted");
             }
+            let work = scoped(root, company, &["training", "runs", id])?;
+            training_gate::validate_files(&work, &metrics)?;
             let review = &input["review"];
             for check in [
                 "role_tasks_passed",
@@ -599,8 +660,42 @@ pub fn operation(root: &Path, company: &str, owner: &str, input: &Value) -> Resu
             let brief = text(input, "brief", 5000)?;
             meeting(root, company, owner, run, brief)?;
         }
+        "governance_install" => {
+            // Operator API only. No tool accepts an owner identity or a new ceiling.
+            Uuid::parse_str(run)?;
+            let policy: crate::governance::Policy =
+                serde_json::from_value(input["policy"].clone())?;
+            let expected = input["expected_revision"]
+                .as_u64()
+                .context("expected_revision required")?;
+            let tx = db.transaction()?;
+            let encoded: Option<String> = tx
+                .query_row("SELECT intake FROM jobs WHERE run_id=?1", [run], |r| {
+                    r.get(0)
+                })
+                .optional()?;
+            let intake: Value = encoded
+                .map(|v| serde_json::from_str(&v))
+                .transpose()?
+                .unwrap_or(Value::Null);
+            if !intake["ceo_plan"].is_null() {
+                crate::ceo_team::validate_policy(&intake, &policy)?;
+            }
+            crate::governance::save(&tx, run, &policy, expected)?;
+            audit(
+                &tx,
+                run,
+                "governance_installed",
+                json!({"revision":policy.revision,"agent_count":policy.ceilings.len(),"payload_logged":false}),
+            )?;
+            tx.commit()?;
+            crate::governance::publish(company, Uuid::parse_str(run)?, policy.revision)?;
+        }
         "status" => {}
         _ => bail!("unsupported company operation"),
+    }
+    if op != "status" {
+        crate::memory::wake();
     }
     status(&db, company)
 }
@@ -715,7 +810,7 @@ pub fn claim_training(root: &Path, company: &str, owner: &str, id: &str) -> Resu
     )
 }
 
-fn file_hash(path: &Path) -> Result<String> {
+pub(crate) fn file_hash(path: &Path) -> Result<String> {
     use std::io::Read;
     if path.is_symlink() {
         bail!("lineage file symlink rejected");
@@ -842,6 +937,19 @@ pub fn admit(root: &Path, company: &str, owner: &str, run: Uuid, task: &str) -> 
     if !v["task_evidence"].is_null() {
         audit_artifacts(root, company, run, &v["task_evidence"])?;
     }
+    let staged = crate::source_files::stage(&tx, root, company, run, &v)?;
+    if !staged.is_null() {
+        audit(&tx, &run.to_string(), "owner_source_files_staged", staged)?;
+    }
+    let staged = crate::owned_inputs::stage(&tx, root, company, owner, run, &v)?;
+    if !staged.is_null() {
+        audit(
+            &tx,
+            &run.to_string(),
+            "owner_component_sources_staged",
+            staged,
+        )?;
+    }
     tx.execute(
         "UPDATE jobs SET state='running' WHERE run_id=?1",
         [run.to_string()],
@@ -865,6 +973,66 @@ pub fn resume(
     run: Uuid,
     task: &str,
 ) -> Result<Vec<String>> {
+    resume_from(
+        root,
+        company,
+        owner,
+        run,
+        task,
+        &["cancelled", "failed", "interrupted"],
+    )
+}
+
+/// Startup recovery cannot override an operator cancellation or a terminal job.
+pub fn resume_interrupted(
+    root: &Path,
+    company: &str,
+    owner: &str,
+    run: Uuid,
+    task: &str,
+) -> Result<Vec<String>> {
+    resume_from(root, company, owner, run, task, &["interrupted"])
+}
+
+/// The company journal wins over a stale UI/run-store snapshot on restart.
+pub fn interrupt_running(root: &Path, company: &str, owner: &str, run: Uuid) -> Result<String> {
+    let mut db = connect(root, company, owner, false)?;
+    let tx = db.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+    let state: String = tx.query_row(
+        "SELECT state FROM jobs WHERE run_id=?1",
+        [run.to_string()],
+        |r| r.get(0),
+    )?;
+    let next = if state == "running" {
+        "interrupted"
+    } else {
+        &state
+    };
+    if state == "running" {
+        tx.execute(
+            "UPDATE jobs SET state='interrupted' WHERE run_id=?1 AND state='running'",
+            [run.to_string()],
+        )?;
+        audit(
+            &tx,
+            &run.to_string(),
+            "job_interrupted",
+            json!({"reason":"controller_restart","external_effects_replayed":false}),
+        )?;
+    }
+    let result = next.to_string();
+    tx.commit()?;
+    Ok(result)
+}
+
+fn resume_from(
+    root: &Path,
+    company: &str,
+    owner: &str,
+    run: Uuid,
+    task: &str,
+    allowed: &[&str],
+) -> Result<Vec<String>> {
     let mut db = connect(root, company, owner, false)?;
     let tx = db.transaction()?;
     let (intake, digest, approval, state): (String, String, Option<String>, String) = tx
@@ -873,7 +1041,7 @@ pub fn resume(
             [run.to_string()],
             |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)),
         )?;
-    if !["cancelled", "failed", "interrupted"].contains(&state.as_str()) {
+    if !allowed.contains(&state.as_str()) {
         bail!("only a stopped existing job may be resumed");
     }
     let frozen: Value = serde_json::from_str(&intake)?;
@@ -999,6 +1167,49 @@ pub fn context(root: &Path, company: &str, owner: &str, run: Uuid, agent: &str) 
     retrieve(root, company, owner, run, agent, "")
 }
 
+pub fn governance(
+    root: &Path,
+    company: &str,
+    owner: &str,
+    run: Uuid,
+) -> Result<Option<crate::governance::Policy>> {
+    let db = connect(root, company, owner, false)?;
+    crate::governance::load(&db, &run.to_string())
+}
+
+pub fn delegate_access(
+    root: &Path,
+    company: &str,
+    owner: &str,
+    run: Uuid,
+    actor: &str,
+    args: &Value,
+) -> Result<Value> {
+    let mut db = connect(root, company, owner, false)?;
+    let tx = db.transaction()?;
+    let mut policy = crate::governance::load(&tx, &run.to_string())?
+        .context("operator-installed policy required")?;
+    let recipient = text(args, "recipient", 200)?;
+    let expected = args["expected_revision"]
+        .as_u64()
+        .context("expected_revision required")?;
+    let grant = serde_json::from_value(args["grant"].clone())?;
+    policy.delegate(actor, recipient, grant, expected)?;
+    crate::governance::save(&tx, &run.to_string(), &policy, expected)?;
+    audit(
+        &tx,
+        &run.to_string(),
+        "access_delegated",
+        json!({"actor":actor,"recipient":recipient,"revision":policy.revision,"payload_logged":false}),
+    )?;
+    tx.commit()?;
+    crate::governance::publish(company, run, policy.revision)?;
+    crate::memory::wake();
+    Ok(
+        json!({"ok":true,"result":{"revision":policy.revision,"recipient":recipient,"ceiling_changed":false}}),
+    )
+}
+
 pub fn retrieve(
     root: &Path,
     company: &str,
@@ -1008,6 +1219,27 @@ pub fn retrieve(
     query: &str,
 ) -> Result<Value> {
     let db = connect(root, company, owner, false)?;
+    let mut live = retrieve_from(&db, company, run, agent, query)?;
+    live["semantic_memory"] =
+        crate::semantic_memory::read_in(&db, company, owner, run, agent)?.unwrap_or(Value::Null);
+    Ok(live)
+}
+
+fn retrieve_from(
+    db: &Connection,
+    company: &str,
+    run: Uuid,
+    agent: &str,
+    query: &str,
+) -> Result<Value> {
+    let policy = crate::governance::load(db, &run.to_string())?;
+    let allowed_senders = policy
+        .as_ref()
+        .and_then(|p| p.grants.get(agent))
+        .map(|grant| grant.memory_from.iter().collect::<Vec<_>>())
+        .unwrap_or_default();
+    let governed = policy.is_some();
+    let allowed_senders = serde_json::to_string(&allowed_senders)?;
     let browse_company_reference = query.trim().is_empty();
     let terms: std::collections::BTreeSet<_> = query
         .split(|c: char| !c.is_ascii_alphanumeric())
@@ -1022,11 +1254,11 @@ pub fn retrieve(
         .join(" OR ");
     let mut ranked = Vec::new();
     if !query.is_empty() {
-        let mut stmt=db.prepare("SELECT c.id,c.body,c.source,c.tier FROM knowledge JOIN context c ON knowledge.id=c.id WHERE knowledge MATCH ?3 AND ((c.tier='ASTC' AND c.run_id=?1 AND c.agent=?2) OR (c.tier='PSTC' AND (c.run_id=?1 OR c.run_id='onboarding' OR c.run_id IN (SELECT run_id FROM operator_recalls))) OR (c.tier='EVIDENCE' AND c.run_id=?1)) ORDER BY bm25(knowledge) LIMIT 10")?;
-        ranked=stmt.query_map(params![run.to_string(),agent,query],|r|Ok(json!({"id":r.get::<_,String>(0)?,"text":r.get::<_,String>(1)?,"source":r.get::<_,String>(2)?,"tier":r.get::<_,String>(3)?})))?.collect::<rusqlite::Result<_>>()?;
+        let mut stmt=db.prepare("SELECT c.id,c.body,c.source,c.tier FROM knowledge JOIN context c ON knowledge.id=c.id WHERE knowledge MATCH ?3 AND (?4=0 OR c.agent=?2 OR c.agent IN (SELECT value FROM json_each(?5))) AND ((c.tier='ASTC' AND c.run_id=?1 AND c.agent=?2) OR (c.tier='PSTC' AND (c.run_id=?1 OR c.run_id='onboarding' OR c.run_id IN (SELECT run_id FROM operator_recalls))) OR (c.tier='EVIDENCE' AND c.run_id=?1)) ORDER BY bm25(knowledge) LIMIT 10")?;
+        ranked=stmt.query_map(params![run.to_string(),agent,query,governed,allowed_senders],|r|Ok(json!({"id":r.get::<_,String>(0)?,"text":r.get::<_,String>(1)?,"source":r.get::<_,String>(2)?,"tier":r.get::<_,String>(3)?})))?.collect::<rusqlite::Result<_>>()?;
     }
-    let mut stmt=db.prepare("SELECT id,body,source,tier FROM context WHERE (tier='ASTC' AND run_id=?1 AND agent=?2) OR (tier='PSTC' AND (run_id=?1 OR (run_id='onboarding' AND ?3) OR run_id IN (SELECT run_id FROM operator_recalls))) OR (tier='EVIDENCE' AND run_id=?1) ORDER BY created DESC LIMIT 16")?;
-    let rows:Vec<Value>=stmt.query_map(params![run.to_string(),agent,browse_company_reference],|r|Ok(json!({"id":r.get::<_,String>(0)?,"text":r.get::<_,String>(1)?,"source":r.get::<_,String>(2)?,"tier":r.get::<_,String>(3)?})))?.collect::<rusqlite::Result<_>>()?;
+    let mut stmt=db.prepare("SELECT id,body,source,tier FROM context WHERE (?4=0 OR agent=?2 OR agent IN (SELECT value FROM json_each(?5))) AND ((tier='ASTC' AND run_id=?1 AND agent=?2) OR (tier='PSTC' AND (run_id=?1 OR (run_id='onboarding' AND ?3) OR run_id IN (SELECT run_id FROM operator_recalls))) OR (tier='EVIDENCE' AND run_id=?1)) ORDER BY created DESC LIMIT 16")?;
+    let rows:Vec<Value>=stmt.query_map(params![run.to_string(),agent,browse_company_reference,governed,allowed_senders],|r|Ok(json!({"id":r.get::<_,String>(0)?,"text":r.get::<_,String>(1)?,"source":r.get::<_,String>(2)?,"tier":r.get::<_,String>(3)?})))?.collect::<rusqlite::Result<_>>()?;
     let mut seen = std::collections::HashSet::new();
     let rows = ranked
         .into_iter()
@@ -1039,6 +1271,242 @@ pub fn retrieve(
     )
 }
 
+pub(crate) fn snapshot_contract(db: &Connection, run: Uuid) -> Result<Value> {
+    let (body, digest): (String, String) = db
+        .query_row(
+            "SELECT intake,digest FROM jobs WHERE run_id=?1",
+            [run.to_string()],
+            |r| Ok((r.get(0)?, r.get(1)?)),
+        )
+        .context("memory snapshot requires frozen job intake")?;
+    if format!("{:x}", Sha256::digest(body.as_bytes())) != digest {
+        bail!("frozen memory contract integrity check failed");
+    }
+    let intake: Value = serde_json::from_str(&body)?;
+    Ok(
+        json!({"intake_sha256":digest,"idea":intake["idea"],"acceptance":intake["acceptance"],"exclusions":intake["exclusions"]}),
+    )
+}
+
+/// Point retrieval shares the canonical memory boundary, not an unfiltered
+/// lookup by a model-supplied ID. Old model epochs cannot be laundered into a
+/// fresh semantic summary after a permission change.
+pub(crate) fn semantic_source(
+    db: &Connection,
+    run: Uuid,
+    actor: &str,
+    id: &str,
+    revision: u64,
+) -> Result<Option<Value>> {
+    use rusqlite::OptionalExtension;
+    let policy = crate::governance::load(db, &run.to_string())?
+        .context("semantic memory requires governance")?;
+    anyhow::ensure!(
+        policy.revision == revision,
+        "semantic source policy changed"
+    );
+    let grant = policy
+        .grants
+        .get(actor)
+        .context("semantic recipient has no grant")?;
+    if id == "frozen-task-contract" {
+        let contract = snapshot_contract(db, run)?;
+        let text=json!({"definition_of_done":contract["acceptance"],"exclusions":contract["exclusions"],"authority":"approved requirements, NOT completed-work evidence"}).to_string();
+        return Ok(Some(
+            json!({"id":id,"sender":"operator","source":"frozen_task_requirement","tier":"CONTRACT","sha256":format!("{:x}",Sha256::digest(contract.to_string().as_bytes())),"text":text}),
+        ));
+    }
+    let row:Option<(String,String,String,String)>=db.query_row(
+        "SELECT body,source,tier,agent FROM context WHERE id=?3 AND (agent=?2 OR agent IN (SELECT value FROM json_each(?4))) AND ((tier='ASTC' AND run_id=?1 AND agent=?2) OR (tier='PSTC' AND (run_id=?1 OR run_id='onboarding' OR run_id IN (SELECT run_id FROM operator_recalls))) OR (tier='EVIDENCE' AND run_id=?1))",
+        params![run.to_string(),actor,id,serde_json::to_string(&grant.memory_from)?],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?))).optional()?;
+    let Some((body, source, tier, sender)) = row else {
+        return Ok(None);
+    };
+    let content = if source == "model_output" {
+        let parsed: Value = serde_json::from_str(&body)?;
+        if parsed["policy_revision"] != revision || parsed["run_id"] != run.to_string() {
+            return Ok(None);
+        }
+        parsed["output"]
+            .as_str()
+            .context("versioned source output missing")?
+            .to_string()
+    } else {
+        body.clone()
+    };
+    Ok(Some(
+        json!({"id":id,"sender":sender,"source":source,"tier":tier,"sha256":format!("{:x}",Sha256::digest(body.as_bytes())),"text":content}),
+    ))
+}
+
+pub(crate) fn semantic_candidates(
+    db: &Connection,
+    company: &str,
+    run: Uuid,
+    actor: &str,
+    query: &str,
+) -> Result<Value> {
+    retrieve_from(db, company, run, actor, query)
+}
+
+struct SnapshotScope<'a> {
+    company: &'a str,
+    run: Uuid,
+    agent: &'a str,
+}
+fn capture_snapshot(
+    db: &Connection,
+    scope: SnapshotScope<'_>,
+    contract: &Value,
+    live: &Value,
+    generation: i64,
+    policy: u64,
+    now: u64,
+) -> Result<Value> {
+    use crate::memory::SnapshotRepository;
+    let SnapshotScope {
+        company,
+        run,
+        agent,
+    } = scope;
+    let snapshot = crate::memory::SqliteSnapshots { db }.append(
+        &run.to_string(),
+        agent,
+        generation,
+        policy,
+        &crate::memory::project(company, &run.to_string(), agent, contract, live)?,
+        now,
+    )?;
+    let metadata = crate::memory::descriptor(&snapshot, generation);
+    audit(
+        db,
+        &run.to_string(),
+        "memory_snapshot_created",
+        json!({"recipient":agent,"metadata":metadata,"payload_logged":false}),
+    )?;
+    Ok(snapshot)
+}
+
+/// Live text is always authorized afresh. The cached object is only a bounded,
+/// versioned source index; old snapshots never hydrate copied private text.
+pub fn memory_context(
+    root: &Path,
+    company: &str,
+    owner: &str,
+    run: Uuid,
+    agent: &str,
+    query: &str,
+) -> Result<Value> {
+    use crate::memory::SnapshotRepository;
+    let mut db = connect(root, company, owner, false)?;
+    let tx = db.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+    let policy = crate::governance::load(&tx, &run.to_string())?
+        .map(|p| p.revision)
+        .unwrap_or(0);
+    let clock = crate::memory::clock(&tx)?;
+    let mut live = retrieve_from(&tx, company, run, agent, query)?;
+    let previous = crate::memory::SqliteSnapshots { db: &tx }.latest(&run.to_string(), agent)?;
+    let stale = previous.as_ref().is_none_or(|snapshot| {
+        snapshot["policy_revision"].as_u64() != Some(policy)
+            || (snapshot["source_generation"].as_i64() != Some(clock.generation)
+                && (clock.first_dirty.is_none() || clock.due(crate::now_ms())))
+    });
+    let snapshot = if stale {
+        capture_snapshot(
+            &tx,
+            SnapshotScope {
+                company,
+                run,
+                agent,
+            },
+            &snapshot_contract(&tx, run)?,
+            &live,
+            clock.generation,
+            policy,
+            crate::now_ms(),
+        )?
+    } else {
+        previous.context("memory snapshot unavailable")?
+    };
+    live["memory_snapshot"] = crate::memory::descriptor(&snapshot, clock.generation);
+    live["semantic_memory"] =
+        crate::semantic_memory::read_in(&tx, company, owner, run, agent)?.unwrap_or(Value::Null);
+    tx.commit()?;
+    Ok(live)
+}
+
+pub type MemoryFlush = (Option<u64>, Vec<(Uuid, String, Value)>);
+pub fn flush_memory(
+    root: &Path,
+    company: &str,
+    owner: &str,
+    runs: &[Uuid],
+    now: u64,
+) -> Result<MemoryFlush> {
+    use crate::memory::SnapshotRepository;
+    let mut db = connect(root, company, owner, false)?;
+    let tx = db.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+    let clock = crate::memory::clock(&tx)?;
+    if !clock.due(now) {
+        return Ok((clock.deadline(), Vec::new()));
+    }
+    let mut events = Vec::new();
+    for run in runs {
+        let contract = snapshot_contract(&tx, *run)?;
+        let policy = crate::governance::load(&tx, &run.to_string())?;
+        let revision = policy.as_ref().map(|p| p.revision).unwrap_or(0);
+        let mut stmt=tx.prepare("SELECT DISTINCT agent FROM context WHERE run_id=?1 UNION SELECT agent FROM memory_snapshots WHERE run_id=?1")?;
+        let mut actors = stmt
+            .query_map([run.to_string()], |r| r.get::<_, String>(0))?
+            .collect::<rusqlite::Result<std::collections::BTreeSet<_>>>()?;
+        if let Some(policy) = policy {
+            actors.extend(policy.grants.into_keys());
+        }
+        for actor in actors {
+            let previous =
+                crate::memory::SqliteSnapshots { db: &tx }.latest(&run.to_string(), &actor)?;
+            if previous.as_ref().is_some_and(|s| {
+                s["source_generation"].as_i64() == Some(clock.generation)
+                    && s["policy_revision"].as_u64() == Some(revision)
+            }) {
+                continue;
+            }
+            let live = retrieve_from(
+                &tx,
+                company,
+                *run,
+                &actor,
+                contract["idea"].as_str().unwrap_or_default(),
+            )?;
+            let snapshot = capture_snapshot(
+                &tx,
+                SnapshotScope {
+                    company,
+                    run: *run,
+                    agent: &actor,
+                },
+                &contract,
+                &live,
+                clock.generation,
+                revision,
+                now,
+            )?;
+            events.push((
+                *run,
+                actor,
+                crate::memory::descriptor(&snapshot, clock.generation),
+            ));
+        }
+    }
+    tx.execute(
+        "UPDATE memory_clock SET first_dirty=NULL,last_dirty=NULL WHERE id=1 AND generation=?1",
+        [clock.generation],
+    )?;
+    tx.commit()?;
+    Ok((None, events))
+}
+
+#[cfg(test)]
 pub fn stage(
     root: &Path,
     company: &str,
@@ -1047,32 +1515,86 @@ pub fn stage(
     agent: &str,
     body: &str,
 ) -> Result<()> {
-    let db = connect(root, company, owner, false)?;
+    stage_guarded(root, company, owner, run, agent, body, None)
+}
+
+pub fn stage_at_policy(
+    root: &Path,
+    company: &str,
+    owner: &str,
+    run: Uuid,
+    agent: &str,
+    body: &str,
+    expected: u64,
+) -> Result<()> {
+    stage_guarded(root, company, owner, run, agent, body, Some(expected))
+}
+
+fn stage_guarded(
+    root: &Path,
+    company: &str,
+    owner: &str,
+    run: Uuid,
+    agent: &str,
+    body: &str,
+    expected: Option<u64>,
+) -> Result<()> {
+    let mut db = connect(root, company, owner, false)?;
+    let tx = db.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
+    stage_in(&tx, run, agent, body, expected)?;
+    tx.commit()?;
+    crate::memory::wake();
+    Ok(())
+}
+
+/// Share the atomic policy/data gate with controllers that commit their own
+/// native reply checkpoint in the same authenticated company transaction.
+pub(crate) fn stage_in(
+    db: &Connection,
+    run: Uuid,
+    agent: &str,
+    body: &str,
+    expected: Option<u64>,
+) -> Result<String> {
+    anyhow::ensure!(
+        !db.is_autocommit(),
+        "model staging requires an enclosing transaction"
+    );
+    crate::security::require_persistable(body)?;
+    if let Some(expected) = expected {
+        let current = crate::governance::load(db, &run.to_string())?
+            .map(|p| p.revision)
+            .unwrap_or(0);
+        if expected != current {
+            bail!("access policy changed before atomic context persistence");
+        }
+    }
+    let id = Uuid::new_v4().to_string();
     db.execute(
         "INSERT INTO context VALUES (?1,?2,?3,'ASTC',?4,'model_output',?5)",
-        params![
-            Uuid::new_v4().to_string(),
-            run.to_string(),
-            agent,
-            body,
-            crate::now_ms() as i64
-        ],
+        params![id, run.to_string(), agent, body, crate::now_ms() as i64],
     )?;
-    Ok(())
+    Ok(id)
 }
 
 pub fn acknowledge(root: &Path, company: &str, owner: &str, run: Uuid, agent: &str) -> Result<()> {
     let mut db = connect(root, company, owner, false)?;
     let tx = db.transaction()?;
+    let policy = crate::governance::load(&tx, &run.to_string())?;
+    let senders = policy
+        .as_ref()
+        .and_then(|p| p.grants.get(agent))
+        .map(|grant| grant.memory_from.iter().collect::<Vec<_>>())
+        .unwrap_or_default();
     tx.execute(
-        "UPDATE context SET tier='PSTC' WHERE run_id=?1 AND tier='ASTC' AND agent<>?2",
-        params![run.to_string(), agent],
+        "UPDATE context SET tier='PSTC' WHERE run_id=?1 AND tier='ASTC' AND agent<>?2 AND (?3=0 OR agent IN (SELECT value FROM json_each(?4)))",
+        params![run.to_string(), agent, policy.is_some(), serde_json::to_string(&senders)?],
     )?;
     audit(
         &tx,
         &run.to_string(),
         "handoff_acknowledged",
-        json!({"recipient":agent,"source_astc_cleared":true,"scope":"company"}),
+        json!({"recipient":agent,"scope":if policy.is_some(){"explicit_sender_grants"}else{"legacy_company"},"policy_revision":policy.map(|p|p.revision),"payload_logged":false}),
     )?;
     tx.commit()?;
     Ok(())
@@ -1081,12 +1603,61 @@ pub fn acknowledge(root: &Path, company: &str, owner: &str, run: Uuid, agent: &s
 pub fn outcome(root: &Path, company: &str, owner: &str, run: Uuid, state: &str) -> Result<()> {
     let mut db = connect(root, company, owner, false)?;
     let tx = db.transaction()?;
+    if state == "completed" {
+        crate::coordination::journal::validate_completed(&tx, run)?;
+    }
     tx.execute(
         "UPDATE jobs SET state=?2 WHERE run_id=?1",
         params![run.to_string(), state],
     )?;
+    // Finish the active memory index before canonical records move to cold
+    // storage. No waiting for the quiet timer at a terminal checkpoint.
+    let snapshot_count: i64 = tx.query_row(
+        "SELECT COUNT(*) FROM memory_snapshots WHERE run_id=?1",
+        [run.to_string()],
+        |r| r.get(0),
+    )?;
+    if snapshot_count > 0 {
+        let contract = snapshot_contract(&tx, run)?;
+        let revision = crate::governance::load(&tx, &run.to_string())?
+            .map(|p| p.revision)
+            .unwrap_or(0);
+        let generation = crate::memory::clock(&tx)?.generation;
+        let mut stmt=tx.prepare("SELECT DISTINCT agent FROM memory_snapshots WHERE run_id=?1 UNION SELECT agent FROM context WHERE run_id=?1")?;
+        let actors = stmt
+            .query_map([run.to_string()], |r| r.get::<_, String>(0))?
+            .collect::<rusqlite::Result<Vec<_>>>()?;
+        for actor in actors {
+            let live = retrieve_from(
+                &tx,
+                company,
+                run,
+                &actor,
+                contract["idea"].as_str().unwrap_or_default(),
+            )?;
+            capture_snapshot(
+                &tx,
+                SnapshotScope {
+                    company,
+                    run,
+                    agent: &actor,
+                },
+                &contract,
+                &live,
+                generation,
+                revision,
+                crate::now_ms(),
+            )?;
+        }
+    }
     if state == "completed" {
         move_to_cold(&tx, Some(&run.to_string()), ContextLifecycle::Completed)?;
+    } else if state == "candidate_submitted" {
+        move_to_cold(
+            &tx,
+            Some(&run.to_string()),
+            ContextLifecycle::CandidateSubmitted,
+        )?;
     } else {
         tx.execute(
             "UPDATE context SET tier=CASE WHEN tier LIKE 'EVIDENCE%' THEN 'EVIDENCE' ELSE 'PSTC' END WHERE run_id=?1",
@@ -1239,6 +1810,333 @@ pub async fn execute(
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn archived_fixture(state: &str) -> (PathBuf, Uuid) {
+        let root = std::env::temp_dir().join(format!("gents-archive-{}", Uuid::new_v4()));
+        std::fs::create_dir_all(&root).unwrap();
+        let run = Uuid::new_v4();
+        operation(
+            &root,
+            "one",
+            "alice",
+            &json!({"op":"register","name":"One"}),
+        )
+        .unwrap();
+        let value = operation(&root,"one","alice",&json!({"op":"intake","run_id":run,"intake":{"idea":"Synthetic archive fixture","acceptance":"Retain governed context","exclusions":"External calls","timeline":"Test","company_signer":"A","provider_signer":"B","budget_usd":0}})).unwrap();
+        operation(
+            &root,
+            "one",
+            "alice",
+            &json!({"op":"approve","run_id":run,"digest":value["jobs"][0]["digest"]}),
+        )
+        .unwrap();
+        stage(
+            &root,
+            "one",
+            "alice",
+            run,
+            "Author",
+            "synthetic-checkpoint-marker",
+        )
+        .unwrap();
+        outcome(&root, "one", "alice", run, state).unwrap();
+        (root, run)
+    }
+    #[test]
+    fn unqualified_submission_is_passive_and_cannot_be_finished_as_accepted_memory() {
+        let (root, run) = archived_fixture("candidate_submitted");
+        let db = connect(&root, "one", "alice", false).unwrap();
+        assert_eq!(
+            db.query_row(
+                "SELECT state FROM jobs WHERE run_id=?1",
+                [run.to_string()],
+                |r| r.get::<_, String>(0)
+            )
+            .unwrap(),
+            "candidate_submitted"
+        );
+        assert_eq!(
+            db.query_row(
+                "SELECT tier FROM context_archive WHERE run_id=?1",
+                [run.to_string()],
+                |r| r.get::<_, String>(0)
+            )
+            .unwrap(),
+            "PLTC"
+        );
+        assert_eq!(
+            db.query_row("SELECT COUNT(*) FROM knowledge", [], |r| r.get::<_, i64>(0))
+                .unwrap(),
+            0
+        );
+        let checkpoint = operation(
+            &root,
+            "one",
+            "alice",
+            &json!({"op":"memory_archive_status","run_id":run}),
+        )
+        .unwrap();
+        assert_eq!(
+            checkpoint["checkpoints"][0]["lifecycle"],
+            "candidate_submitted"
+        );
+        assert!(checkpoint["checkpoints"][0]["contract_sha256"]
+            .as_str()
+            .is_some());
+        assert!(!checkpoint
+            .to_string()
+            .contains("synthetic-checkpoint-marker"));
+        assert!(operation(&root, "one", "alice", &json!({"op":"finish","run_id":run})).is_err());
+        assert!(operation(
+            &root,
+            "one",
+            "other-owner",
+            &json!({"op":"memory_archive_status","run_id":run})
+        )
+        .is_err());
+        drop(db);
+        std::fs::remove_dir_all(root).unwrap();
+    }
+    #[test]
+    fn failed_recall_rolls_back_owner_recall_grant_and_retains_cold_records() {
+        let (root, run) = archived_fixture("completed");
+        let db = connect(&root, "one", "alice", false).unwrap();
+        let generation = crate::memory::clock(&db).unwrap().generation;
+        db.execute_batch("CREATE TRIGGER fail_recall BEFORE INSERT ON context BEGIN SELECT RAISE(ABORT,'simulated recall storage failure');END;").unwrap();
+        assert!(operation(
+            &root,
+            "one",
+            "alice",
+            &json!({"op":"recall","target_run_id":run})
+        )
+        .is_err());
+        assert_eq!(crate::memory::clock(&db).unwrap().generation, generation);
+        assert_eq!(
+            db.query_row("SELECT COUNT(*) FROM operator_recalls", [], |r| r
+                .get::<_, i64>(0))
+                .unwrap(),
+            0
+        );
+        assert_eq!(
+            db.query_row(
+                "SELECT COUNT(*) FROM context_archive WHERE run_id=?1",
+                [run.to_string()],
+                |r| r.get::<_, i64>(0)
+            )
+            .unwrap(),
+            1
+        );
+        assert_eq!(
+            db.query_row("SELECT COUNT(*) FROM context", [], |r| r.get::<_, i64>(0))
+                .unwrap(),
+            0
+        );
+        db.execute_batch("DROP TRIGGER fail_recall").unwrap();
+        operation(
+            &root,
+            "one",
+            "alice",
+            &json!({"op":"recall","target_run_id":run}),
+        )
+        .unwrap();
+        assert_eq!(
+            db.query_row("SELECT COUNT(*) FROM operator_recalls", [], |r| r
+                .get::<_, i64>(0))
+                .unwrap(),
+            1
+        );
+        assert_eq!(
+            db.query_row(
+                "SELECT COUNT(*) FROM context WHERE run_id=?1",
+                [run.to_string()],
+                |r| r.get::<_, i64>(0)
+            )
+            .unwrap(),
+            1
+        );
+        assert_eq!(
+            db.query_row(
+                "SELECT COUNT(*) FROM context_archive WHERE run_id=?1",
+                [run.to_string()],
+                |r| r.get::<_, i64>(0)
+            )
+            .unwrap(),
+            0
+        );
+        drop(db);
+        std::fs::remove_dir_all(root).unwrap();
+    }
+    #[test]
+    fn snapshot_cache_revocation_is_immediate_and_raw_records_are_retained() {
+        use crate::memory::SnapshotRepository;
+        let root = std::env::temp_dir().join(format!("gents-memory-{}", Uuid::new_v4()));
+        std::fs::create_dir_all(&root).unwrap();
+        let run = Uuid::new_v4();
+        operation(
+            &root,
+            "one",
+            "alice",
+            &json!({"op":"register","name":"One"}),
+        )
+        .unwrap();
+        operation(&root,"one","alice",&json!({"op":"intake","run_id":run,"intake":{"idea":"Review snapshot source marker","acceptance":"No revoked memory reads","exclusions":"External calls","timeline":"Test","company_signer":"A","provider_signer":"B","budget_usd":0}})).unwrap();
+        let empty = json!({"tools":[],"skills":[],"memory_from":[]});
+        let shared = json!({"tools":[],"skills":[],"memory_from":["Writer"]});
+        let master = json!({"tools":["access_delegate"],"skills":[],"memory_from":[]});
+        operation(&root,"one","alice",&json!({"op":"governance_install","run_id":run,"expected_revision":0,
+            "policy":{"revision":1,"master":"Master","ceilings":{"Master":master,"Writer":empty,"Reader":shared},
+                "grants":{"Master":master,"Writer":empty,"Reader":shared}}})).unwrap();
+        stage(
+            &root,
+            "one",
+            "alice",
+            run,
+            "Writer",
+            "restricted-memory-marker",
+        )
+        .unwrap();
+        acknowledge(&root, "one", "alice", run, "Reader").unwrap();
+        let first = memory_context(&root, "one", "alice", run, "Reader", "marker").unwrap();
+        assert!(first.to_string().contains("restricted-memory-marker"));
+        assert_eq!(first["memory_snapshot"]["revision"], 1);
+        let db = connect(&root, "one", "alice", false).unwrap();
+        let snapshot = crate::memory::SqliteSnapshots { db: &db }
+            .latest(&run.to_string(), "Reader")
+            .unwrap()
+            .unwrap();
+        assert!(!snapshot.to_string().contains("restricted-memory-marker"));
+        assert!(!snapshot["manifest"]["source_refs"]
+            .as_array()
+            .unwrap()
+            .is_empty());
+        drop(db);
+        delegate_access(
+            &root,
+            "one",
+            "alice",
+            run,
+            "Master",
+            &json!({"recipient":"Reader","expected_revision":1,"grant":empty}),
+        )
+        .unwrap();
+        // No 30-second wait: a policy revision invalidates the old snapshot now.
+        assert!(stage_at_policy(&root, "one", "alice", run, "Writer", "stale-output", 1).is_err());
+        let revoked = memory_context(&root, "one", "alice", run, "Reader", "marker").unwrap();
+        assert_eq!(revoked["records"], json!([]));
+        assert_eq!(revoked["memory_snapshot"]["policy_revision"], 2);
+        assert_eq!(revoked["memory_snapshot"]["revision"], 2);
+        assert_ne!(
+            first["memory_snapshot"]["sha256"],
+            revoked["memory_snapshot"]["sha256"]
+        );
+        assert!(memory_context(&root, "one", "mallory", run, "Reader", "marker").is_err());
+        let db = connect(&root, "one", "alice", false).unwrap();
+        assert_eq!(
+            db.query_row(
+                "SELECT COUNT(*) FROM context WHERE body='restricted-memory-marker'",
+                [],
+                |r| r.get::<_, i64>(0)
+            )
+            .unwrap(),
+            1
+        );
+        let latest = crate::memory::SqliteSnapshots { db: &db }
+            .latest(&run.to_string(), "Reader")
+            .unwrap()
+            .unwrap();
+        assert_eq!(latest["manifest"]["source_refs"], json!([]));
+        // An altered snapshot must fail closed, rather than being trusted as context.
+        db.execute("UPDATE memory_snapshots SET manifest='{}' WHERE run_id=?1 AND agent='Reader' AND revision=2",[run.to_string()]).unwrap();
+        drop(db);
+        assert!(memory_context(&root, "one", "alice", run, "Reader", "").is_err());
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn snapshot_debounce_flush_is_durable_and_does_not_delete_original_context() {
+        use crate::memory::SnapshotRepository;
+        let root = std::env::temp_dir().join(format!("gents-debounce-{}", Uuid::new_v4()));
+        std::fs::create_dir_all(&root).unwrap();
+        let run = Uuid::new_v4();
+        operation(
+            &root,
+            "one",
+            "alice",
+            &json!({"op":"register","name":"One"}),
+        )
+        .unwrap();
+        operation(&root,"one","alice",&json!({"op":"intake","run_id":run,"intake":{"idea":"Review source records","acceptance":"Retain records","exclusions":"Cloud","timeline":"Test","company_signer":"A","provider_signer":"B","budget_usd":0}})).unwrap();
+        memory_context(&root, "one", "alice", run, "Writer", "").unwrap();
+        stage(&root, "one", "alice", run, "Writer", "first durable record").unwrap();
+        let queued = memory_context(&root, "one", "alice", run, "Writer", "").unwrap();
+        assert_eq!(queued["memory_snapshot"]["revision"], 1);
+        assert_eq!(queued["memory_snapshot"]["pending_updates"], true);
+        assert!(queued.to_string().contains("first durable record"));
+        let deadline = {
+            let db = connect(&root, "one", "alice", false).unwrap();
+            crate::memory::clock(&db).unwrap().deadline().unwrap()
+        };
+        assert!(flush_memory(&root, "one", "alice", &[run], deadline - 1)
+            .unwrap()
+            .1
+            .is_empty());
+        let events = flush_memory(&root, "one", "alice", &[run], deadline)
+            .unwrap()
+            .1;
+        assert_eq!(events.len(), 1);
+        let db = connect(&root, "one", "alice", false).unwrap();
+        assert!(crate::memory::clock(&db).unwrap().first_dirty.is_none());
+        let persisted = crate::memory::SqliteSnapshots { db: &db }
+            .latest(&run.to_string(), "Writer")
+            .unwrap()
+            .unwrap();
+        assert_eq!(persisted["revision"], 2);
+        assert_eq!(
+            persisted["manifest"]["source_refs"]
+                .as_array()
+                .unwrap()
+                .len(),
+            1
+        );
+        assert_eq!(
+            db.query_row("SELECT COUNT(*) FROM context", [], |r| r.get::<_, i64>(0))
+                .unwrap(),
+            1
+        );
+        drop(db);
+        // Terminal checkpoints cannot wait for a quiet period: snapshot the
+        // last raw write before moving canonical context into the archive.
+        stage(&root, "one", "alice", run, "Writer", "last durable record").unwrap();
+        outcome(&root, "one", "alice", run, "completed").unwrap();
+        let db = connect(&root, "one", "alice", false).unwrap();
+        let final_snapshot = crate::memory::SqliteSnapshots { db: &db }
+            .latest(&run.to_string(), "Writer")
+            .unwrap()
+            .unwrap();
+        assert_eq!(final_snapshot["revision"], 3);
+        assert_eq!(
+            final_snapshot["manifest"]["source_refs"]
+                .as_array()
+                .unwrap()
+                .len(),
+            2
+        );
+        assert_eq!(
+            db.query_row("SELECT COUNT(*) FROM context", [], |r| r.get::<_, i64>(0))
+                .unwrap(),
+            0
+        );
+        assert_eq!(
+            db.query_row(
+                "SELECT COUNT(*) FROM context_archive WHERE tier='ALTC'",
+                [],
+                |r| r.get::<_, i64>(0)
+            )
+            .unwrap(),
+            2
+        );
+        drop(db);
+        std::fs::remove_dir_all(root).unwrap();
+    }
     #[test]
     fn task_evidence_is_run_scoped_frozen_and_cold_archivable() {
         let root = std::env::temp_dir().join(format!("gents-evidence-test-{}", Uuid::new_v4()));
@@ -1485,6 +2383,82 @@ mod tests {
         std::fs::remove_dir_all(root).unwrap();
     }
     #[test]
+    fn governed_memory_requires_explicit_sharing_and_honors_revocation() {
+        let root = std::env::temp_dir().join(format!("gents-governance-{}", Uuid::new_v4()));
+        std::fs::create_dir_all(&root).unwrap();
+        operation(
+            &root,
+            "one",
+            "alice",
+            &json!({"op":"register","name":"One"}),
+        )
+        .unwrap();
+        let run = Uuid::new_v4();
+        let access = json!({"tools":[],"skills":[],"memory_from":[]});
+        let policy = json!({"revision":1,"master":"Master",
+            "ceilings":{"Master":{"tools":["access_delegate"],"skills":[],"memory_from":[]},
+                "Writer":access,"Reader":{"tools":[],"skills":[],"memory_from":["Writer"]},"Stranger":access},
+            "grants":{"Master":{"tools":["access_delegate"],"skills":[],"memory_from":[]},
+                "Writer":access,"Reader":access,"Stranger":access}});
+        let install =
+            json!({"op":"governance_install","run_id":run,"expected_revision":0,"policy":policy});
+        assert!(operation(&root, "one", "bob", &install).is_err());
+        operation(&root, "one", "alice", &install).unwrap();
+        stage(&root, "one", "alice", run, "Writer", "restricted marker").unwrap();
+        acknowledge(&root, "one", "alice", run, "Reader").unwrap();
+        assert_eq!(
+            retrieve(&root, "one", "alice", run, "Reader", "marker").unwrap()["records"],
+            json!([])
+        );
+        let share = json!({"recipient":"Reader","expected_revision":1,
+            "grant":{"tools":[],"skills":[],"memory_from":["Writer"]}});
+        assert!(delegate_access(&root, "one", "alice", run, "Reader", &share).is_err());
+        delegate_access(&root, "one", "alice", run, "Master", &share).unwrap();
+        acknowledge(&root, "one", "alice", run, "Reader").unwrap();
+        assert_eq!(
+            retrieve(&root, "one", "alice", run, "Reader", "marker").unwrap()["records"][0]["text"],
+            "restricted marker"
+        );
+        for who in ["Stranger", "Unknown"] {
+            assert_eq!(
+                retrieve(&root, "one", "alice", run, who, "marker").unwrap()["records"],
+                json!([])
+            );
+            assert_eq!(
+                retrieve(&root, "one", "alice", run, who, "").unwrap()["records"],
+                json!([])
+            );
+        }
+        delegate_access(
+            &root,
+            "one",
+            "alice",
+            run,
+            "Master",
+            &json!({"recipient":"Reader","expected_revision":2,"grant":access}),
+        )
+        .unwrap();
+        // The record remains PSTC after sharing, but revocation still applies
+        // to both ranked search and fallback browsing, before reading bodies.
+        for query in ["marker", ""] {
+            assert_eq!(
+                retrieve(&root, "one", "alice", run, "Reader", query).unwrap()["records"],
+                json!([])
+            );
+        }
+        assert!(stage(
+            &root,
+            "one",
+            "alice",
+            run,
+            "Writer",
+            "patient jane@example.com"
+        )
+        .is_err());
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
     fn tenant_owner_path_and_lifecycle() {
         let root = std::env::temp_dir().join(format!("gents-test-{}", Uuid::new_v4()));
         std::fs::create_dir_all(&root).unwrap();
@@ -1499,6 +2473,18 @@ mod tests {
             .unwrap();
         }
         assert!(operation(&root, "one", "bob", &json!({"op":"status"})).is_err());
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            assert_eq!(
+                std::fs::metadata(root.join("data/companies/one/brain.sqlite3"))
+                    .unwrap()
+                    .permissions()
+                    .mode()
+                    & 0o777,
+                0o600
+            );
+        }
         let run = Uuid::new_v4();
         stage(&root, "one", "alice", run, "sender", "tenant-one-secret").unwrap();
         let other = context(&root, "two", "alice", run, "recipient").unwrap();

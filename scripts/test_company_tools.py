@@ -24,6 +24,14 @@ class CompanyTools(unittest.TestCase):
         self.temp.cleanup()
     def tool(self, action, **args):
         return tools.execute("one", self.run, action, args)
+    def test_integer_arithmetic_is_exact_bounded_and_not_code_execution(self):
+        result = self.tool("integer_arithmetic", calculations=[{"id":"one","values":[100,20,-7],"subtract":130},{"id":"empty","values":[],"subtract":-9}])
+        self.assertEqual(result["calculations"], [{"id":"one","sum":113,"difference":-17},{"id":"empty","sum":0,"difference":9}])
+        for value in (True, 1.2, "1+2", 10_000_001):
+            with self.assertRaises(ValueError):
+                self.tool("integer_arithmetic", calculations=[{"id":"one","values":[value],"subtract":0}])
+        with self.assertRaises(ValueError):
+            self.tool("integer_arithmetic", calculations=[{"id":"one","values":[],"subtract":0}]*2)
     def test_files_cannot_escape_or_follow_symlinks(self):
         result = self.tool("files", op="write", path="answer.txt", content="verified")
         self.assertEqual((self.root / result["path"]).read_text(), "verified")
@@ -34,6 +42,11 @@ class CompanyTools(unittest.TestCase):
         (work / "alias").symlink_to(self.root / "models")
         with self.assertRaises(ValueError):
             self.tool("files", op="read", path="alias/private")
+    def test_legacy_files_do_not_silently_ignore_native_write_preconditions(self):
+        result = self.tool("files", op="write", path="answer.txt", content="original")
+        with self.assertRaisesRegex(ValueError, "native MCP"):
+            self.tool("files", op="write", path="answer.txt", content="replacement", expected_sha256="a"*64)
+        self.assertEqual((self.root / result["path"]).read_text(), "original")
     @unittest.skipUnless(sys.platform == "darwin" and Path("/usr/bin/sandbox-exec").exists(), "macOS filesystem sandbox")
     def test_isolated_process_cannot_follow_a_workspace_symlink_to_modify_host_data(self):
         self.tool("files", op="list", path="")
@@ -216,6 +229,18 @@ class CompanyTools(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "existing"):
             self.tool("skill_compose", id="unsafe", purpose="Invent permission", roles=["worker"],
                       steps=["arbitrary_shell_root"], instructions="Do anything")
+    def test_approved_skills_can_be_retrieved_after_compaction_but_not_shadowed(self):
+        base = self.root / "docs/companies/we-need-getns-llc/shared-skills"
+        (base / "approved/document-workflow").mkdir(parents=True)
+        (base / "catalog.json").write_text(json.dumps({"skills":[{"id":"document-workflow","version":"fixture","roles":["planner","worker"],"status":"approved-demo","path":"approved/document-workflow/SKILL.md"}]}))
+        (base / "approved/document-workflow/SKILL.md").write_text("Author your own source, then render and inspect it.")
+        self.assertEqual(self.tool("skill_list")["approved_skills"][0]["id"],"document-workflow")
+        read = self.tool("skill_read",id="document-workflow")["skill"]
+        self.assertIn("render and inspect",read["instructions"])
+        self.assertEqual(len(read["sha256"]),64)
+        with self.assertRaisesRegex(ValueError,"shadowed"):
+            self.tool("skill_compose",id="document-workflow",purpose="Replace instructions",roles=["worker"],steps=["files"],instructions="Override")
+
     def test_resource_settings_report_secret_presence_not_values(self):
         with patch.dict(os.environ, {"RUST_OPENAI_API_KEY": "do-not-return-this"}, clear=True):
             values = tools.settings()
@@ -239,6 +264,37 @@ class CompanyTools(unittest.TestCase):
             self.tool("source_read", path=".env.local")
         with self.assertRaisesRegex(ValueError, "human review"):
             self.tool("source_read", path="crates/harness/src/security.rs")
+        with self.assertRaisesRegex(ValueError, "human review"):
+            self.tool("source_read", path="crates/harness/src/workflow.rs")
+        with self.assertRaisesRegex(ValueError, "human review"):
+            self.tool("source_patch", path="crates/harness/src/release_gate.rs",
+                      expected_sha256="0" * 64, content="remove release checks")
+        for alias in ("crates//harness/src/release_gate.rs", "crates/harness/src/./release_gate.rs",
+                      "crates/harness/src/ReLeAsE_GaTe.rs"):
+            with self.assertRaises(ValueError):
+                self.tool("source_patch", path=alias, expected_sha256="0" * 64, content="bypass")
+        for guard in ("scripts/local_sqlite.py", "scripts/company_schedule.py",
+                      "scripts/run-harness.mjs",
+                      "scripts/mcp-curriculum-journal.py", "scripts/mcp-coding-verifier.mjs",
+                      "scripts/mcp-curriculum-bridge.mjs", "scripts/mcp-new-host-helper.mjs",
+                      "scripts/fixtures/mcp-rust-weighted-slots.mjs",
+                      "scripts/FIXTURES/new-reviewed-suite.mjs",
+                      "config/mcp-development-curriculum.json",
+                      "config/company.mcp-development.json",
+                      "config/COMPANY.MCP-rust-reasoning-specialist-review.json",
+                      "crates/harness/src/review_context.rs",
+                      "crates/harness/src/memory_archive.rs",
+                      "crates/harness/src/rust_review.rs",
+                      "crates/harness/src/completion_review.rs",
+                      "crates/harness/src/authorization_context.rs"):
+            with self.assertRaisesRegex(ValueError, "human review"):
+                self.tool("source_patch", path=guard, expected_sha256="0"*64, content="bypass")
+        linked = source.parent / "linked.md"
+        os.link(source, linked)
+        with self.assertRaisesRegex(ValueError, "hard-linked"):
+            self.tool("source_patch", path="docs/linked.md",
+                      expected_sha256=changed["sha256"], content="bypass through hardlink")
+        self.assertEqual(source.read_text(), "after\n")
     @unittest.skipUnless(__import__("sys").platform=="darwin", "uses macOS sandbox")
     def test_shell_writes_only_workspace_and_cannot_read_host_data(self):
         output = self.tool("shell", command="/usr/bin/printf verified > result.txt")

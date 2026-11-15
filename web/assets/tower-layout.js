@@ -1,7 +1,8 @@
 // Purpose-built vertical campus. Floors are ordered top-to-bottom so the
 // exterior cutaway, controls, hit targets and room routing share one source.
+import {officeAssignment} from './office-activity.js';
 export const towerFloors=[
- {id:11,name:'CODEX',rooms:['Gold command suite'],height:184,theme:'#dfb64f'},
+ {id:11,name:'LOCAL EXECUTIVE',rooms:['Gold command suite'],height:184,theme:'#dfb64f'},
  {id:10,name:'CEO',rooms:['Enterprise oversight office'],height:138,theme:'#78cfc0'},
  {id:9,name:'CFO',rooms:['Token finance office'],height:124,theme:'#c9a66c'},
  {id:8,name:'INTELLIGENCE / ARCHIVE',rooms:['Grand stacks & archives'],height:132,theme:'#aab98a'},
@@ -12,7 +13,11 @@ export const towerFloors=[
  {id:3,name:'CONFERENCE',rooms:['All-hands auditorium'],height:132,theme:'#d2a273'},
  {id:2,name:'TESTING',rooms:['Model testing laboratory'],height:138,theme:'#b9b7e8'},
  {id:1,name:'LOBBY',rooms:['Grand hotel reception'],height:154,theme:'#d5a45c'},
+ {id:0,name:'MCP / SERVER BASEMENT',rooms:['Local tool registry & governed execution'],height:154,theme:'#75d5b5'},
 ];
+// A room's elevation now has almost the same aspect as its architectural
+// image. The former ~7:1 bands flattened furniture and made rooms unreadable.
+for(const floor of towerFloors)floor.height=floor.id===11?540:floor.id===1?480:460;
 
 export const crewKey=s=>`${s.id}:${s.role}`;
 export function preferredRoom(s){
@@ -26,8 +31,15 @@ export function preferredRoom(s){
  return [6,0];
 }
 
-export function reserveTowerSeats(crew,{conferenceActive=false}={}){
+export function reserveTowerSeats(crew,{conferenceActive=false,tour=false}={}){
  const occupied=new Map(),result=new Map();
+ if(tour){
+  for(const [index,s]of crew.entries()){
+   const assignment=officeAssignment(s,index),floor=assignment.floor,seat=occupied.get(floor)||0;occupied.set(floor,seat+1);
+   result.set(crewKey(s),{floor,room:0,seat,pod:assignment.pod??index,podFloor:4,state:assignment.state,activity:assignment.activity});
+  }
+  return result;
+ }
  const workingFloors=[8,7,6,5,2];
  for(const [index,s]of crew.entries()){
   const pinned=s.id.toLowerCase()==='ceo';
@@ -45,6 +57,17 @@ export function rectsOverlap(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&
 export function detailStationRect(seat){
  const column=seat.seat%4,row=Math.floor(seat.seat/4);
  return {x:154+column*318,y:220+row*210,w:276,h:200};
+}
+// Photo backdrops use image-space floor lanes, not the legacy oblique desk
+// coordinates. Keep occupants in the foreground rather than on a desktop.
+export function photographicStationRect(seat){
+ const column=seat.seat%4,row=Math.floor(seat.seat/4);
+ let center=240+column*345,foot=865-row*205;
+ if([2,5,8,9].includes(seat.floor))foot=([2,5].includes(seat.floor)?930:seat.floor===8?940:925)-row*205;
+ if(seat.floor===3&&seat.seat<2){center=490+seat.seat*620;foot=875;}
+ if(seat.floor===10&&seat.seat<2){center=245+seat.seat*265;foot=875;}
+ if(seat.floor===11&&seat.seat<2){center=590+seat.seat*750;foot=885;}
+ return {x:center-122,y:foot-180,w:244,h:200,screenSpace:true,scale:Math.max(.7,1-row*.14)};
 }
 export function detailPodRect(index){return {x:147+(index%5)*263,y:205+Math.floor(index/5)*160,w:226,h:145,pod:index};}
 export function floorWalkPose(r,time,seed=0,reducedMotion=false){
@@ -65,6 +88,7 @@ export function interiorPodRect(index){
 }
 
 export const roomDesigns={
+ '0':{id:'mcp',material:'LOCAL RUST / GOVERNED FUNCTIONS / LOOPBACK',floor:'#172c30',tile:'#355054',wall:'#0a1e27',accent:'#75d5b5',desk:'#334c54',edge:'#5b8d88'},
  '11':{id:'codex',material:'GOLD / OBSIDIAN / QUANTUM GLASS',floor:'#604617',tile:'#98742b',wall:'#2b1d0d',accent:'#ffd868',desk:'#d7a936',edge:'#8d6820'},
  '10':{id:'ceo',material:'WALNUT / CALACATTA / LIVE ASSURANCE',floor:'#493c33',tile:'#6b5948',wall:'#182b31',accent:'#87ddca',desk:'#d8cfb9',edge:'#9b7d52'},
  '9':{id:'cfo',material:'SMOKED OAK / BRASS / TOKEN LEDGER',floor:'#403a35',tile:'#5d5248',wall:'#27292b',accent:'#d1ae73',desk:'#9e8565',edge:'#806443'},

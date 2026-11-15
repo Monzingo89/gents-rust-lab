@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "scope": "synthetic local enterprise-workflow evaluation only",
+  "admission": "pending_role_specific_evaluations_and_workflow_security_gates",
+  "counting_rule": "Distinct publisher base identities only; aliases, adapters and quantizations of a base do not add models",
+  "new_candidates": [
+    {
+      "base_id": "Qwen/Qwen2.5-0.5B-Instruct",
+      "source_repo": "Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "source_revision": "9217f5db79a29953eb74d5343926648285ec7e67",
+      "path": "models/qwen2.5-0.5b-instruct/qwen2.5-0.5b-instruct-q4_k_m.gguf",
+      "sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+      "documented_context_tokens": 32768,
+      "evaluation_context_tokens": 8192,
+      "documented_license": "Apache-2.0",
+      "license_evidence": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/blob/9217f5db79a29953eb74d5343926648285ec7e67/LICENSE"
+    },
+    {
+      "base_id": "Qwen/Qwen2.5-1.5B-Instruct",
+      "source_repo": "Qwen/Qwen2.5-1.5B-Instruct-GGUF",
+      "source_revision": "91cad51170dc346986eccefdc2dd33a9da36ead9",
+      "path": "models/qwen2.5-1.5b-instruct/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+      "sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+      "documented_context_tokens": 32768,
+      "evaluation_context_tokens": 8192,
+      "documented_license": "Apache-2.0",
+      "license_evidence": "https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/blob/91cad51170dc346986eccefdc2dd33a9da36ead9/LICENSE"
+    },
+    {
+      "base_id": "HuggingFaceTB/SmolLM2-1.7B-Instruct",
+      "source_repo": "lmstudio-community/SmolLM2-1.7B-Instruct-GGUF",
+      "source_revision": "e54b91ee756cb2d5fd8615757239acc89f88c7e0",
+      "publisher_revision": "31b70e2e869a7173562077fd711b654946d38674",
+      "path": "models/smollm2-1.7b-instruct/SmolLM2-1.7B-Instruct-Q4_K_M.gguf",
+      "sha256": "48db74b86a7e5f1d177f8efbf9929aa3e42bdb07bdc338c14a380a90cd98bde6",
+      "documented_context_tokens": 8192,
+      "evaluation_context_tokens": 8192,
+      "documented_license": "Apache-2.0",
+      "license_evidence": "https://huggingface.co/HuggingFaceTB/SmolLM2-1.7B-Instruct/blob/31b70e2e869a7173562077fd711b654946d38674/README.md#license",
+      "limitations": "Community quantization; publisher warns of factual, logical and bias limitations. No remote repository code is executed."
+    }
+  ],
+  "preexisting_gguf_candidates_needing_provenance_review": [
+    "models/gemma-4-12b-it-qat-q4_0/gemma-4-12b-it-qat-q4_0.gguf",
+    "models/phi-4/phi-4-Q4_K.gguf",
+    "models/qwen3-8b/Qwen3-8B-Q4_K_M.gguf",
+    "models/qwen3-coder-30b-worker/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+    "models/qwen3-vl-8b/Qwen3VL-8B-Instruct-Q4_K_M.gguf",
+    "models/qwen3.5-4b-router/Qwen3.5-4B-Q4_K_M.gguf",
+    "models/qwen3.8-27b-planner-judge/Qwen3.8-27B-UD-Q4_K_M.gguf"
+  ],
+  "private_receipts": "data/model-registry/",
+  "partial_provenance_evidence": [
+    {
+      "path": "models/qwen3-8b/Qwen3-8B-Q4_K_M.gguf",
+      "source_repo": "Qwen/Qwen3-8B-GGUF",
+      "source_revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+      "inventory_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+      "checksum_check": "hf cache verify at the pinned revision checked one present weight successfully; other remote quantizations were not downloaded and local extras were not admitted",
+      "publisher_base": "Qwen/Qwen3-8B",
+      "publisher_card_license_claim": "apache-2.0",
+      "license_evidence": "https://huggingface.co/Qwen/Qwen3-8B#license",
+      "admission": "pending_scoped_license_and_enterprise_role_review"
+    }
+  ],
+  "basic_probe_limit": "Two local policy-comprehension cases per new candidate do not establish role qualification, secure enforcement, model fairness or regulatory compliance"
+}

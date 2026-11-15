@@ -1,0 +1,27 @@
+import {oracleRust,coverage} from './mcp-settlement-inputs.mjs';
+const tests=`${oracleRust}
+fn verify(input:&[i64]){
+ let before=input.to_vec();let result=candidate::settle_balances(input);std::assert_eq!(input,before);
+ let sum:i128=input.iter().map(|&v|v as i128).sum();if input.len()>12||sum!=0{std::assert_eq!(result,None);return;}
+ let transfers=result.expect("Valid balanced inputs require a settlement");std::assert_eq!(transfers.len(),optimum_count(input));
+ let mut outgoing=Vec::new();outgoing.resize(input.len(),0i128);let mut incoming=Vec::new();incoming.resize(input.len(),0i128);let mut previous=None;
+ for &(from,to,amount) in &transfers{std::assert!(from<input.len()&&to<input.len()&&from!=to&&amount>0);std::assert!(input[from]<0&&input[to]>0);if let Some(pair)=previous{std::assert!(pair<(from,to));}previous=Some((from,to));outgoing[from]+=amount as i128;incoming[to]+=amount as i128;}
+ for i in 0..input.len(){if input[i]<0{std::assert_eq!(outgoing[i],-(input[i] as i128));std::assert_eq!(incoming[i],0);}else{std::assert_eq!(incoming[i],input[i] as i128);std::assert_eq!(outgoing[i],0);}}
+}
+#[test]fn empty_zero_and_invalid(){verify(&[]);verify(&[0,0,0]);verify(&[1]);verify(&[-1]);verify(&[1,-2]);verify(&[0;13]);}
+#[test]fn original_indices_and_single_pair(){verify(&[0,5,0,-5]);verify(&[-9,9]);verify(&[9,-9]);}
+#[test]fn greedy_pairing_is_not_always_optimal(){verify(&[-5,-4,4,5]);verify(&[-8,-7,-6,13,8]);verify(&[-3,-3,-2,4,4]);}
+#[test]fn wide_signed_values_and_totals(){verify(&[i64::MIN,i64::MAX,1]);verify(&[i64::MIN,i64::MIN,i64::MAX,i64::MAX,2]);verify(&[i64::MIN,i64::MAX]);verify(&[i64::MAX,i64::MAX]);}
+#[test]fn twelve_balances_and_original_input(){verify(&[-1,-2,-3,-4,-5,-6,6,5,4,3,2,1]);verify(&[-1,-1,-1,-1,-1,-1,1,1,1,1,1,1]);verify(&[0,0,-4,0,0,0,0,0,4,0,0,0]);}
+#[test]fn permutations_preserve_optimal_count(){let original=[-5,-4,-3,3,4,5];for shift in 0..6{let mut values=original;values.rotate_left(shift);verify(&values);values.reverse();verify(&values);}}
+#[test]fn exhaustive_four_balance_grid(){for code in 0..625usize{let mut remaining=code;let mut values=[0i64;4];for value in &mut values{*value=(remaining%5) as i64-2;remaining/=5;}verify(&values);}}
+#[test]fn distinct_balanced_six_balance_corpus(){for seed in 0..512usize{verify(&balanced_inputs(seed));}}
+`;
+export default {
+ kind:'rust_library',planningMode:'implementation',id:'rust-minimum-settlement',
+ title:'Synthetic fintech: globally minimum balance-settlement transfers',industry:'synthetic_fintech',
+ complexity:'extremely_hard',complexity_basis:'Relative curriculum label: exact global minimum with constructed greedy counterexamples, signed-width arithmetic and 12-account scale. Not enterprise, regulatory or general financial competence.',modalities:['text'],
+ sourcePath:'minimum_settlement.rs',testsPath:'acceptance.rs',testsText:tests,testsCount:8,enumeration_coverage:coverage(),
+ initial:'Build an offline arithmetic helper for settling fictional account balances with as few transfers as possible. Clarify validity, optimization and the definition of done before selecting staff and tools. This must never access real accounts or initiate payments.',
+ requirements:'Author minimum_settlement.rs containing pub fn settle_balances(balances: &[i64]) -> Option<Vec<(usize, usize, u64)>>. Support at most 12 input entries, including zeros; reject oversized inputs before allocating based on their unbounded length. A negative balance must pay its absolute value, a positive balance must receive its value, and zero-balance entries must neither send nor receive. Use exact arithmetic for all i64 values and aggregate sums, including i64::MIN and totals outside i64. Reject nonzero aggregate balance with None. Empty and all-zero valid inputs return Some(empty). Each tuple is (original sender index, original recipient index, positive amount), with a negative original sender and positive original recipient only. No self transfers, intermediate relays, repeated sender-recipient pairs or zero amounts. Fully settle every balance exactly while minimizing the TOTAL NUMBER of transfers globally across all valid plans, not greedily by original order or amount. Return the chosen transfers sorted strictly by (sender index, recipient index). Any globally minimum plan satisfying those rules is acceptable; no additional tie-breaking rule is required. Preserve the input. Handle all supported sizes within the native verification limits. This is fictional integer arithmetic, not financial advice, payment execution, banking integration or compliance certification. Choose minimum staffing and installed tools yourself; independent host authorization and final QA are supplied separately. Write and fully read back your source, then use rust_verify to compile and execute the exact owner-frozen acceptance suite against current source bytes and policy. The host supplies acceptance.rs with its pinned hash after planning; never modify it. Safe pure Rust function items and standard library only: no imports, candidate macros, attributes, modules, unsafe, async, extern, I/O, environment, subprocesses, dependencies, Cargo, shell, network, downloads, credentials, memory tools, policy changes, self-approval or source promotion. Pure helper functions are allowed. Keep the source as an unpromoted run-workspace artifact. Do not generate an implementation, transfer plans or expected outputs during planning.'
+};

@@ -78,6 +78,11 @@ with tempfile.TemporaryDirectory(prefix="gents-company-smoke-") as temporary:
         assert op("two","status")["capabilities"]==[]
         op("one","archive")
         assert all(t["tier"]=="PLTC" for t in op("one","status")["tiers"])
+        archived=op("one","memory_archive_status",run_id="onboarding")
+        assert archived["backend"]=="owned_local_sqlite" and archived["checkpoints"]
+        assert archived["checkpoints"][0]["lifecycle"]=="inactive"
+        assert "Company one private evidence" not in json.dumps(archived)
+        assert op("two","memory_archive_status",run_id="onboarding")["checkpoints"]==[]
     finally:
         process.terminate()
         process.wait(timeout=10)

@@ -39,14 +39,20 @@ test('reload drops removed file settings and restores original process values', 
 test('direct company launch loads integrations while preserving runtime isolation', () => {
   const root = mkdtempSync(join(tmpdir(), 'gents-env-'));
   try {
-    writeFileSync(join(root, '.env.local'), 'BIND=127.0.0.1:8787\nCONFIG=config/mock.json\nRUN_STORE=data/runs.sqlite3\nHF_TOKEN=fixture-local\n');
+    writeFileSync(join(root, '.env.local'), 'GENTS_MCP_TRANSPORT=stdio\nBIND=127.0.0.1:8787\nCONFIG=config/mock.json\nRUN_STORE=data/runs.sqlite3\nHF_TOKEN=fixture-local\n');
     writeFileSync(join(root, '.env.company'), 'HF_TOKEN=fixture-company\n');
-    const env = { BIND: '127.0.0.1:8788', CONFIG: 'config/company.local.json', RUN_STORE: 'data/company-runs.sqlite3', GENTS_LOCAL_ONLY: '1' };
+    const env = { BIND: '127.0.0.1:8788', CONFIG: 'config/company.local.json', RUN_STORE: 'data/company-runs.sqlite3', GENTS_LOCAL_ONLY: '1', GENTS_MCP_TRANSPORT: 'sse', LOCAL_MODEL_PORT: '8798', GENTS_RUNTIME_MANIFEST:'data/mcp-runtime-bundles/frozen/manifest.json', GENTS_RUNTIME_MANIFEST_SHA256:'frozen-digest', GENTS_SQLITE_BRIDGE:'/owned/frozen/gents-sqlite-bridge' };
+    writeFileSync(join(root, '.env.company'), 'HF_TOKEN=fixture-company\nLOCAL_MODEL_PORT=1234\nGENTS_RUNTIME_MANIFEST=redirected\nGENTS_RUNTIME_MANIFEST_SHA256=wrong\nGENTS_SQLITE_BRIDGE=redirected\n');
     loadCompanyRuntimeEnv({ root, env });
     assert.equal(env.HF_TOKEN, 'fixture-company');
     assert.equal(env.BIND, '127.0.0.1:8788');
     assert.equal(env.CONFIG, 'config/company.local.json');
     assert.equal(env.RUN_STORE, 'data/company-runs.sqlite3');
     assert.equal(env.GENTS_LOCAL_ONLY, '1');
+    assert.equal(env.GENTS_MCP_TRANSPORT, 'sse');
+    assert.equal(env.LOCAL_MODEL_PORT, '8798');
+    assert.equal(env.GENTS_RUNTIME_MANIFEST, 'data/mcp-runtime-bundles/frozen/manifest.json');
+    assert.equal(env.GENTS_RUNTIME_MANIFEST_SHA256, 'frozen-digest');
+    assert.equal(env.GENTS_SQLITE_BRIDGE, '/owned/frozen/gents-sqlite-bridge');
   } finally { rmSync(root, { recursive: true }); }
 });

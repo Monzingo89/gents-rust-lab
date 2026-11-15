@@ -1,0 +1,17 @@
+{
+  "status":"component_accepted_after_host_gates_not_whole_company_goal_complete",
+  "initial_local_run":"d07df27a-0449-4b9b-9481-4bd0fe602cc7",
+  "revision_local_run":"380a333f-3878-49b7-986d-b7196f16ae0e",
+  "revision_authoring_receipt":{"agent":"Engineer Gent","model":"local / Qwen3-Coder-30B","event_seq":17},
+  "candidate_sha256":"4ddc7a28fc344b2dc065a0af4b5311aaed7910fcd6b4d5b8eb3beaae0a6b70f5",
+  "promoted_path":"mcp/src/packet_budget.rs",
+  "promoted_sha256":"55862f4a28363e77132b46c0001ac070e8bc03e20d3ae357cad86e62f4f78477",
+  "host_changes":"source attribution header and cargo fmt only",
+  "independent_tests_path":"mcp/tests/packet_budget.rs",
+  "independent_tests_sha256":"a34ce47dbe65ecbf40e7ebd3f3eadb3daa40397df4a67473d5126104652c223d",
+  "fixed_gates":{"authored_tests":7,"independent_edge_cases":1000,"independent_seeded_cases":10000,"strict_workspace_clippy":"passed","locked_offline_workspace_tests":"passed","locked_offline_workspace_build":"passed"},
+  "review":{"pure_integer_function":true,"io":false,"unsafe":false,"subprocess":false,"dependencies_added":false,"permission_expansion":false,"lint_waivers":false},
+  "consumer":"crates/harness/src/local_runtime.rs native tokenizer admission budget",
+  "provider_cost_usd":0,
+  "limits":"Fixed synthetic tests and focused source review; no regulatory certification or proof of arbitrary model correctness. Original review-loop failures remain retained. Company run lifecycle is separate from component acceptance."
+}

@@ -1,6 +1,7 @@
 [package]
 name = "gents-office"
 version = "0.1.0"
+license = "MIT"
 edition = "2021"
 [lib]
 name = "gents_office_lib"
@@ -18,3 +19,9 @@ sha2 = "0.10"
 base64 = "0.22"
 url = "2"
 tokio = { version = "1", features = ["net", "io-util", "time"] }
+
+# Reviewed GTK 3 security backports; see vendor/README.md.
+[patch.crates-io]
+glib = { path = "vendor/glib-0.18.5" }
+glib-macros = { path = "vendor/glib-macros-0.18.5" }
+gtk3-macros = { path = "vendor/gtk3-macros-0.18.2" }

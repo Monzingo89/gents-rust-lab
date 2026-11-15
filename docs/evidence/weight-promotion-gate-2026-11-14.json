@@ -1,0 +1,7 @@
+{
+  "training_id": "a5608814-dd9d-49cd-888f-a1eb2ea526f7",
+  "http_status": 400,
+  "rejection": "observed task regression prohibits promotion",
+  "empty_owner_review_prevents_promotion_even_if_gate_is_absent": true,
+  "provider_cost_usd": 0
+}

@@ -6,6 +6,15 @@ from train_role import samples,confined
 
 
 class TrainingBoundaries(unittest.TestCase):
+    def test_training_profiles_are_bounded_and_copied(self):
+        from weight_training_profiles import profile
+        self.assertEqual(profile("four-layer-v1")["layers"],4)
+        modified=profile(); modified["layers"]=999
+        self.assertEqual(profile()["layers"],1)
+        for value in ["remote",None,{"layers":999}]:
+            with self.assertRaises(ValueError):
+                profile(value)
+
     def setUp(self):
         self.temporary=tempfile.TemporaryDirectory(prefix="gents-training-test-")
         self.root=Path(self.temporary.name)

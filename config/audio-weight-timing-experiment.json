@@ -1,0 +1,25 @@
+{
+  "id": "audio-paired-timing-v1",
+  "status": "prospective-not-run",
+  "dataset": "data/weight-experiments/audio-paired-v1/paired/manifest.json",
+  "base_safetensors_sha256": "f7fb2fc74c4f59ff91b32cc7559865b57f9f65990e2d1a92a8d6eea804bd6443",
+  "scope": "Reference-duration matching on fine-tuning holdout clips from a likely pretraining dataset; not general intelligibility or speech quality.",
+  "trainable_component": "stochastic duration predictor only",
+  "other_components": "frozen",
+  "optimizer": {"name": "AdamW", "learning_rate": 0.00001, "weight_decay": 0.0, "max_gradient_norm": 1.0},
+  "seed": 17,
+  "epochs": 2,
+  "batch_size": 1,
+  "evaluation": {
+    "noise_scale_w": 0.0,
+    "length_scale": 1.0,
+    "metric": "mean absolute relative duration error against reference audio",
+    "minimum_relative_metric_reduction": 0.05,
+    "maximum_per_case_absolute_relative_error_increase": 0.1,
+    "finite_positive_duration_required": true,
+    "fresh_saved_candidate_reload_required": true,
+    "test_split_used_for_training_or_selection": false
+  },
+  "promotion": "Never automatic; timing results alone do not qualify a voice for production.",
+  "provider_budget_usd": 0
+}

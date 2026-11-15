@@ -13,7 +13,6 @@ import hashlib
 import http.client
 from html.parser import HTMLParser
 import imaplib
-import ipaddress
 import json
 import os
 from pathlib import Path
@@ -28,21 +27,25 @@ import sys
 import time
 import urllib.parse
 import xml.etree.ElementTree as ET
+from public_network import public_address
 
 ROOT = Path(__file__).resolve().parents[1]
 ACTIVE_CHILD = None
 TOOLS = {
+    "models_inventory": "Read bounded offline model identity and context metadata; no loading, network, code execution or automatic admission",
+    "integer_arithmetic": "calculations:[{id,values:[signed integers],subtract:signed integer}]; exact bounded sums and differences with no side effects",
     "web_search": "query: public search string",
     "web_read": "url: public HTTPS page; returns source URL and extracted text",
     "browser": "url; actions: [{kind:click|fill, selector, value?}]; screenshot captured",
     "files": "op: list|read|write; path: relative to run workspace; content for write",
     "pdf_inspect": "path:existing workspace PDF; page_start>=1; page_count:1..8; extract text, hash and render pages for independent review",
+    "pdf_render": "source:agent-authored workspace JSON page specification; output:workspace PDF; deterministic text and vector rendering without shell or pdftk",
     "image_review": "paths:1..2 workspace PNGs, question, optional max_tokens:64..1024; local hash-bound vision observations under the shared model lease",
     "shell": "command: run code/tests in isolated run workspace; timeout_seconds up to 3600; no network or home access",
     "resources": "Inspect free disk, system RAM, local model files, process usage, and secret-safe configured-integration status loaded from gitignored .env.local/.env.company",
     "skill_compose": "id, purpose, roles:[planner|worker], steps:[existing tool ids], instructions; save a declarative composition without expanding permissions",
     "skill_list": "List declarative skills composed in this run",
-    "skill_read": "id; read one declarative skill composition",
+    "skill_read": "id; retrieve approved instructions (including document-workflow) or a run composition, without expanding permissions",
     "source_read": "path: allowlisted repository-relative source file; returns bounded content and SHA-256",
     "source_patch": "path, expected_sha256, content; atomic hash-guarded replacement with backup, fixed checks, and rollback",
     "harness_restart": "reason; handled by the Rust supervisor after durable checkpointing",
@@ -86,23 +89,76 @@ def confined(base, relative):
 
 SOURCE_PREFIXES = ("crates/", "scripts/", "web/", "config/", "docs/")
 SOURCE_SUFFIXES = {".rs", ".py", ".js", ".mjs", ".json", ".md", ".css", ".html"}
+# Frozen acceptance, launch/admission code and authority readers are host-owned.
+# New reviewed curriculum helpers inherit this boundary without a filename list.
+PROTECTED_SOURCE_PREFIXES = ("scripts/fixtures/", "scripts/mcp-", "config/company.mcp-")
 PROTECTED_SOURCE_FILES = {
     "crates/harness/src/auth.rs", "crates/harness/src/security.rs",
     "crates/harness/src/provider.rs", "crates/harness/src/escalation.rs",
     "crates/harness/src/main.rs", "scripts/company-env.mjs", "config/global-pstc.json",
+    "scripts/run-harness.mjs",
     "scripts/company_tools.py", "scripts/vision_tools.py", "config/vision.local.json",
+    "scripts/document_renderer.py",
+    "crates/harness/src/governance.rs", "crates/harness/src/company.rs",
+    "crates/harness/src/autonomy.rs", "crates/harness/src/contracts.rs",
+    "crates/harness/src/local_runtime.rs", "crates/harness/src/skills.rs",
+    "crates/harness/src/local_ingress.rs",
+    "crates/harness/src/operator_answers.rs",
+    "scripts/company-browser.mjs", "scripts/public-network.mjs", "scripts/public_network.py",
+    "scripts/browser-public-http.mjs", "config/public-network-policy.json",
+    "scripts/test_public_network.py", "scripts/public-network.test.mjs",
+    "scripts/fixtures/public-addresses.json",
+    "crates/harness/src/runtime_pool.rs", "crates/harness/src/runtime_environment.rs",
+    "crates/harness/src/runtime_fit.rs", "crates/harness/src/local_generation.rs",
+    "scripts/model_security_scan.py", "scripts/model_security_inspection.py", "scripts/model-security-service.mjs",
+    "crates/harness/src/memory.rs",
+    "crates/harness/src/memory_archive.rs",
+    "crates/harness/src/semantic_memory.rs",
+    "crates/harness/src/memory_consumption.rs",
+    "crates/harness/src/memory_handoff.rs",
+    "crates/harness/src/workflow.rs",
+    "crates/harness/src/lease_clock.rs",
+    "crates/harness/src/context.rs",
+    "crates/harness/src/review_context.rs",
+    "crates/harness/src/completion_review.rs",
+    "crates/harness/src/authorization_context.rs",
+    "crates/harness/src/rust_review.rs", "crates/harness/src/rust_workflow.rs",
+    "crates/harness/src/worker_packet.rs", "crates/harness/src/recovery_scope.rs",
+    "crates/harness/src/campaign.rs", "scripts/paired_campaign.py",
+    "scripts/local_sqlite.py", "scripts/test_local_sqlite.py",
+    "scripts/company_schedule.py", "scripts/mcp-curriculum-journal.py",
+    "scripts/mcp-coding-verifier.mjs", "scripts/mcp-workflow-verifier.mjs",
+    "scripts/mcp-development-curriculum.mjs", "scripts/mcp-team-verification.mjs",
+    "config/mcp-development-curriculum.json",
+    "scripts/model_inventory.py",
+    "scripts/model_provenance.py", "config/enterprise-model-roster.json",
+    "crates/harness/src/role_probe.rs", "config/enterprise-role-probes.json",
+    "scripts/role_probe_campaign.py",
+    "crates/harness/src/enterprise.rs", "crates/harness/src/banking.rs",
+    "crates/harness/src/release_gate.rs",
+    "crates/harness/src/release_policy.rs",
+    "scripts/enterprise_campaign.py",
+    "config/enterprise-model-candidates.json",
+    "config/company-tools.json", "config/company-tool-inputs.json",
 }
 
 
 def source_target(relative):
     if not isinstance(relative, str) or not relative.startswith(SOURCE_PREFIXES):
         raise ValueError("source path is outside the repair allowlist")
+    if Path(relative).as_posix() != relative:
+        raise ValueError("source path must use its canonical relative spelling")
     if any(part.startswith(".env") or part in {"data", "models", "target", ".git", "node_modules"}
            for part in Path(relative).parts):
         raise ValueError("secret, data, model, build, and VCS paths are forbidden")
-    if relative in PROTECTED_SOURCE_FILES:
+    # macOS commonly resolves case aliases to the same file. Match protected
+    # paths before I/O, and reject separator/dot aliases instead of normalizing
+    # an untrusted model path into a privileged target.
+    if relative.casefold() in {path.casefold() for path in PROTECTED_SOURCE_FILES} or relative.casefold().startswith(PROTECTED_SOURCE_PREFIXES):
         raise ValueError("authentication, provider, secret, and security-boundary files require human review")
     target = confined(ROOT, relative)
+    if target.exists() and target.stat().st_nlink != 1:
+        raise ValueError("hard-linked source files require human review")
     if target.suffix.lower() not in SOURCE_SUFFIXES or target.is_symlink():
         raise ValueError("source file type or symlink is not repairable")
     return target
@@ -125,13 +181,6 @@ def source_checks(path, work):
         except Exception as error:
             return {"exit_code": 1, "output": f"JSON validation failed: {error}"}
     return {"exit_code": 0, "output": "No executable check required for this documentation-only file"}
-
-
-def public_address(host):
-    addresses = socket.getaddrinfo(host, 443, type=socket.SOCK_STREAM)
-    if not addresses or any(not ipaddress.ip_address(item[4][0]).is_global for item in addresses):
-        raise ValueError("web tools require public internet hosts, not local/private addresses")
-    return addresses[0][4][0]
 
 
 def tls_context():
@@ -159,8 +208,8 @@ def web_request(url, method="GET", payload=None, headers=None, limit=2_000_000):
                                headers={"User-Agent": "GentsCompany/1.0", **(headers or {})})
             response = connection.getresponse()
             if response.status in (301, 302, 303, 307, 308):
-                if headers and "Authorization" in headers:
-                    raise ValueError("credentialed requests cannot redirect")
+                if headers:
+                    raise ValueError("requests with caller-supplied headers cannot redirect")
                 url = urllib.parse.urljoin(url, response.getheader("Location", ""))
                 continue
             data = response.read(limit + 1)
@@ -474,12 +523,44 @@ def workspace_sandbox(work, read_files=()):
     return profile, env
 
 
+def approved_skills():
+    base = ROOT / "docs/companies/we-need-getns-llc/shared-skills"
+    catalog = base / "catalog.json"
+    if not catalog.is_file() or catalog.is_symlink():
+        return {}
+    return {item["id"]: item for item in json.loads(catalog.read_text())["skills"]
+            if item.get("status") in {"approved-demo", "approved-local"}}
+
+
 def execute(company, run, action, args):
     if not re.fullmatch(r"[a-z0-9-]{1,80}", company) or not re.fullmatch(r"[a-f0-9-]{36}", run):
         raise ValueError("invalid scope")
     work = confined(ROOT, f"data/companies/{company}/runs/{run}/workspace")
     work.mkdir(parents=True, exist_ok=True)
     skills = confined(work, ".skills")
+    if action == "models_inventory":
+        if args:
+            raise ValueError("models_inventory accepts no arguments")
+        from model_inventory import inventory
+        return inventory(root=ROOT)
+    if action == "integer_arithmetic":
+        calculations = args.get("calculations")
+        if set(args) != {"calculations"} or not isinstance(calculations, list) or not 1 <= len(calculations) <= 12:
+            raise ValueError("provide 1..12 exact integer calculations")
+        rows, seen = [], set()
+        valid = lambda value: type(value) is int and abs(value) <= 10_000_000
+        for item in calculations:
+            if not isinstance(item, dict) or set(item) != {"id", "values", "subtract"}:
+                raise ValueError("calculation requires id, values and subtract only")
+            identity, values, subtract = item["id"], item["values"], item["subtract"]
+            if not isinstance(identity, str) or not re.fullmatch(r"[A-Za-z0-9-]{1,40}", identity) or identity in seen:
+                raise ValueError("invalid or duplicate calculation ID")
+            if not isinstance(values, list) or len(values) > 12 or not all(valid(value) for value in values) or not valid(subtract):
+                raise ValueError("only bounded signed integers are permitted; no floats or booleans")
+            seen.add(identity)
+            total = sum(values)
+            rows.append({"id": identity, "sum": total, "difference": total - subtract})
+        return {"calculations": rows, "exact": True}
     if action == "source_read":
         target = source_target(args.get("path", ""))
         if not target.is_file() or target.stat().st_size > 1_000_000:
@@ -525,6 +606,8 @@ def execute(company, run, action, args):
         instructions = args.get("instructions", "").strip()
         if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+){0,7}", skill_id):
             raise ValueError("skill id must be lowercase words separated by hyphens")
+        if skill_id in approved_skills():
+            raise ValueError("an approved skill cannot be shadowed by a run composition")
         if not isinstance(roles, list) or not roles or not set(roles) <= {"planner", "worker"}:
             raise ValueError("skill roles must contain planner and/or worker")
         if not isinstance(steps, list) or not 1 <= len(steps) <= 8 or any(step not in TOOLS or step in {"skill_compose", "skill_list", "skill_read"} for step in steps):
@@ -540,13 +623,23 @@ def execute(company, run, action, args):
         target.write_text(json.dumps(manifest, indent=2) + "\n")
         return {"ok": True, "skill": manifest, "path": str(target.relative_to(work))}
     if action == "skill_list":
+        approved = [{key: value for key, value in item.items() if key != "path"}
+                    for item in approved_skills().values()]
         if not skills.exists():
-            return {"skills": []}
-        return {"skills": [json.loads(path.read_text()) for path in sorted(skills.glob("*.json"))[:100]]}
+            return {"skills": [], "approved_skills": approved}
+        return {"skills": [json.loads(path.read_text()) for path in sorted(skills.glob("*.json"))[:100]], "approved_skills": approved}
     if action == "skill_read":
         skill_id = args.get("id", "")
         if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+){0,7}", skill_id):
             raise ValueError("invalid skill id")
+        entry = approved_skills().get(skill_id)
+        if entry:
+            target = confined(ROOT / "docs/companies/we-need-getns-llc/shared-skills", entry["path"])
+            if not target.is_file() or target.stat().st_size > 24000:
+                raise ValueError("approved skill instructions missing or exceed the retrieval budget")
+            return {"skill": {"id":skill_id,"version":entry["version"],"roles":entry["roles"],
+                              "instructions":target.read_text(),"sha256":hashlib.sha256(target.read_bytes()).hexdigest(),
+                              "authority":"procedure only; every tool action still requires independent admin review"}}
         return {"skill": json.loads(confined(skills, skill_id + ".json").read_text())}
     if action == "journal_read":
         step = int(args["step"])
@@ -557,6 +650,23 @@ def execute(company, run, action, args):
         if record.get("request", {}).get("action") == "journal_read":
             raise ValueError("journal_read cannot read another journal_read result; select the original non-journal tool step from verified_progress")
         return record
+    if action == "pdf_render":
+        source = confined(work, args.get("source", ""))
+        output = confined(work, args.get("output", ""))
+        if not source.is_file() or source.suffix != ".json" or output.suffix != ".pdf":
+            raise ValueError("pdf_render requires an existing JSON specification and an output .pdf path")
+        helper = ROOT / "scripts/document_renderer.py"
+        profile, env = workspace_sandbox(work, read_files=[helper])
+        result = subprocess.run(["/usr/bin/sandbox-exec", "-p", profile, str(ROOT / ".venv-inference/bin/python"), str(helper)],
+            input=json.dumps({"source": str(source), "output": str(output)}), cwd=work,
+            capture_output=True, text=True, timeout=120, env=env)
+        if result.returncode:
+            try: detail = json.loads(result.stdout)["error"]
+            except (ValueError, KeyError): detail = "local rendering process failed"
+            raise ValueError("PDF authoring failed: " + str(detail)[:1000])
+        rendered = json.loads(result.stdout)
+        rendered.update({"path": str(output.relative_to(work)), "source": str(source.relative_to(work))})
+        return rendered
     if action == "pdf_inspect":
         target = confined(work, args.get("path", ""))
         if not target.is_file() or target.suffix.lower() != ".pdf":
@@ -590,6 +700,8 @@ def execute(company, run, action, args):
             raise ValueError(f"local vision failed: {category}; exit code {result['exit_code']}. Inspect model/resource configuration")
         return observation(invocation, result["output"], round((time.monotonic()-start)*1000))
     if action == "files":
+        if "expected_sha256" in args:
+            raise ValueError("hash-conditioned writes require governed native MCP; legacy adapter cannot enforce this precondition")
         target = confined(work, args.get("path", ""))
         if args["op"] == "write":
             content = args["content"].encode()

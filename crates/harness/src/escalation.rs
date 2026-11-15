@@ -63,6 +63,21 @@ fn output_text(response: &Value) -> Option<&str> {
 /// operator authority. API failures are returned to the caller for observable,
 /// bounded fallback to the red-phone workflow.
 pub async fn resolve(question: &str) -> Result<Option<ResolvedQuestion>> {
+    resolve_with_cloud_policy(
+        question,
+        std::env::var("GENTS_LOCAL_ONLY").as_deref() == Ok("0"),
+    )
+    .await
+}
+async fn resolve_with_cloud_policy(
+    question: &str,
+    enabled: bool,
+) -> Result<Option<ResolvedQuestion>> {
+    // Credential presence is never consent to cloud spending or data export.
+    // Match the main provider boundary before even looking up a credential.
+    if !enabled {
+        return Ok(None);
+    }
     if !may_auto_resolve(question) {
         return Ok(None);
     }
@@ -143,6 +158,16 @@ pub async fn resolve(question: &str) -> Result<Option<ResolvedQuestion>> {
 mod tests {
     use super::*;
 
+    #[tokio::test]
+    async fn local_policy_exits_before_cloud_preparation_or_credentials() {
+        let restricted = "Which approved tool should contact fixture@example.com?";
+        assert!(crate::security::require_persistable(restricted).is_err());
+        assert!(resolve_with_cloud_policy(restricted, false)
+            .await
+            .unwrap()
+            .is_none());
+        assert!(resolve_with_cloud_policy(restricted, true).await.is_err());
+    }
     #[test]
     fn authority_questions_never_auto_resolve() {
         assert!(!may_auto_resolve("Type APPROVE to stop this exact process"));

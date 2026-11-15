@@ -1,0 +1,46 @@
+{
+  "source_sha256": "f49e9af70265433aa03d403efc2fe161e0c42b9083c3768a17338be4b0af720a",
+  "safetensors_sha256": "f7fb2fc74c4f59ff91b32cc7559865b57f9f65990e2d1a92a8d6eea804bd6443",
+  "tensor_count": 949,
+  "allowed_nondefault_globals": [
+    "pathlib.PosixPath"
+  ],
+  "weights_only": true,
+  "optimizer_state_retained": false,
+  "admitted": false,
+  "scope": "Serialization conversion only; no model parity, licensing or quality acceptance",
+  "source": {
+    "repo": "rhasspy/piper-checkpoints",
+    "revision": "005db054ce8f013d8213b7dd4b0917de3c9347fe",
+    "directory": "en/en_US/ljspeech/high",
+    "checkpoint": {
+      "name": "ljspeech-2000.ckpt",
+      "bytes": 998167044,
+      "sha256": "f49e9af70265433aa03d403efc2fe161e0c42b9083c3768a17338be4b0af720a"
+    },
+    "metadata": [
+      {
+        "name": "MODEL_CARD",
+        "bytes": 513,
+        "git_blob_sha1": "ddd2c7524cadf38f78a9b268ad957079e9815383"
+      },
+      {
+        "name": "config.json",
+        "bytes": 7087,
+        "git_blob_sha1": "359c02eb480cd9f87bc6740c4e78025f77ba0a21"
+      }
+    ],
+    "admission": "quarantined; not equivalent to installed ONNX until verified",
+    "restricted_loading_only": true,
+    "provider_budget_usd": 0
+  },
+  "safetensors_bytes": 332440136,
+  "conversion_sandbox_exit_code": 0,
+  "provider_cost_usd": 0,
+  "production_voice_modified": false,
+  "source_files": {
+    "scripts/audio_checkpoint_conversion.py": "b19d904a0711fd6543bd539a21801804040601d9f14811888f04dc0d65f3a45f",
+    "scripts/convert_audio_checkpoint_sandboxed.py": "994a3bed0781bdbbb00faeca68733685c6a11844b54c16d9fbd20986980010bd",
+    "scripts/acquire_audio_training_checkpoint.py": "b57994a0a9461dca3e215879661fdc7f6723d0004fe5604884d3c50c63d284af"
+  }
+}

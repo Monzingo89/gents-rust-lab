@@ -113,6 +113,15 @@ async fn review(
 ) -> Result<()> {
     let root = std::env::current_dir()?;
     let state = company::operation(&root, company_id, owner, &json!({"op":"status"}))?;
+    let snapshot = crate::autonomy::work_snapshot(&root, company_id, id)?;
+    let last = if task.to_ascii_lowercase().contains("pdf") {
+        snapshot["delivery_watch"]["last_change_ms"]
+            .as_u64()
+            .filter(|t| *t > 0)
+            .unwrap_or(last)
+    } else {
+        last
+    };
     let risk = risk(&state, id, crate::now_ms(), last);
     emit(
         app,
@@ -133,7 +142,6 @@ async fn review(
         .context("CEO requires local model")?
         .worker
         .clone();
-    let snapshot = crate::autonomy::work_snapshot(&root, company_id, id)?;
     if snapshot["waiting_for_operator"] == true || snapshot["pending_tool"] == true {
         return Ok(());
     }
@@ -164,8 +172,7 @@ async fn review(
                 < REVIEW_CADENCE.as_millis() as u64
     });
     if decision["all_hands"] == true && observed && !recent_meeting {
-        let brief = decision["summary"].as_str().context("CEO status missing")?;
-        let brief: String = brief.chars().take(2500).collect();
+        let brief = repair_brief(&decision);
         let meeting = company::meeting(&root, company_id, owner, &id.to_string(), &brief)?;
         emit(
             app,
@@ -182,6 +189,14 @@ async fn review(
     Ok(())
 }
 
+fn repair_brief(decision: &Value) -> String {
+    format!("{}\nFuture repair plan for the strongest local worker to implement (advisory; every action requires independent admin review):\n{}",
+        decision["summary"].as_str().unwrap_or("Observed execution blocker"),
+        decision["suggested_next_actions"].as_array().into_iter().flatten()
+            .filter_map(Value::as_str).take(6).map(|s| s.chars().take(350).collect::<String>()).collect::<Vec<_>>().join("\n")
+    ).chars().take(3000).collect()
+}
+
 fn evidence_review(progress: &Value, raw: &Value) -> Value {
     json!({"summary":format!("{} tool results recorded. Action counts: {}. Overall completion is not verified; consult tool journals. A schedule is not an email receipt.",progress["tool_results"],progress["action_counts"]),
         "all_hands":raw["all_hands"]==true,"suggested_next_actions":raw["next_actions"].as_array().cloned().unwrap_or_default(),
@@ -191,6 +206,15 @@ fn evidence_review(progress: &Value, raw: &Value) -> Value {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn repair_actions_reach_the_worker_brief() {
+        let decision = evidence_review(
+            &json!({"tool_results":12,"action_counts":{}}),
+            &json!({"all_hands":true,"next_actions":["Inspect the failed authoring command; repair its source and rerun."]}),
+        );
+        assert!(repair_brief(&decision).contains("repair its source and rerun"));
+        assert!(repair_brief(&decision).contains("admin review"));
+    }
     #[test]
     fn review_cadence_is_three_hours() {
         assert_eq!(REVIEW_CADENCE.as_secs(), 10_800);

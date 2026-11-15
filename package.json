@@ -1,18 +1,31 @@
 {
   "name": "gents-office-lab",
   "version": "0.1.0",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "scripts": {
     "tauri": "tauri",
     "dev": "vite web --host 127.0.0.1 --port 1420 --strictPort",
     "company": "node scripts/start-company.mjs",
+    "company:activity": "node scripts/start-office-activity.mjs",
+    "test:activity": "node --test scripts/office-activity.test.mjs",
+    "test:activity:browser": "node scripts/office-activity-smoke.mjs",
     "company:mobile": "node scripts/start-mobile.mjs",
     "test:mobile": "node --test scripts/mobile-access.test.mjs",
     "test:mobile:browser": "node scripts/mobile-browser-smoke.mjs",
     "test:office": "node scripts/office-smoke.mjs",
     "test:company:local": "python3 scripts/autonomy_live_smoke.py",
-    "build": "vite build web --outDir ../dist --emptyOutDir"
+    "build": "vite build web --outDir ../dist --emptyOutDir",
+    "site:build": "node scripts/build-introduction.mjs",
+    "site:preview": "npm run site:build && python3 -m http.server 4173 --bind 127.0.0.1 --directory site/dist",
+    "test:site": "node --test scripts/introduction.test.mjs && npm run site:build && python3 scripts/verify_introduction.py",
+    "test:site:browser": "node scripts/introduction-browser-smoke.mjs",
+    "env:check": "node scripts/check-company-env.mjs",
+    "site:build:production": "node scripts/build-introduction.mjs --production",
+    "site:env:check": "node scripts/sync-vercel-website-env.mjs",
+    "site:env:sync": "node scripts/sync-vercel-website-env.mjs --apply",
+    "release:audit": "node scripts/audit-release-source.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1",

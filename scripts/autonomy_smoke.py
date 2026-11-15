@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Real HTTP, durable questions, restart, and sandbox tools; mock model decisions."""
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -18,6 +19,9 @@ with tempfile.TemporaryDirectory(prefix="gents-autonomy-smoke-") as temporary:
     root = Path(temporary)
     (root / "scripts").mkdir()
     shutil.copyfile(ROOT / "scripts/company_tools.py", root / "scripts/company_tools.py")
+    shutil.copyfile(ROOT / "scripts/public_network.py", root / "scripts/public_network.py")
+    (root / "config").mkdir()
+    shutil.copyfile(ROOT / "config/public-network-policy.json", root / "config/public-network-policy.json")
     model = {"provider": "mock", "model": "autonomy-fixture"}
     config = {"company_mode": True, "company_tools": True, "admin_judge": model,
               "agents": [{"id": "Engineer Gent", "assignment": "fixture", "planner": model, "worker": model}],
@@ -106,6 +110,15 @@ with tempfile.TemporaryDirectory(prefix="gents-autonomy-smoke-") as temporary:
         assert shell["result"]["result"]["result"]["exit_code"] == 0, shell
         assert shell["result"]["result"]["result"]["output"] == "verified", shell
         assert all(j["admin"]["decision"] == "allow" for j in journals)
+        contexts = [json.loads(e["message"]) for e in result["events"] if e["kind"] == "authorization_context"]
+        write = next(j for j in journals if j["request"]["action"] == "files" and j["request"]["arguments"]["op"] == "write")
+        focus = next(c for c in contexts if (c["action_under_review"] or {}).get("action") == "files" and c["action_under_review"]["operation"] == "write")
+        exact = json.dumps(write["request"]["arguments"], sort_keys=True, separators=(",", ":")).encode()
+        assert focus["action_under_review"]["arguments_sha256"] == hashlib.sha256(exact).hexdigest()
+        assert focus["action_under_review"]["authority_granted"] is False
+        assert focus["action_under_review"]["execution_established"] is False
+        assert write["request"]["arguments"]["content"] not in json.dumps(contexts)
+        assert all(c["pre_context_packet_bytes"] > 0 and len(c["pre_context_packet_sha256"]) == 64 for c in contexts)
         loop_run = intake("autonomy-loop-smoke")
         result = wait_for(lambda: request(f"/api/runs/{loop_run}"), lambda r: r["status"] != "running")
         assert result["status"] == "completed", result
@@ -141,6 +154,16 @@ with tempfile.TemporaryDirectory(prefix="gents-autonomy-smoke-") as temporary:
         assert any(e["kind"] == "codex_phone_unanswered" for e in observed["events"])
         request(f"/api/runs/{stalled}/cancel", {})
         wait_for(lambda: request(f"/api/runs/{stalled}"), lambda r: r["status"] != "running")
+        artifact_stall = intake("autonomy-artifact-stall-smoke Produce report.json")
+        question = wait_for(lambda: request(f"/api/runs/{artifact_stall}/attention"), lambda r: r.get("attention"), seconds=75)["attention"]
+        assert "12 recovery attempts" in question["question"]
+        observed = request(f"/api/runs/{artifact_stall}")
+        failed_finishes = [e for e in observed["events"] if e["kind"] == "completion_review" and json.loads(e["message"])["verdict"] == "revise"]
+        assert 1 <= len(failed_finishes) <= 12, failed_finishes
+        assert any("report.json" in e["message"] for e in failed_finishes)
+        assert not (root / f"data/companies/one/runs/{artifact_stall}/workspace/report.json").exists()
+        request(f"/api/runs/{artifact_stall}/cancel", {})
+        wait_for(lambda: request(f"/api/runs/{artifact_stall}"), lambda r: r["status"] != "running")
         tool_failure = intake("autonomy-tool-failure-smoke")
         observed = wait_for(lambda: request(f"/api/runs/{tool_failure}"), lambda r: any(e["kind"] == "loop_recovery" and "recorded_tool_failure" in e["message"] for e in r["events"]))
         assert any(e["kind"] == "tool_result" and not json.loads(e["message"])["result"]["ok"] for e in observed["events"])
@@ -150,4 +173,4 @@ with tempfile.TemporaryDirectory(prefix="gents-autonomy-smoke-") as temporary:
             process.terminate()
             process.wait(timeout=15)
 
-print("PASS: repeated-operation rejection and automatic replanning, admin veto before tools, real HTTP intake, persistent questions, restart recovery, no replay of uncertain email intent, stale-answer rejection, actual sandbox file and shell output; model decisions are simulated")
+print("PASS: bounded repeated missing-artifact completion attempts, repeated-operation rejection and automatic replanning, admin veto before tools, real HTTP intake, persistent questions, restart recovery, no replay of uncertain email intent, stale-answer rejection, actual sandbox file and shell output; model decisions are simulated")

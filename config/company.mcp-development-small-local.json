@@ -1,0 +1,75 @@
+{
+  "company_mode": true,
+  "company_tools": true,
+  "admin_judge": {
+    "provider": "local",
+    "model": "Qwen3-4B experimental company profile",
+    "path": "models/qwen3-4b-instruct/Qwen3-4B-Q4_K_M.gguf",
+    "context_tokens": 8192,
+    "local_reasoning_tokens": 512,
+    "local_final_tokens": 1024
+  },
+  "max_steps": 3,
+  "max_tokens": 1024,
+  "max_run_seconds": 86400,
+  "agents": [
+    {
+      "id": "PM Gent",
+      "assignment": "Plan bounded local Rust tool implementation using only installed tools, current policy and measured evidence.",
+      "planner": {
+        "provider": "local",
+        "model": "Qwen3-4B experimental company profile",
+        "path": "models/qwen3-4b-instruct/Qwen3-4B-Q4_K_M.gguf",
+        "context_tokens": 8192,
+        "local_reasoning_tokens": 512,
+        "local_final_tokens": 1024
+      },
+      "worker": {
+        "provider": "local",
+        "model": "Qwen3-4B experimental company profile",
+        "path": "models/qwen3-4b-instruct/Qwen3-4B-Q4_K_M.gguf",
+        "context_tokens": 8192,
+        "local_reasoning_tokens": 512,
+        "local_final_tokens": 1024
+      }
+    },
+    {
+      "id": "Engineer Gent",
+      "assignment": "Implement small isolated Rust functions with tests; use governed native memory, never expand permissions or use paid APIs.",
+      "planner": {
+        "provider": "local",
+        "model": "Qwen3-4B experimental company profile",
+        "path": "models/qwen3-4b-instruct/Qwen3-4B-Q4_K_M.gguf",
+        "context_tokens": 8192,
+        "local_reasoning_tokens": 512,
+        "local_final_tokens": 1024
+      },
+      "worker": {
+        "provider": "local",
+        "model": "Qwen3-4B experimental company profile",
+        "path": "models/qwen3-4b-instruct/Qwen3-4B-Q4_K_M.gguf",
+        "context_tokens": 8192,
+        "local_reasoning_tokens": 512,
+        "local_final_tokens": 1024
+      }
+    }
+  ],
+  "planning_model_policy": {
+    "failures_before_next": 2,
+    "candidates": [
+      {
+        "id": "small_local_candidate",
+        "model": {
+          "provider": "local",
+          "model": "Qwen3-4B experimental company profile",
+          "path": "models/qwen3-4b-instruct/Qwen3-4B-Q4_K_M.gguf",
+          "context_tokens": 8192,
+          "local_reasoning_tokens": 512,
+          "local_final_tokens": 1024
+        },
+        "sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+        "minimum_memory_mib": 8192
+      }
+    ]
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "scope": "same concepts, unseen fixed seeds; geometric conformity only, not perceptual quality or generalization",
+  "cases": [
+    {
+      "index": 0,
+      "color": "red",
+      "seed": 9401,
+      "image_sha256": "98151d1c7f047986dd8f617c0a0d474c3c73c2c8aa7afad49fc58dedf2bcb5b7",
+      "elapsed_ms": 8076,
+      "passed": true,
+      "checks": {
+        "foreground_area_fraction": true,
+        "centroid_distance_from_center_max": true,
+        "foreground_bbox_aspect_ratio": true,
+        "foreground_fill_fraction_min": true,
+        "dominant_requested_color_fraction_min": true,
+        "white_background_fraction_min": true
+      },
+      "measurements": {
+        "foreground_area_fraction": 0.31195068359375,
+        "centroid_distance_from_center": 0.0027429506252805297,
+        "foreground_bbox_aspect_ratio": 0.9724137931034482,
+        "foreground_fill_fraction": 0.9999510882856444,
+        "dominant_requested_color_fraction": 0.9931520250440227,
+        "white_background_fraction": 0.6878814697265625
+      }
+    },
+    {
+      "index": 1,
+      "color": "blue",
+      "seed": 9402,
+      "image_sha256": "b69c078a70f2166d463b1b56cb98e2fc527426a6b920b90d884437be89e1455b",
+      "elapsed_ms": 7748,
+      "passed": true,
+      "checks": {
+        "foreground_area_fraction": true,
+        "centroid_distance_from_center_max": true,
+        "foreground_bbox_aspect_ratio": true,
+        "foreground_fill_fraction_min": true,
+        "dominant_requested_color_fraction_min": true,
+        "white_background_fraction_min": true
+      },
+      "measurements": {
+        "foreground_area_fraction": 0.3856964111328125,
+        "centroid_distance_from_center": 0.003918400471589874,
+        "foreground_bbox_aspect_ratio": 0.9875,
+        "foreground_fill_fraction": 0.999881329113924,
+        "dominant_requested_color_fraction": 0.9643549471851881,
+        "white_background_fraction": 0.6143035888671875
+      }
+    },
+    {
+      "index": 2,
+      "color": "green",
+      "seed": 9403,
+      "image_sha256": "f7275f4d40627d9c2a5a36eee5e9de0c8efa9718d7541c1b1ac318f38c7129bf",
+      "elapsed_ms": 7778,
+      "passed": true,
+      "checks": {
+        "foreground_area_fraction": true,
+        "centroid_distance_from_center_max": true,
+        "foreground_bbox_aspect_ratio": true,
+        "foreground_fill_fraction_min": true,
+        "dominant_requested_color_fraction_min": true,
+        "white_background_fraction_min": true
+      },
+      "measurements": {
+        "foreground_area_fraction": 0.317138671875,
+        "centroid_distance_from_center": 0.0046988381376981,
+        "foreground_bbox_aspect_ratio": 1.049645390070922,
+        "foreground_fill_fraction": 0.9959746981023577,
+        "dominant_requested_color_fraction": 0.994707467282525,
+        "white_background_fraction": 0.6820220947265625
+      }
+    },
+    {
+      "index": 3,
+      "color": "purple",
+      "seed": 9404,
+      "image_sha256": "8036b5adf9d54800f2f819a3189888d8cad987c35bc9eb25c0384f32fa13d560",
+      "elapsed_ms": 7974,
+      "passed": true,
+      "checks": {
+        "foreground_area_fraction": true,
+        "centroid_distance_from_center_max": true,
+        "foreground_bbox_aspect_ratio": true,
+        "foreground_fill_fraction_min": true,
+        "dominant_requested_color_fraction_min": true,
+        "white_background_fraction_min": true
+      },
+      "measurements": {
+        "foreground_area_fraction": 0.3720855712890625,
+        "centroid_distance_from_center": 0.0032333180598005063,
+        "foreground_bbox_aspect_ratio": 0.95625,
+        "foreground_fill_fraction": 0.9961192810457516,
+        "dominant_requested_color_fraction": 0.9783883534960016,
+        "white_background_fraction": 0.6268157958984375
+      }
+    }
+  ],
+  "passed": 4,
+  "total": 4,
+  "provider_cost_usd": 0,
+  "weights_modified": false,
+  "decision": "skip_training_saturated_baseline"
+}
