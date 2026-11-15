@@ -16,7 +16,7 @@ pub struct Auth {
     pub local: bool,
     keys: Mutex<(Instant, Instant, HashMap<String, DecodingKey>)>,
 }
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 struct Claims {
     tid: String,
     oid: String,
@@ -109,5 +109,35 @@ impl Auth {
         }
         let oid = uuid::Uuid::parse_str(&claims.oid).context("invalid object ID")?;
         Ok(format!("{}:{}", claims.tid, oid))
+    }
+}
+
+#[cfg(test)]
+mod claim_validation_tests {
+    use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
+    use serde_json::{json, Value};
+
+    #[test]
+    fn malformed_optional_time_claims_cannot_bypass_validation() {
+        let secret = b"only a synthetic unit test signing fixture";
+        let mut validation = Validation::new(Algorithm::HS256);
+        validation.validate_nbf = true;
+        validation.validate_aud = false;
+        validation.required_spec_claims.clear();
+        let check = |claims: Value| {
+            let token = encode(
+                &Header::default(),
+                &claims,
+                &EncodingKey::from_secret(secret),
+            )
+            .unwrap();
+            decode::<Value>(&token, &DecodingKey::from_secret(secret), &validation)
+        };
+        assert!(check(json!({"exp":4_000_000_000_u64,"nbf":0})).is_ok());
+        assert!(check(json!({"exp":4_000_000_000_u64,"nbf":4_000_000_000_u64})).is_err());
+        for malformed in [json!("future"), json!(true), json!([]), json!({})] {
+            assert!(check(json!({"exp":4_000_000_000_u64,"nbf":malformed})).is_err());
+            assert!(check(json!({"exp":malformed,"nbf":0})).is_err());
+        }
     }
 }

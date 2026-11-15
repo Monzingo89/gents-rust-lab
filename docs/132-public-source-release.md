@@ -35,6 +35,10 @@ The declared Python pins are checked without resolving or installing optional mo
 engines. This scope does not audit every possible operator-installed environment.
 The release updated pypdf from 6.21.2 to 6.21.4 to address seven reported advisories;
 four real document-renderer tests and three PDF boundary tests passed afterward.
+The cloud JWT library was also updated from 9.3.1 to 10.4.0 after GitHub identified
+a malformed time-claim validation advisory not flagged by the RustSec snapshot.
+A regression test rejects malformed optional expiry/not-before values. Scans are
+complementary; no single advisory feed proves absence of vulnerabilities.
 
 ## Publish only the website artifact
 

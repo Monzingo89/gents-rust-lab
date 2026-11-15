@@ -157,6 +157,7 @@ pub fn due(note: &Notebook, now: u64, fingerprint: &str) -> bool {
     (note.last_attempt_ms == 0 || now.saturating_sub(note.last_attempt_ms) >= INTERVAL_MS)
         && note.fingerprint != fingerprint
 }
+#[cfg(any(target_os = "macos", test))]
 fn gpu_stat(text: &str, key: &str) -> Option<u64> {
     let after = text.split(&format!("\"{key}\"=")).nth(1)?;
     after
