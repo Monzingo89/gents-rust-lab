@@ -16,6 +16,7 @@ python3 scripts/verify_introduction.py
 python3 scripts/audit-desktop-dependencies.py
 npm audit --audit-level=low
 cargo audit --deny warnings
+uv tool run --python 3.12 pip-audit --disable-pip --no-deps -r mcp/media/requirements.lock -r config/document-requirements.txt -r config/inference-requirements.txt
 ```
 
 The optional desktop GTK 3 graph uses exact, retained security backports. Its
@@ -29,6 +30,11 @@ The indexed-source scanner rejects model/data/env artifacts and matching local
 credential values; its generic-pattern scan has six individually reviewed public literals on exact source paths
 in `.gitleaks.toml`. A clean scan reduces exposure risk; it cannot prove
 that all possible credentials or vulnerabilities are absent.
+
+The declared Python pins are checked without resolving or installing optional model
+engines. This scope does not audit every possible operator-installed environment.
+The release updated pypdf from 6.21.2 to 6.21.4 to address seven reported advisories;
+four real document-renderer tests and three PDF boundary tests passed afterward.
 
 ## Publish only the website artifact
 

@@ -61,3 +61,16 @@ jobs:
           cargo +1.99.1 check --manifest-path src-tauri/vendor/glib-macros-0.18.5/Cargo.toml
           cargo +1.99.1 check --manifest-path src-tauri/vendor/gtk3-macros-0.18.2/Cargo.toml
           cargo +1.99.1 test --release --manifest-path src-tauri/vendor/glib-0.18.5/Cargo.toml --lib variant_iter --config "patch.crates-io.glib-macros.path='$GITHUB_WORKSPACE/src-tauri/vendor/glib-macros-0.18.5'"
+
+  python-pins:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Audit declared Python pins without installing model engines
+        run: |
+          python3 -m venv "$RUNNER_TEMP/python-audit"
+          "$RUNNER_TEMP/python-audit/bin/pip" install pip-audit==2.10.1
+          "$RUNNER_TEMP/python-audit/bin/pip-audit" --disable-pip --no-deps -r mcp/media/requirements.lock -r config/document-requirements.txt -r config/inference-requirements.txt
