@@ -5,6 +5,7 @@ cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo test --workspace --locked
 cargo build --workspace --locked
+python3 -m unittest discover -s scripts -p 'test_company_research.py'
 python3 -m unittest discover -s scripts -p 'test_local_sqlite.py'
 python3 -m unittest discover -s scripts -p 'test_completed_memory_proof.py'
 python3 scripts/audio_inspect_interop.py

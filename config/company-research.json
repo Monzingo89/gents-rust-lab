@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "enabled": true,
+  "tools": [
+    "web_search",
+    "web_read",
+    "source_read",
+    "skill_list",
+    "skill_read",
+    "memory_search",
+    "memory_append"
+  ],
+  "scope": "Owner-enabled defaults for every configured actor in newly approved local campaign jobs. Existing frozen jobs and phase restrictions retain their own contracts.",
+  "learning": "Keep source-linked research notes local and tenant-scoped. Model findings remain candidates until independent checks support them."
+}
