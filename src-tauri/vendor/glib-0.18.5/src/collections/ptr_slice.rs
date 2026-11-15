@@ -895,6 +895,7 @@ impl<T: TransparentPtrType> PtrSlice<T> {
             while self.len > len {
                 self.len -= 1;
                 let p = self.ptr.as_ptr().add(self.len);
+                // Move ownership out, restore the vacant slot, then run the destructor.
                 let item = ptr::read(p as *mut T);
                 ptr::write(
                     p,
@@ -1179,6 +1180,28 @@ impl<'a, T: TransparentPtrType> IntoPtrSlice<T> for &'a [T] {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::object::ObjectExt;
+
+    #[test]
+    fn test_truncate_releases_only_removed_objects() {
+        let objects = [
+            crate::Object::new::<crate::Object>(),
+            crate::Object::new::<crate::Object>(),
+        ];
+        let first = objects[0].downgrade();
+        let second = objects[1].downgrade();
+        let mut slice = PtrSlice::from(&objects[..]);
+        drop(objects);
+        slice.truncate(1);
+        assert!(first.upgrade().is_some());
+        assert!(second.upgrade().is_none());
+        // A no-op must preserve the remaining reference; clearing must release it.
+        slice.truncate(5);
+        assert!(first.upgrade().is_some());
+        slice.truncate(0);
+        assert!(first.upgrade().is_none());
+        slice.truncate(0);
+    }
 
     #[test]
     fn test_from_glib_full() {

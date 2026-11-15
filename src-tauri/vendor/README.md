@@ -28,3 +28,8 @@ they do not establish a Linux GUI release or general absence of vulnerabilities.
 Do not change these sources without updating provenance and reviewing the patch.
 Remove the backports and exception when the desktop dependency graph moves to
 maintained compatible upstream packages.
+
+Pointer-slice truncation also moves each removed item out and clears its slot
+before dropping the item. Its optimized weak-reference regression test and
+reviewed provenance hash are retained. See [GitHub triage](../../docs/134-github-security-triage.md)
+for the individually reviewed CodeQL FFI/generic-conversion false positives.

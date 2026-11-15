@@ -125,7 +125,9 @@
     },
     "modified_sha256": {
       "LICENSE": "f9c4c77baa3828004ee54b8a4f2db2e88ed44a6237a493965bf551fac0fcb62d",
-      "src/variant_iter.rs": "a0f5ee8acb8faa089bcdfbc9a57372609fce7654026ccef7d9a224d05a654ccc"
+      "src/variant_iter.rs": "a0f5ee8acb8faa089bcdfbc9a57372609fce7654026ccef7d9a224d05a654ccc",
+      "src/collections/ptr_slice.rs": "336a13f21df5b90da0696b799d0b518117840fcafb3bbe115d69e590ac7dc013",
+      "src/collections/strv.rs": "bbe4d71b31afca5a78c9baf446b04962a4097273dd5af397b9668d59cb4107f4"
     }
   },
   "glib-macros-0.18.5": {

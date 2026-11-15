@@ -60,7 +60,7 @@ jobs:
         run: |
           cargo +1.99.1 check --manifest-path src-tauri/vendor/glib-macros-0.18.5/Cargo.toml
           cargo +1.99.1 check --manifest-path src-tauri/vendor/gtk3-macros-0.18.2/Cargo.toml
-          cargo +1.99.1 test --release --manifest-path src-tauri/vendor/glib-0.18.5/Cargo.toml --lib variant_iter --config "patch.crates-io.glib-macros.path='$GITHUB_WORKSPACE/src-tauri/vendor/glib-macros-0.18.5'"
+          cargo +1.99.1 test --release --manifest-path src-tauri/vendor/glib-0.18.5/Cargo.toml --lib --config "patch.crates-io.glib-macros.path='$GITHUB_WORKSPACE/src-tauri/vendor/glib-macros-0.18.5'"
 
   python-pins:
     runs-on: ubuntu-latest
