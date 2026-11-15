@@ -50,6 +50,9 @@ try{
  assert.equal(await page.locator('#achievements tbody tr').count(),15);
  assert.equal(await page.locator('#achievements img').evaluate(image=>image.complete&&image.naturalWidth===512&&image.naturalHeight===512),true);
  assert.match(await page.locator('.achievement-metrics').innerText(),/120\.29 seconds/);
+ assert.equal(await page.getByRole('heading',{name:'A tested MCP workflow repair',exact:true}).count(),1);
+ assert.match(await page.locator('#achievements').innerText(),/43,297 → 17,732 bytes/);
+ assert.match(await page.locator('#achievements').innerText(),/37\.0 minutes/);
  await page.screenshot({path:new URL('metivolve-achievements-desktop.png',folder).pathname});
  await page.setViewportSize({width:390,height:844});
  for(const path of ['index.html','start.html','guide.html','capabilities.html','faq.html','privacy.html','terms.html','readiness.html','support.html','cookbook.html']){await page.goto(`${base}/${path}`,{waitUntil:'networkidle'});assert.equal(await page.getByRole('heading',{level:1}).count(),1);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,path);assert.deepEqual(await page.evaluate(()=>window.__cspViolations),[],path);if(path==='start.html')await page.screenshot({path:new URL('metivolve-onboarding-mobile.png',folder).pathname});}

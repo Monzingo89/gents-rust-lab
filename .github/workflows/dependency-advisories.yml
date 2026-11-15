@@ -54,13 +54,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes libglib2.0-dev pkg-config
           rustup toolchain install 1.99.1 --profile minimal
-      - name: Check macros and optimized iterator regression tests
+      - name: Check macros and all optimized GLib library tests
         env:
           CARGO_TARGET_DIR: ${{ github.workspace }}/target/vendor-check
+          RUST_BACKTRACE: full
         run: |
           cargo +1.99.1 check --manifest-path src-tauri/vendor/glib-macros-0.18.5/Cargo.toml
           cargo +1.99.1 check --manifest-path src-tauri/vendor/gtk3-macros-0.18.2/Cargo.toml
-          cargo +1.99.1 test --release --manifest-path src-tauri/vendor/glib-0.18.5/Cargo.toml --lib --config "patch.crates-io.glib-macros.path='$GITHUB_WORKSPACE/src-tauri/vendor/glib-macros-0.18.5'"
+          cargo +1.99.1 test --release --manifest-path src-tauri/vendor/glib-0.18.5/Cargo.toml --lib --config "patch.crates-io.glib-macros.path='$GITHUB_WORKSPACE/src-tauri/vendor/glib-macros-0.18.5'" -- --test-threads=1 --nocapture
 
   python-pins:
     runs-on: ubuntu-latest

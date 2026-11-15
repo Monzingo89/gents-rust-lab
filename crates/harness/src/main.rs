@@ -5,6 +5,7 @@ mod architecture_review;
 mod artifact_requirements;
 mod auth;
 mod authorization_context;
+mod authorization_history;
 mod autonomy;
 mod banking;
 mod campaign;

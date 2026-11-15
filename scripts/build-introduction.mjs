@@ -12,7 +12,7 @@ const production = process.argv.includes('--production');
 const imageEvidence = JSON.parse(await readFile(resolve(root,'docs/evidence/local-image-showcase-2026-11-15.json'),'utf8'));
 const imageBytes = await readFile(resolve(root,'assets/showcase/local-owl.png'));
 if(createHash('sha256').update(imageBytes).digest('hex') !== imageEvidence.artifact.sha256) throw Error('Showcase asset differs from accepted evidence.');
-const achievementContent = achievementsSection(JSON.parse(await readFile(resolve(root,'docs/evidence/local-image-showcase-2026-11-15.json'),'utf8')), JSON.parse(await readFile(resolve(root,'docs/evidence/reasoning-completion-2026-11-13.json'),'utf8')), await readFile(resolve(root,'docs/121-owned-mcp-cookbook.md'),'utf8'));
+const achievementContent = achievementsSection(JSON.parse(await readFile(resolve(root,'docs/evidence/local-image-showcase-2026-11-15.json'),'utf8')), JSON.parse(await readFile(resolve(root,'docs/evidence/reasoning-completion-2026-11-13.json'),'utf8')), await readFile(resolve(root,'docs/121-owned-mcp-cookbook.md'),'utf8'), JSON.parse(await readFile(resolve(root,'docs/evidence/local-context-repair-2026-11-15.json'),'utf8')));
 const pages = [...contentPages.map(page=>page.file==='index.html'?{...page,body:page.body+achievementContent}:page), cookbookPage(await readFile(resolve(root,'docs/121-owned-mcp-cookbook.md'),'utf8'))];
 const hostedPreview = process.argv.includes('--vercel-preview');
 const label = production ? 'Open-source preview' : hostedPreview ? 'Evaluation preview' : 'Local preview';
