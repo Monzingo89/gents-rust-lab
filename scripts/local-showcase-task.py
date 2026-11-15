@@ -1,7 +1,7 @@
 """Owner-invoked local campaign task; retain one dispatch, frozen scope and receipts.
 No automatic retries, publication, email, model downloads or permission expansion.
 """
-import argparse,json,time,urllib.request,urllib.parse,uuid
+import argparse,hashlib,json,shutil,time,urllib.request,urllib.parse,uuid
 from pathlib import Path
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('--spec',type=Path,required=True);p.add_argument('--server',default='http://127.0.0.1:8788');a=p.parse_args()
 root=Path(__file__).resolve().parents[1];spec=json.loads(a.spec.read_text());base=a.server.rstrip('/');target=urllib.parse.urlparse(base)
@@ -16,11 +16,23 @@ save('freeze.json',{'run':run,'spec':spec,'source_revision':__import__('subproce
 route='/api/companies/'+spec['company']
 if spec.get('register'):api(route,{'op':'register','name':'Gents local capability campaign'})
 intake={'idea':spec['task'],'acceptance':'\n'.join(spec['criteria']),'exclusions':'All tools outside the frozen grant','timeline':'Measured, no completion-time promise','company_signer':'Owner-authorized Gents campaign','provider_signer':'Local Gents Company','budget_usd':0,'deliverable_type':'agent'}
+if spec.get('candidate_workflow'):
+ intake['candidate_workflow']=spec['candidate_workflow'];intake['deliverable_type']='candidate'
 state=api(route,{'op':'intake','run_id':run,'intake':intake});job=next(j for j in state['jobs'] if j['run_id']==run);save('job.json',job)
 api(route,{'op':'approve','run_id':run,'digest':job['digest']})
 access={'tools':spec['tools'],'skills':[],'memory_from':[]}
 policy={'revision':1,'master':spec['actor'],'ceilings':{spec['actor']:access},'grants':{spec['actor']:access}}
 api(route,{'op':'governance_install','run_id':run,'expected_revision':0,'policy':policy});save('policy.json',policy)
+# Owner-supplied public/synthetic reference copies only; model output never selects these paths.
+inputs=[]
+workspace=root/'data/companies'/spec['company']/'runs'/run/'workspace'
+for item in spec.get('seed_files',[]):
+ source=(root/item['source']).resolve(strict=True)
+ assert source.is_relative_to(root/'data/local-showcase/research-inputs') and source.is_file() and not (root/item['source']).is_symlink()
+ relative=Path(item['path']);assert not relative.is_absolute() and all(part not in ('.','..') and not part.startswith('.') for part in relative.parts)
+ target=workspace/relative;target.parent.mkdir(parents=True,exist_ok=True);assert not target.exists();shutil.copyfile(source,target)
+ inputs.append({'path':str(relative),'sha256':hashlib.sha256(source.read_bytes()).hexdigest()})
+save('reference-inputs.json',inputs)
 started=time.monotonic();save('dispatch-intent.json',{'run':run,'status':'pending; reconcile by run ID if response is lost'})
 result=api('/api/runs',{'company_id':spec['company'],'run_id':run,'task':spec['task'],'definition_of_done':spec['criteria'],'consent':False},{'Idempotency-Key':run});save('dispatch.json',result)
 print(json.dumps({'status':'STARTED','run':run,'folder':str(folder)}),flush=True)

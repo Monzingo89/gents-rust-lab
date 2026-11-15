@@ -1981,12 +1981,31 @@ fn review_context(task: &str, proposal: &Value) -> Result<Value> {
     }
     // A PM's speculative open questions are plans, not missing operator input.
     // Review actual observations/answers, without letting plans veto discovery.
+    let mut is_files_write_action = false;
     if let Some(history) = proposal
         .get_mut("recent_evidence")
         .and_then(Value::as_array_mut)
     {
         history.retain(|item| item.get("plan").is_none() && item.get("role").is_none());
         crate::authorization_context::historical_evidence(history);
+        // Check if the next action is files op=write before borrowing proposal mutably
+        if let (Some(action), Some(arguments)) = (
+            proposal["request"]["action"].as_str(),
+            proposal["request"]["arguments"].as_object(),
+        ) {
+            if action == "files" && arguments.get("op").and_then(|v| v.as_str()) == Some("write") {
+                is_files_write_action = true;
+            }
+        }
+    }
+    if is_files_write_action {
+        // Call the new helper function for files write actions
+        if let Some(history) = proposal
+            .get_mut("recent_evidence")
+            .and_then(Value::as_array_mut)
+        {
+            crate::authorization_history::compact_legacy_file_write_history(history);
+        }
     }
     let action = proposal["request"]["action"].as_str().unwrap_or("");
     let args = &proposal["request"]["arguments"];
@@ -4892,3 +4911,7 @@ mod tests {
         std::fs::remove_dir_all(root).unwrap();
     }
 }
+
+#[cfg(test)]
+#[path = "authorization_history_integration_acceptance.rs"]
+mod authorization_history_integration_acceptance;
