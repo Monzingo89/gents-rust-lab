@@ -1,8 +1,10 @@
 """Owner-invoked local campaign task; retain one dispatch, frozen scope and receipts.
-No automatic retries, publication, email, model downloads or permission expansion.
+No automatic retries, publication, email, downloads or changes to existing policies.
+Fresh policy grants include the owner-controlled company-research.json defaults.
 """
 import argparse,hashlib,json,shutil,time,urllib.request,urllib.parse,uuid
 from pathlib import Path
+from company_research import fresh_access
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('--spec',type=Path,required=True);p.add_argument('--server',default='http://127.0.0.1:8788');a=p.parse_args()
 root=Path(__file__).resolve().parents[1];spec=json.loads(a.spec.read_text());base=a.server.rstrip('/');target=urllib.parse.urlparse(base)
 assert target.scheme=='http' and target.hostname=='127.0.0.1' and not target.username and not target.password and target.path=='', 'Loopback harness only'
@@ -12,7 +14,10 @@ def api(path,body=None,headers=None):
  req=urllib.request.Request(base+path,data=None if body is None else json.dumps(body).encode(),headers={'Content-Type':'application/json',**(headers or {})})
  with urllib.request.urlopen(req,timeout=30) as r:return json.load(r)
 config=api('/api/config');assert config['local_only'] and config['company_tools']
-save('freeze.json',{'run':run,'spec':spec,'source_revision':__import__('subprocess').check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),'scope':'Actual owner-authorized local task; independent artifact acceptance remains separate.'})
+access_map,research_profile=fresh_access(root/'config/company-research.json',[actor['id'] for actor in config['agents']],spec['actor'],spec['tools'])
+spec['tools']=access_map[spec['actor']]['tools']
+save('research-profile.json',research_profile)
+save('freeze.json',{'run':run,'spec':spec,'source_revision':__import__('subprocess').check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),'source_dirty':bool(__import__('subprocess').check_output(['git','status','--porcelain'],cwd=root,text=True).strip()),'runner_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'scope':'Actual owner-authorized local task; independent artifact acceptance remains separate.'})
 route='/api/companies/'+spec['company']
 if spec.get('register'):api(route,{'op':'register','name':'Gents local capability campaign'})
 intake={'idea':spec['task'],'acceptance':'\n'.join(spec['criteria']),'exclusions':'All tools outside the frozen grant','timeline':'Measured, no completion-time promise','company_signer':'Owner-authorized Gents campaign','provider_signer':'Local Gents Company','budget_usd':0,'deliverable_type':'agent'}
@@ -20,8 +25,7 @@ if spec.get('candidate_workflow'):
  intake['candidate_workflow']=spec['candidate_workflow'];intake['deliverable_type']='candidate'
 state=api(route,{'op':'intake','run_id':run,'intake':intake});job=next(j for j in state['jobs'] if j['run_id']==run);save('job.json',job)
 api(route,{'op':'approve','run_id':run,'digest':job['digest']})
-access={'tools':spec['tools'],'skills':[],'memory_from':[]}
-policy={'revision':1,'master':spec['actor'],'ceilings':{spec['actor']:access},'grants':{spec['actor']:access}}
+policy={'revision':1,'master':spec['actor'],'ceilings':access_map,'grants':access_map}
 api(route,{'op':'governance_install','run_id':run,'expected_revision':0,'policy':policy});save('policy.json',policy)
 # Owner-supplied public/synthetic reference copies only; model output never selects these paths.
 inputs=[]
