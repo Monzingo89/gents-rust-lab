@@ -132,3 +132,12 @@ The main office's older LEGO task remains waiting for owner review and was not
 cancelled or answered by this campaign. Campaign execution uses a separate
 loopback runtime and run journal so its task slots remain independent. There is
 no claim that this computer can work while asleep or after the owned runtime stops.
+
+## Linux GLib verification follow-up
+
+One parallel optimized GLib CI run aborted in the panic runtime while the same
+revision passed in the pull-request job. The log does not establish a root cause.
+The gate now runs every library test serially, with uncaptured output and full
+backtraces, to make the failing case observable and avoid inter-test concurrency.
+The tests that create their own threads still do so. No test or advisory gate
+is skipped, and the original abort log is retained privately for investigation.
