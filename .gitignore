@@ -34,3 +34,5 @@ __pycache__/
 *.pth
 *.pem
 *.key
+# Per-machine editor executable paths
+/.vscode/settings.json

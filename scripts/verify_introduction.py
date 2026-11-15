@@ -81,5 +81,13 @@ sitemap = ET.parse(ROOT / 'sitemap.xml')
 locations = [node.text for node in sitemap.findall('.//{http://www.sitemaps.org/schemas/sitemap/0.9}loc')]
 assert len(locations) == len(pages) and len(set(locations)) == len(pages)
 assert all(url.startswith('https://metivolve.com/') for url in locations)
+security = (ROOT / '.well-known/security.txt').read_text()
+assert 'Canonical: https://metivolve.com/.well-known/security.txt' in security
+assert 'Contact: mailto:robertjmonzingo@gmail.com' in security
+from datetime import datetime, timezone
+expiry = next(line.split(': ', 1)[1] for line in security.splitlines() if line.startswith('Expires: '))
+assert datetime.fromisoformat(expiry.replace('Z', '+00:00')) > datetime.now(timezone.utc), 'Renew security.txt before it expires'
+for name in ('index.html', 'guide.html'):
+    assert 'https://github.com/Monzingo89/gents-rust-lab' in pages[name].links
 assert not any(p.suffix in ['.sqlite3', '.gguf', '.safetensors'] for p in ROOT.rglob('*'))
 print('PASS: ten introduction pages; local links/anchors, accessible labels, metadata, structured content and CSP hashes; explicit preview/production indexing policy; no remote assets; only support allows same-origin API requests')

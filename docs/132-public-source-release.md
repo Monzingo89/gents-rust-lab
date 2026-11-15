@@ -103,3 +103,10 @@ Preserve `features/session-1`, merge the tested source into `main`, then create
 secrets, generated artifacts and installed environments excluded on every branch.
 The model-improvement work remains incomplete: narrow gains and rejected
 candidates are documented in [the capability scorecard](131-model-capability-scorecard.md).
+
+
+The website also exposes a public security contact at `/.well-known/security.txt`
+and a [security assurance register](133-security-assurance-readiness.md). Renew the
+security contact expiration before May 14, 2027. Neither publication nor the
+register establishes a SOC 2 report. The public repository is linked directly
+from the homepage and the setup guide.

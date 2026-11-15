@@ -1,0 +1,6 @@
+Contact: https://github.com/Monzingo89/gents-rust-lab/security/advisories/new
+Contact: mailto:robertjmonzingo@gmail.com
+Expires: 2027-05-14T23:59:59Z
+Preferred-Languages: en
+Canonical: https://metivolve.com/.well-known/security.txt
+Policy: https://metivolve.com/readiness

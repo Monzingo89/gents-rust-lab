@@ -17,6 +17,8 @@ const sourceDirty = Boolean(execFileSync('git',['status','--porcelain','--untrac
 const version = JSON.parse(await readFile(resolve(root,'package.json'),'utf8')).version;
 await rm(out, { recursive:true, force:true });
 await mkdir(resolve(out,'assets'),{ recursive:true });
+await mkdir(resolve(out,'.well-known'),{recursive:true});
+await copyFile(resolve(root,'site/security.txt'),resolve(out,'.well-known/security.txt'));
 for (const name of ['styles.css','app.mjs','calculator.mjs','icon.svg','support.mjs','onboarding.mjs']) await copyFile(resolve(root,'site/src',name),resolve(out,name));
 await copyFile(resolve(root,'site/src/office.webp'),resolve(out,'assets/office.webp'));
 await copyFile(resolve(root,'web/assets/rooms/floor-0.png'),resolve(out,'assets/office.png'));
@@ -25,7 +27,7 @@ await copyFile(resolve(root,'web/assets/basic-answers.js'),resolve(out,'basic-an
 await copyFile(resolve(root,'assets/brand/gents-icon-transparent.ico'),resolve(out,'favicon.ico'));
 await copyFile(resolve(root,'LICENSE'),resolve(out,'LICENSE.txt'));
 for (const page of pages) {
-  const structured = [{ '@context':'https://schema.org', '@type':'SoftwareApplication',name:'Metivolve',applicationCategory:'DeveloperApplication',operatingSystem:'macOS',softwareVersion:version,url:'https://metivolve.com/',downloadUrl:'https://github.com/Monzingo89/gents-rust-lab',codeRepository:'https://github.com/Monzingo89/gents-rust-lab',license:'https://opensource.org/license/mit',description:'Free local agent-company project with reviewed permissions and recorded execution. Early access; task support is bounded.',offers:{'@type':'Offer',price:'0',priceCurrency:'USD'}}];
+  const structured = [{ '@context':'https://schema.org', '@type':'SoftwareApplication',name:'Metivolve',applicationCategory:'DeveloperApplication',operatingSystem:'macOS',softwareVersion:version,url:'https://metivolve.com/',downloadUrl:'https://github.com/Monzingo89/gents-rust-lab',sameAs:'https://github.com/Monzingo89/gents-rust-lab',license:'https://opensource.org/license/mit',description:'Free local agent-company project with reviewed permissions and recorded execution. Early access; task support is bounded.',offers:{'@type':'Offer',price:'0',priceCurrency:'USD'}}];
   if (['index.html','faq.html'].includes(page.file)) structured.push({'@context':'https://schema.org','@type':'FAQPage',mainEntity:faq.map(([name,text])=>({'@type':'Question',name,acceptedAnswer:{'@type':'Answer',text}}))});
   if (page.file === 'cookbook.html') structured.splice(0, structured.length, {'@context':'https://schema.org','@type':'TechArticle',headline:'Local MCP cookbook',description:page.description,url:'https://metivolve.com/cookbook',inLanguage:'en',about:'Project-owned local MCP tools'});
   const json = JSON.stringify(structured).replaceAll('<','\\u003c');
