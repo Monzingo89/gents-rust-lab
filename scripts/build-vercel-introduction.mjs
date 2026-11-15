@@ -6,7 +6,7 @@ const root=resolve(import.meta.dirname,'..'),out=resolve(root,'site/deploy'),pub
 const info=JSON.parse(await readFile(resolve(publicRoot,'build-info.json'),'utf8'));
 if(!['production','vercel-evaluation-preview'].includes(info.mode))throw Error('Build the hosted evaluation preview first: node scripts/build-introduction.mjs --vercel-preview');
 if(info.mode==='production'&&info.source_dirty)throw Error('Production packaging requires a clean committed source tree.');
-const publicFiles=[...info.pages,'styles.css','app.mjs','calculator.mjs','support.mjs','onboarding.mjs','computer-readiness.js','basic-answers.js','favicon.ico','icon.svg','assets/office.png','assets/office.webp','LICENSE.txt','robots.txt','sitemap.xml','.well-known/security.txt','build-info.json'];
+const publicFiles=[...info.pages,'styles.css','app.mjs','calculator.mjs','support.mjs','onboarding.mjs','computer-readiness.js','basic-answers.js','favicon.ico','icon.svg','assets/office.png','assets/office.webp','assets/local-owl.png','LICENSE.txt','robots.txt','sitemap.xml','.well-known/security.txt','build-info.json'];
 await rm(out,{recursive:true,force:true});await mkdir(resolve(out,'api'),{recursive:true});await mkdir(resolve(out,'assets'),{recursive:true});
 for(const file of publicFiles){const source=resolve(publicRoot,file);if(!(await lstat(source)).isFile())throw Error('A public source is not a regular file.');await mkdir(resolve(out,file,'..'),{recursive:true});await copyFile(source,resolve(out,file));}
 const policy=await readFile(resolve(root,'site/server/support-service.mjs'),'utf8');

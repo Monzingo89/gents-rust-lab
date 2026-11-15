@@ -1,0 +1,54 @@
+{
+  "date": "2026-11-15",
+  "source_revision": "d114d73c0da6ed7e7e2ccc8f49274f018dfa782f",
+  "github_open_alerts": {
+    "dependabot": 0,
+    "code_scanning": 0,
+    "secret_scanning": 0
+  },
+  "codeql_triage": {
+    "fixed": [
+      9
+    ],
+    "dismissed_false_positive": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "explanation": "docs/134-github-security-triage.md"
+  },
+  "checks": {
+    "github_dependency_advisory_gates": "success",
+    "github_verify_harness": "success",
+    "github_source_secret_scan": "success",
+    "optimized_glib_library_tests": 227,
+    "workspace_tests": "passed; opt-in local-model tests excluded",
+    "rust_workspace_advisory_audit": "pass",
+    "desktop_audit": "pass with exact-source GLib backport exception",
+    "javascript_audit": "zero vulnerabilities"
+  },
+  "deployment": {
+    "id": "dpl_EYnzALwE1svtmJvrKMoL84c9dMDb",
+    "url": "https://metivolve.com",
+    "public_files_matched": 26,
+    "browser_pages": 10,
+    "desktop": [
+      1440,
+      1000
+    ],
+    "mobile": [
+      390,
+      844
+    ],
+    "page_errors": 0,
+    "support_mail_sent": false
+  },
+  "release_incident": {
+    "description": "An empty deployment briefly replaced production during connector use. The previous known-good deployment was restored, then the exact verified artifact was staged and promoted.",
+    "recovered": true
+  },
+  "scope": "GitHub snapshot and explicit revision checks; no blanket vulnerability-free guarantee."
+}

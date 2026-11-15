@@ -1,0 +1,43 @@
+{
+  "date": "2026-11-15",
+  "run": "d615b59e-138f-460e-a29b-5259bfcb2ed2",
+  "status": "completed",
+  "task": "Create and inspect an original mechanical owl illustration for the local model showcase.",
+  "artifact": {
+    "bytes": 208823,
+    "created_new": true,
+    "path": "showcase-owl.png",
+    "retry_rule": "Read the retained path/hash before retrying an uncertain effect; no automatic overwrite or replay.",
+    "sha256": "29a5615ef14a1c105dc9adb028b59005d2ff45a91f61cf965b4cfe5795949ffe"
+  },
+  "width": 512,
+  "height": 512,
+  "engine": "mflux_flux2_klein_4bit",
+  "model_manifest_sha256": "d463c1e8b7c89e49de16ee72a7840793f4bea4eec094d80c0f208e66102853f0",
+  "generation_receipt": {
+    "actor": "Engineer Gent",
+    "arguments_sha256": "4bad1731c41839b26aad116ccf4425663d9db751c17e1dffd4541f4479816b14",
+    "phase": "worker",
+    "policy_revision": 1,
+    "provider_cost_usd": 0,
+    "result_sha256": "e0f303438face3de17dc2d737bc6a33923c4e3c6b97f177a6f7964c009178aa5",
+    "status": "completed",
+    "tool": "image_generate"
+  },
+  "elapsed_seconds": 120.29,
+  "model_calls": 9,
+  "provider_cost_usd": 0,
+  "vision_review": {
+    "model": "Qwen3-VL-8B Instruct",
+    "latency_ms": 9160,
+    "observation": "Visible elements:\n- A stylized, robotic owl figurine with metallic textures, blue and orange coloring, and large, detailed eyes.\n- A wooden desk with drawers and turned legs.\n- A lit, adjustable metal desk lamp with a warm glow.\n- Dark, moody background with focused lighting on the desk and owl.\n\nFlaws:\n- The owl\u2019s design is highly stylized and appears to be a digital rendering or 3D model, not a real object.\n- The lighting and shadows are overly dramatic and artificial, suggesting a studio or CGI setup.\n- The desk and lamp appear slightly too perfect and clean for a real-world scene.\n- No visible wear, imperfections, or realistic textures on the owl or furniture, which may indicate it is not a photograph of physical objects."
+  },
+  "independent_acceptance": {
+    "artifact_sha256_verified": true,
+    "png_dimensions_verified": true,
+    "visually_inspected": true,
+    "decision": "Accept for a decorative website showcase: recognizable copper/teal mechanical owl, desk, lamp, blue backdrop; no visible text/logo. Stylized illustration, not a photograph.",
+    "reviewer": "Host-side assistant visual review; no claim of human approval."
+  },
+  "scope": "One real local company task, including admission, prompt, native generation, local vision review and QA. Hardware/electricity/frontier development excluded from provider fees; no model training or general image-quality benchmark claim."
+}

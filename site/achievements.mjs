@@ -1,0 +1,32 @@
+// Render reviewed public evidence at build time. The browser never loads task records.
+const escape = value => String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+const source = path => `https://github.com/Monzingo89/gents-rust-lab/blob/main/${path}`;
+export function achievementsSection(image, writing, cookbook) {
+  if (image.status !== 'completed' || !image.independent_acceptance?.artifact_sha256_verified || !image.independent_acceptance?.visually_inspected || image.provider_cost_usd !== 0 || !Number.isFinite(image.elapsed_seconds) || image.elapsed_seconds <= 0) throw Error('Showcase requires accepted, measured image evidence.');
+  if (writing.measurements.status !== 'PASS' || writing.read_only_verification.status !== 'PASS' || writing.measurements.provider_fees_usd !== 0) throw Error('Writing evidence is incomplete.');
+  const tools = [...cookbook.matchAll(/```json\n([\s\S]*?)\n```/g)].map(([,raw])=>JSON.parse(raw)).filter(tool=>tool.name && tool.source);
+  if (tools.length !== 15 || new Set(tools.map(tool=>tool.name)).size !== 15) throw Error('Review changed local tool inventory.');
+  const descriptions = {
+    image_generate:'Generate a new 256–512 px PNG illustration with local FLUX.',
+    audio_generate:'Turn up to 600 characters of English text into local speech WAV.',
+    audio_inspect:'Measure WAV duration, samples and signal properties; no transcription.',
+    files:'Read, list and write confined workspace files.',
+    host_resources:'Observe available memory and compute resources.',
+    integer_arithmetic:'Calculate bounded exact integer results.',
+    memory_append:'Save an authorized, scoped agent memory record.',
+    memory_search:'Search authorized agent memory text; no semantic retrieval claim.',
+    owned_rust_call:'Invoke an approved, source-bound pure Rust function.',
+    rust_verify:'Compile and test a frozen pure Rust candidate in isolation.',
+    skill_list:'Discover skills granted to the current agent.',
+    skill_read:'Read an authorized local skill.',
+    table_aggregate:'Group and aggregate bounded local table data.',
+    table_join:'Join bounded local tables with explicit keys.',
+    table_read_json:'Read a bounded local JSON table.'
+  };
+  const rows = tools.map(tool=>{
+    if (!descriptions[tool.name]) throw Error('Missing tool description.');
+    const time=tool.name==='image_generate'?`${Math.round(image.elapsed_seconds)} seconds for the full demonstrated image task`: 'Not measured for a complete task';
+    return `<tr><th scope="row"><a href="cookbook.html#${escape(tool.name.replaceAll('_','-'))}">${escape(tool.name)}</a></th><td>${escape(descriptions[tool.name])}</td><td>${escape(time)}</td><td>$0 provider fees offline</td></tr>`;
+  }).join('');
+  return `<section id="achievements" aria-labelledby="achievements-title"><span class="eyebrow">Real local work. Recorded results.</span><h2 id="achievements-title">What I have achieved</h2><p class="lead">See what the local Gents Company has actually finished, how long it took on this computer, and what it cost.</p><div class="achievement-grid"><figure class="achievement-image"><img src="assets/local-owl.png" width="512" height="512" loading="lazy" alt="Copper and teal mechanical owl on a wooden desk beside a warm lamp, against a midnight-blue background"><figcaption>Generated locally with FLUX.2 Klein 4B. Original PNG, seed 241114; no paid image API.</figcaption></figure><div><h3>An illustration, created and reviewed locally</h3><p>The company wrote the prompt, generated this 512 × 512 PNG, inspected the actual image with a local vision model, and completed its QA review. The publishing assistant then verified the file hash, dimensions and visual result.</p><div class="achievement-metrics"><p><strong>${escape(image.elapsed_seconds)} seconds</strong><br>Full company task</p><p><strong>$0</strong><br>Provider and tool fees</p></div><p class="note">9 recorded model replies. Includes admission, model loading, generation, local vision inspection and QA. One successful example; aesthetic acceptance is a scoped publishing review.</p><a href="${source('docs/evidence/local-image-showcase-2026-11-15.json')}">Inspect image evidence</a></div></div><div class="feature-row"><div><h3>A factual two-sentence update</h3><p>One local writer preserved two supplied facts. A different local model reviewed the answer, and an independent exact-text check passed.</p></div><div><p><strong>${escape((writing.measurements.elapsed_ms/1000).toFixed(2))} seconds · $0 provider fees</strong></p><p class="note">Execution and final review only; earlier planning is separate. A synthetic writing task, not general factual accuracy.</p><a href="${source('docs/128-independent-reasoning-acceptance.md')}">Inspect writing evidence</a></div></div><h3>What you can run locally</h3><p>The complete current native MCP tool inventory is below. A tool being implemented does not mean every task built from it will succeed. Each task needs its own permissions and acceptance checks.</p><div class="table-scroll" role="region" aria-label="Local tasks, observed time and cost" tabindex="0"><table><thead><tr><th scope="col">Tool</th><th scope="col">What it does</th><th scope="col">Observed time</th><th scope="col">Cost</th></tr></thead><tbody>${rows}</tbody></table></div><details><summary>Broader company work and experiments</summary><p>Local agents can also draft text, propose and test code, research with explicitly allowed public web tools, and prepare local model-training experiments. Code refactoring and company improvement are the next campaign stages; they are not claimed as completed showcase achievements here. Web research requires a network connection. Email and hosting use separate services and may have their own charges.</p><p>Existing training experiments include narrow gains, no-gain trials and rejected regressions. None establishes frontier-level capability or a qualified production improvement. <a href="${source('docs/131-model-capability-scorecard.md')}">Read the current scorecard</a>. Video generation has no installed qualified backend.</p></details><p class="note">Times are observations from this Apple Silicon computer with 36 GB unified memory, not estimates for your hardware. Hardware, electricity, setup, downloads and development are excluded from $0 provider fees. Image and speech engines currently require the supported macOS setup. No model or company execution runs on this public website.</p></section>`;
+}
