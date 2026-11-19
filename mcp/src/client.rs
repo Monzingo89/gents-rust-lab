@@ -94,6 +94,9 @@ pub async fn invoke(
     if requirements.installed_rustc {
         command.env("GENTS_RUSTC", crate::rust_verification::compiler_path()?);
     }
+    if requirements.installed_python {
+        command.env("GENTS_PYTHON", crate::python_check::interpreter_path()?);
+    }
     let call_timeout = Duration::from_secs(requirements.call_timeout_seconds);
     let mut child = command.spawn()?;
     if transport == "sse" {

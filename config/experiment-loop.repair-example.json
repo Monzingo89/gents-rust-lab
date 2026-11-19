@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "company": "local-research",
+  "evidence_paths": [
+    "data/experiment-inputs/local-rust/evidence.json"
+  ],
+  "max_model_calls": 3,
+  "experiments": [
+    {
+      "id": "baseline",
+      "actor": "Engineer Gent",
+      "task": "Author only a dependency-free safe Rust implementation of pub fn bounded_chunk_end(text: &str, offset: usize, limit: usize) -> Option<usize>. Return None if limit is zero, offset exceeds the string byte length, or offset is not a UTF-8 boundary. Otherwise return the furthest UTF-8 boundary not exceeding the string byte length or offset plus the byte limit, without integer overflow. At end of input with positive limit return that end offset. If a nonempty remainder cannot fit a complete character, return None. Only function items; no imports, macros, attributes, unsafe, I/O, subprocesses or environment access. Author the implementation yourself. The host separately evaluates the quarantined source against frozen acceptance; do not claim compilation, correctness or promotion.",
+      "criteria": [
+        "Submit a quarantined candidate with exact native readback; independent host review is required before execution or promotion."
+      ],
+      "tools": [
+        "files:read",
+        "files:write"
+      ],
+      "max_model_calls": 1,
+      "candidate_workflow": {
+        "version": 1,
+        "actor": "Engineer Gent",
+        "path": "chunk_boundary.rs",
+        "max_bytes": 8192,
+        "max_attempts": 1
+      },
+      "evaluation": {
+        "kind": "rust_acceptance",
+        "tests_path": "data/experiment-inputs/local-rust/acceptance.rs",
+        "tests_sha256": "94f2bb5de1a1197070e971dea1348e23f25daafe9e6c0bdd520a771aed23b3ba"
+      }
+    },
+    {
+      "id": "repair-1",
+      "actor": "Engineer Gent",
+      "task": "Author only a dependency-free safe Rust implementation of pub fn bounded_chunk_end(text: &str, offset: usize, limit: usize) -> Option<usize>. Return None if limit is zero, offset exceeds the string byte length, or offset is not a UTF-8 boundary. Otherwise return the furthest UTF-8 boundary not exceeding the string byte length or offset plus the byte limit, without integer overflow. At end of input with positive limit return that end offset. If a nonempty remainder cannot fit a complete character, return None. Only function items; no imports, macros, attributes, unsafe, I/O, subprocesses or environment access. Author the implementation yourself. The host separately evaluates the quarantined source against frozen acceptance; do not claim compilation, correctness or promotion.",
+      "criteria": [
+        "Submit a quarantined candidate with exact native readback; independent host review is required before execution or promotion."
+      ],
+      "tools": [
+        "files:read",
+        "files:write"
+      ],
+      "max_model_calls": 1,
+      "candidate_workflow": {
+        "version": 1,
+        "actor": "Engineer Gent",
+        "path": "chunk_boundary.rs",
+        "max_bytes": 8192,
+        "max_attempts": 1
+      },
+      "evaluation": {
+        "kind": "rust_acceptance",
+        "tests_path": "data/experiment-inputs/local-rust/acceptance.rs",
+        "tests_sha256": "94f2bb5de1a1197070e971dea1348e23f25daafe9e6c0bdd520a771aed23b3ba"
+      },
+      "after": {
+        "experiment": "baseline",
+        "outcome": "rejected"
+      }
+    },
+    {
+      "id": "repair-2",
+      "actor": "Engineer Gent",
+      "task": "Author only a dependency-free safe Rust implementation of pub fn bounded_chunk_end(text: &str, offset: usize, limit: usize) -> Option<usize>. Return None if limit is zero, offset exceeds the string byte length, or offset is not a UTF-8 boundary. Otherwise return the furthest UTF-8 boundary not exceeding the string byte length or offset plus the byte limit, without integer overflow. At end of input with positive limit return that end offset. If a nonempty remainder cannot fit a complete character, return None. Only function items; no imports, macros, attributes, unsafe, I/O, subprocesses or environment access. Author the implementation yourself. The host separately evaluates the quarantined source against frozen acceptance; do not claim compilation, correctness or promotion.",
+      "criteria": [
+        "Submit a quarantined candidate with exact native readback; independent host review is required before execution or promotion."
+      ],
+      "tools": [
+        "files:read",
+        "files:write"
+      ],
+      "max_model_calls": 1,
+      "candidate_workflow": {
+        "version": 1,
+        "actor": "Engineer Gent",
+        "path": "chunk_boundary.rs",
+        "max_bytes": 8192,
+        "max_attempts": 1
+      },
+      "evaluation": {
+        "kind": "rust_acceptance",
+        "tests_path": "data/experiment-inputs/local-rust/acceptance.rs",
+        "tests_sha256": "94f2bb5de1a1197070e971dea1348e23f25daafe9e6c0bdd520a771aed23b3ba"
+      },
+      "after": {
+        "experiment": "repair-1",
+        "outcome": "rejected"
+      }
+    }
+  ]
+}

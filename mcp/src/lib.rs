@@ -22,12 +22,16 @@ pub fn frozen_input_path(intake: &serde_json::Value, path: &str) -> bool {
     owner_inputs::protected(intake, path)
 }
 pub mod packet_budget;
+pub mod proposal_feedback;
 pub mod proposals;
 pub mod protocol;
+pub mod python_check;
+mod python_custody;
 mod runtime_bundle;
 pub mod rust_verification;
 pub mod safety;
 pub mod skills;
+pub mod task_engine;
 pub mod transports;
 pub mod workspace;
 pub mod workspace_path;
@@ -89,12 +93,14 @@ pub fn now_ms() -> u64 {
 #[derive(Clone, Copy, Debug, Serialize)]
 pub struct RuntimeRequirements {
     pub installed_rustc: bool,
+    pub installed_python: bool,
     pub call_timeout_seconds: u64,
 }
 impl Default for RuntimeRequirements {
     fn default() -> Self {
         Self {
             installed_rustc: false,
+            installed_python: false,
             call_timeout_seconds: 10,
         }
     }
@@ -103,6 +109,7 @@ impl RuntimeRequirements {
     pub const fn isolated_rust() -> Self {
         Self {
             installed_rustc: true,
+            installed_python: false,
             call_timeout_seconds: 110,
         }
     }
@@ -420,7 +427,7 @@ impl Registry {
                     bail!("mutating tools require an approved active job");
                 }
             }
-            if name == "files" && arguments["op"] == "write" {
+            if name == "files" && matches!(arguments["op"].as_str(), Some("write" | "rename")) {
                 let encoded: String = tx.query_row(
                     "SELECT intake FROM jobs WHERE run_id=?1",
                     [scope.run.to_string()],
@@ -432,6 +439,19 @@ impl Registry {
                     !owner_inputs::write_protected(&authority.workspace(scope)?, &intake, path)?,
                     "frozen owner input files cannot be overwritten by agents"
                 );
+                if arguments["op"] == "rename" {
+                    let destination = arguments["destination"]
+                        .as_str()
+                        .context("rename destination required")?;
+                    anyhow::ensure!(
+                        !owner_inputs::write_protected(
+                            &authority.workspace(scope)?,
+                            &intake,
+                            destination
+                        )?,
+                        "frozen owner input files cannot be rename destinations"
+                    );
+                }
                 if arguments.get("expected_sha256").is_some() {
                     policy.authorize(&scope.actor, "files", &json!({"op":"read","path":path}))?;
                 }
@@ -471,6 +491,7 @@ impl Registry {
                 &result,
                 policy.revision,
             )?;
+            python_custody::capture(&tx, scope, name, &arguments, &result, policy.revision)?;
             Ok((result, policy.revision))
         })();
         match outcome {
@@ -490,7 +511,12 @@ impl Registry {
                         // This separate uncertainty record is best-effort if
                         // the database itself is unavailable; never claim success.
                         let _=db.execute("INSERT INTO audit(run_id,kind,body,created) VALUES(?1,'mcp_tool_effect_uncertain',?2,?3)",params![scope.run.to_string(),json!({"actor":scope.actor,"phase":scope.phase,"tool":name,"arguments_sha256":arguments_sha,"status":"effect_uncertain","reason":"audit_commit_failed","payload_logged":false}).to_string(),now_ms() as i64]);
-                        return Err(error.context("External write completed but its audit receipt failed; inspect the workspace path and hash before retrying"));
+                        let message = if name == "files" && arguments["op"] == "rename" {
+                            "External rename completed but its audit receipt failed; inspect BOTH source and destination workspace paths and hashes before retrying"
+                        } else {
+                            "External write completed but its audit receipt failed; inspect the workspace path and hash before retrying"
+                        };
+                        return Err(error.context(message));
                     }
                     return Err(error);
                 }
@@ -505,7 +531,12 @@ impl Registry {
                 };
                 db.execute("INSERT INTO audit(run_id,kind,body,created) VALUES(?1,?2,?3,?4)",params![scope.run.to_string(),if external_effect_started{"mcp_tool_effect_uncertain"}else{"mcp_tool_rejected"},json!({"actor":scope.actor,"phase":scope.phase,"tool":if self.contains(name){name}else{"unregistered"},"tool_name_sha256":digest(name.as_bytes()),"arguments_sha256":arguments_sha,"status":status,"payload_logged":false}).to_string(),now_ms() as i64])?;
                 if external_effect_started {
-                    Err(error.context("External write was not proven absent; inspect the workspace path and hash before retrying"))
+                    let message = if name == "files" && arguments["op"] == "rename" {
+                        "External rename was not proven absent; inspect BOTH source and destination workspace paths and hashes before retrying"
+                    } else {
+                        "External write was not proven absent; inspect the workspace path and hash before retrying"
+                    };
+                    Err(error.context(message))
                 } else {
                     Err(error)
                 }

@@ -819,6 +819,9 @@ fn bind_company_review_schema(schema: &mut Value, input: &str) -> Result<()> {
 }
 
 fn schema_for(system: &str) -> Option<Value> {
+    if system.starts_with("LOCAL_GROUNDED_ANSWER:") {
+        return Some(gents_local_mcp::task_engine::grounded::reply_schema());
+    }
     if system.starts_with("OUTPUT_INTENT_JUDGE:") {
         return Some(crate::output_routing::schema());
     }
@@ -848,7 +851,9 @@ fn schema_for(system: &str) -> Option<Value> {
         }
         return Some(schema);
     }
-    if system.starts_with("LOCAL_CANDIDATE_AUTHOR:") {
+    if system.starts_with("LOCAL_CANDIDATE_AUTHOR:")
+        || system.starts_with("LOCAL_CANDIDATE_AUTHOR_FOCUSED:")
+    {
         return Some(gents_local_mcp::proposals::author_schema());
     }
     if system.starts_with("RISK_POLICY:") {
@@ -1654,4 +1659,12 @@ mod tests {
         }
         runtime.stop_owned().await;
     }
+}
+#[test]
+fn focused_candidate_uses_the_same_strict_source_output_schema() {
+    let full = schema_for("LOCAL_CANDIDATE_AUTHOR: source only").unwrap();
+    let focused = schema_for("LOCAL_CANDIDATE_AUTHOR_FOCUSED: source only").unwrap();
+    assert_eq!(full, focused);
+    assert_eq!(focused["additionalProperties"], false);
+    assert!(focused["properties"].get("prompt_profile").is_none());
 }

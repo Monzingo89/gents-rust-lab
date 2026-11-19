@@ -4,6 +4,13 @@ use gents_local_mcp::{default_authority, protocol, Phase, Registry, Scope};
 use std::{collections::BTreeMap, path::PathBuf};
 async fn run() -> Result<()> {
     let args = std::env::args().skip(1).collect::<Vec<_>>();
+    if args == ["--implementation-catalog"] {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&Registry::new().catalog())?
+        );
+        return Ok(());
+    }
     if args.len() < 12 || args.len() % 2 != 0 {
         bail!("usage: gents-local-mcp --root REPOSITORY --company COMPANY --owner OWNER --run UUID --actor ACTOR --phase planner|worker");
     }

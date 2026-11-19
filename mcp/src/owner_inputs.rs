@@ -14,6 +14,19 @@ fn paths(intake: &Value) -> Vec<&str> {
         .flatten()
         .filter_map(|check| check["tests_path"].as_str())
         .for_each(|path| paths.push(path));
+    intake["python_check_contracts"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|check| check["tests_path"].as_str())
+        .for_each(|path| paths.push(path));
+    intake["python_check_contracts"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|check| check["frozen_inputs"].as_object())
+        .flat_map(|inputs| inputs.keys().map(String::as_str))
+        .for_each(|path| paths.push(path));
     intake["ceo_source_files"]
         .as_array()
         .into_iter()

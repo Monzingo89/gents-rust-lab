@@ -1,0 +1,152 @@
+{
+  "run": "0f3b8ce1-9595-4c1f-b07c-ba2ed1058701",
+  "status": "completed",
+  "elapsed_seconds": 260.13,
+  "model_replies": 21,
+  "reserved_model_attempts": 21,
+  "local_tokens": {
+    "input": 145184,
+    "output": 5276,
+    "cached_input": 6585
+  },
+  "provider_cost_usd": 0.0,
+  "live_host_coaching_messages": 1,
+  "independent_methods_passed": 16,
+  "original_methods_rechecked_passed": 12,
+  "core_sha256": "bacbf530a2507816fcefc93835d3f84b1bb1f01f581a540dc6ea77d83f050219",
+  "host_function_logic_edits": false,
+  "scope": "Real retained observer function repair, explicitly host coached after identical writes. Same local model serves worker/admin/QA. Independent frozen tests and host static review separately recorded; bounded contract only.",
+  "schema_version": 1,
+  "source": {
+    "path": "scripts/showcase_observer.py",
+    "sha256": "bacbf530a2507816fcefc93835d3f84b1bb1f01f581a540dc6ea77d83f050219"
+  },
+  "independent_acceptance": {
+    "methods": 16,
+    "original_methods_rechecked": 12,
+    "static_review": true,
+    "suite_path": "scripts/fixtures/showcase-observer/acceptance.py",
+    "suite_sha256": "32f4790f778f55c9e29bc903dcbe239c1d9bb1fb7a488c81c9f5e9330bd58e57"
+  },
+  "live_observation": {
+    "runtime_status": "cancelled",
+    "read_requests": 4,
+    "requests_read_only": true,
+    "model_calls_dispatched_by_observer": 0,
+    "task_dispatched_by_observer": false,
+    "repeated_observation_files_unchanged": true,
+    "controlled_clock_for_deterministic_report": true,
+    "observed_existing_model_replies": 18,
+    "actual_cli_completed": true,
+    "source_sha256": "bacbf530a2507816fcefc93835d3f84b1bb1f01f581a540dc6ea77d83f050219"
+  },
+  "company_own_tests_qualified": false,
+  "source_publication_verified": false,
+  "deployment_verified": false,
+  "host_adoption": {
+    "pending_worktree_source": true,
+    "automatic_model_promotion": false,
+    "independent_review_required_and_recorded": true
+  },
+  "company_own_test_trials": [
+    {
+      "runtime_status": "cancelled",
+      "recorded_model_replies": 18,
+      "reserved_attempts": 22,
+      "recorded_tokens": {
+        "input": 122210,
+        "output": 4380,
+        "cached_input": 29613
+      },
+      "recorded_provider_cost_usd": 0.0,
+      "failed_calls": 4,
+      "usage_for_failed_calls_unknown": true,
+      "live_host_coaching_messages": 1,
+      "candidate_written": false,
+      "qualified": false,
+      "failure": "Repeated source reads; worker history clipped large native pages. Cancelled before the frozen allowance was extended or a test promoted."
+    },
+    {
+      "runtime_status": "cancelled",
+      "recorded_model_replies": 18,
+      "reserved_attempts": 20,
+      "recorded_tokens": {
+        "input": 139253,
+        "output": 2857,
+        "cached_input": 47589
+      },
+      "recorded_provider_cost_usd": 0.0,
+      "failed_preparation_or_calls": 2,
+      "candidate_write_executed": false,
+      "own_tests_qualified": false,
+      "independent_tests_relaxed": false
+    },
+    {
+      "runtime_status": "cancelled",
+      "recorded_model_replies": 12,
+      "reserved_attempts": 24,
+      "recorded_tokens": {
+        "input": 84935,
+        "output": 4239,
+        "cached_input": 0
+      },
+      "recorded_provider_cost_usd": 0.0,
+      "failed_preparation_or_calls": 12,
+      "candidate_write_executed": false,
+      "own_tests_qualified": false,
+      "independent_tests_relaxed": false
+    }
+  ],
+  "company_own_test_review": {
+    "native_wrapper_passed": false,
+    "frozen_positive_control_and_mutation_quality_passed": false,
+    "proposed_write_executed": false,
+    "own_test_source_adopted": false,
+    "criteria_relaxed": false,
+    "scope": "Exact final unexecuted proposal was copied for separate isolated host review; three own methods failed. No native write/readback or autonomous completion is claimed."
+  },
+  "authorization_packet_repair_measured_in_new_company_trial": true,
+  "verification": {
+    "rust_workspace_passed": 554,
+    "rust_workspace_ignored": 27,
+    "strict_offline_clippy": "passed",
+    "offline_workspace_build": "passed",
+    "python_snapshot_checks_passed": 8,
+    "broker_checks_passed": 32,
+    "retained_observer_checks_passed": 16,
+    "site_checks": "passed; local build only",
+    "deployment_verified": false
+  },
+  "company_own_test_method_trial": {
+    "runtime_status": "cancelled",
+    "recorded_model_replies": 19,
+    "reserved_attempts": 20,
+    "recorded_tokens": {
+      "input": 152764,
+      "output": 6693,
+      "cached_input": 17694
+    },
+    "recorded_provider_cost_usd": 0.0,
+    "confirmed_native_writes": 2,
+    "native_written_candidate_sha256": "1476c2e9b0286f7dd04bcf7e716b50461fbd450fd54c8f96ba25af68182d8959",
+    "historical_read_projections_observed": null,
+    "source_readback_denials": [
+      {
+        "actual_requested_action": "files",
+        "actual_requested_operation": "read",
+        "reason": "The proposed action attempts to write to observer_qa_patch.py, but the current task scope requires only reading and repairing the three specified functions. The write operation is not authorized under the current frozen task instructions, which explicitly state that only observer_qa_patch.py is mutable and that the repair must be done by reading the patch and then writing the corrected functions, not by attempting a new write operation."
+      }
+    ],
+    "independent_positive_control_passed": false,
+    "host_method_logic_edits": false,
+    "company_own_tests_qualified": false,
+    "company_own_tests_adopted": false,
+    "live_host_coaching_messages": 1,
+    "scope": "Real three-method repair decomposition; independent suite rejected the final written bytes. Readback denial preserved; another differently keyed worker write was authorized, rather than replaying the denied read. No suite relaxation or broader success claimed.",
+    "historical_read_projection_note": "Projection is tested and compiled into this trial binary; counts are not logged in the public authorization event.",
+    "host_reviewed_candidate_sha256": "1476c2e9b0286f7dd04bcf7e716b50461fbd450fd54c8f96ba25af68182d8959"
+  },
+  "authorization_packet_repair_scope": "Fresh smaller three-method write reached independent action authorization and a canonical native write receipt. This does not prove the earlier full-module request fits or fix semantic reviewer confusion.",
+  "historical_snapshot": true,
+  "snapshot_note": "Recorded experiment evidence; current workspace/runtime capabilities and test counts may differ. New rename evidence is recorded separately."
+}

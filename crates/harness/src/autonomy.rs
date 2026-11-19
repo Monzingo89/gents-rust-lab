@@ -792,6 +792,7 @@ fn capability_revision() -> String {
     digest.update(include_str!("security.rs").as_bytes());
     for path in [
         "scripts/company_tools.py",
+        "scripts/public_research.py",
         "scripts/pdf_tools.py",
         "scripts/document_renderer.py",
     ] {
@@ -996,6 +997,33 @@ async fn emit(
     .await
 }
 
+async fn stop_rename_for_reconciliation(
+    app: &App,
+    id: Uuid,
+    company: &str,
+    state: &mut Checkpoint,
+    args: &Value,
+    reason: &str,
+) -> Result<judges::Outcome> {
+    state.plan_queue.clear();
+    state.review_intent = None;
+    save(&std::env::current_dir()?, company, id, state)?;
+    let observation = crate::file_observations::rename_reconciliation(args, reason);
+    emit(
+        app,
+        id,
+        "Operations Gent",
+        "operations",
+        "rename_needs_reconciliation",
+        &observation,
+    )
+    .await?;
+    Ok(judges::Outcome {
+        status: "needs_reconciliation",
+        output: observation.to_string(),
+    })
+}
+
 fn should_retry_question_resolution(state: &Checkpoint, question: &str) -> bool {
     state.attention.is_none()
         || state.attention.as_ref().is_some_and(|attention| {
@@ -1040,6 +1068,9 @@ async fn ask(
     question: &str,
     cancel: &AtomicBool,
 ) -> Result<String> {
+    if cancel.load(Ordering::Relaxed) {
+        bail!("run stopped before question resolution");
+    }
     let root = std::env::current_dir()?;
     let workspace = company::scoped(&root, company, &["runs", &id.to_string()])?.join("workspace");
     let (task, owner) = {
@@ -1117,6 +1148,9 @@ async fn ask(
                     cloud_permitted = true;
                 }
                 Err(error) => {
+                    if cancel.load(Ordering::Relaxed) {
+                        return Err(error);
+                    }
                     state.history.push(json!({"local_executive_escalation":{"question":question,"outcome":"failed","error":error.to_string(),"model":smartest_local_model(app).model,"cloud_used":false}}));
                     save(&root, company, id, state)?;
                     cloud_permitted = true;
@@ -1129,6 +1163,9 @@ async fn ask(
             .filter(|item| item["openai_codex_escalation"]["question"] == question)
             .count();
         if cloud_enabled && cloud_permitted && prior_attempts == 0 {
+            if cancel.load(Ordering::Relaxed) {
+                bail!("run stopped before advisory escalation");
+            }
             emit(app,id,"Executive Hotline","observability","codex_phone_ringing",
                 &json!({"question":question,"purpose":"bounded advisory guidance only","operator_interruption":false,"authority_granted":false,"task_answer_requested":false})).await?;
             match crate::escalation::resolve(question).await {
@@ -1236,7 +1273,7 @@ fn executive_action(
     EmbeddedContracts.validate(&action, &arguments).ok()?;
     // Scoped Rust observations are deduplicated later using current source,
     // tests, policy and verifier identity. The path-only prefilter is too broad.
-    let source_bound = action == "rust_verify"
+    let source_bound = matches!(action.as_str(), "rust_verify" | "python_check")
         && catalog[&action]["source_bound_dispatch_guard"] == true
         || action == "files"
             && arguments["op"] == "read"
@@ -2424,6 +2461,17 @@ async fn execute(
     }
     if state.pending.is_some() {
         let details = state.pending.clone().unwrap();
+        if details["action"] == "files" && details["arguments"]["op"] == "rename" {
+            return stop_rename_for_reconciliation(
+                app,
+                id,
+                &company,
+                &mut state,
+                &details["arguments"],
+                "interrupted_rename_intent",
+            )
+            .await;
+        }
         let answer=ask(app,id,&company,&mut state,&format!("This action was interrupted and may already have taken effect: {details}. Inspect its result. Tell the company what happened; the action will not be automatically replayed."),cancel).await?;
         state.history.push(json!({"interrupted_action":details,"operator_resolution":answer,"automatic_replay":false}));
         state.pending = None;
@@ -2726,6 +2774,7 @@ async fn execute(
             "operator_supplied_facts":operator_supplied_facts(task),
             "recent_evidence":if state.recovery_attempts>0 {recovery_evidence(&state)}else{recent_worker_evidence(&state)},"workspace":workspace_view(&root.join("data/companies").join(&company).join("runs").join(id.to_string()).join("workspace"),&state.evidence),
             "blocked_requests":blocked_requests(&state),
+            "source_bound_rejections":crate::worker_packet::stateful_rejections(&state.history,state.ceo_team_mode.then_some(state.ceo_stage as u64)),
             "proposal_feedback":crate::rust_review::repair_feedback(&job["intake"], &engineer.id, state.ceo_stage, &state.history),
             "generation_feedback":crate::local_generation::latest_cutoff(&state.history,&engineer.id,state.ceo_stage),
             "verified_progress":progress_summary(&state),
@@ -2733,6 +2782,28 @@ async fn execute(
             "recovery_attempt":state.recovery_attempts,
             "execution_rule":"Every recent_evidence action/result is an ALREADY EXECUTED operation, not a suggested next step. Use its result to advance a different unmet criterion. Do not echo or re-run it. Repeated identical requests are blocked; use a different authorized approach. If the schedule is registered, proceed to actual research/report/email evidence, not more schedule listing. An existing misconfigured schedule can be updated by its creating run. Read full journals when needed. A time-based observation can be refreshed after another action or an explicitly recorded waiting interval, not in a tight loop.",
             "company_context":retrieved.chars().take(3000).collect::<String>()});
+        if job["intake"]["python_check_contracts"]
+            .as_array()
+            .is_some_and(|v| !v.is_empty())
+        {
+            let authority = gents_local_mcp::default_authority(root.clone())?;
+            let scope = gents_local_mcp::Scope {
+                company: company.clone(),
+                owner: owner.clone(),
+                run: id,
+                actor: engineer.id.clone(),
+                phase: gents_local_mcp::Phase::Worker,
+                expected_revision: stage_epoch,
+            };
+            context["python_diagnostics"] = json!(gents_local_mcp::python_check::observations(
+                &authority, &scope
+            )?);
+            context["source_pages"] = json!(crate::worker_packet::source_pages(
+                &state.history,
+                &context["python_diagnostics"],
+                &engineer.id,
+            ));
+        }
         if let Some(revision) = stage_epoch {
             context["evidence_policy_revision"] = json!(revision);
         }
@@ -2841,6 +2912,48 @@ async fn execute(
                 }
             }
         }
+        if state.plan_queue.is_empty()
+            && state.review_intent.is_none()
+            && !job["intake"]["python_review_submission"].is_null()
+        {
+            let policy = company::governance(&root, &company, &owner, id)?
+                .context("Python review submission requires current governance")?;
+            let scope = gents_local_mcp::Scope {
+                company: company.clone(),
+                owner: owner.clone(),
+                run: id,
+                actor: engineer.id.clone(),
+                phase: gents_local_mcp::Phase::Worker,
+                expected_revision: Some(policy.revision),
+            };
+            if let Some(submission) = crate::python_review_submission::compile(
+                &job["intake"],
+                &scope,
+                &policy,
+                job["digest"].as_str().unwrap_or(""),
+                &context["python_diagnostics"],
+            )
+            .filter(|submission| {
+                state.ceo_contract_submission_gates.get(&state.ceo_stage)
+                    != Some(&submission.fingerprint)
+            }) {
+                state
+                    .ceo_contract_submission_gates
+                    .insert(state.ceo_stage, submission.fingerprint);
+                state.ceo_contract_finishes.insert(state.ceo_stage);
+                emit(
+                    app,
+                    id,
+                    &engineer.id,
+                    "worker",
+                    "python_review_submission",
+                    &submission.observation,
+                )
+                .await?;
+                state.plan_queue.push(submission.proposal);
+                save(&root, &company, id, &state)?;
+            }
+        }
         let proposal: Value = if let Some(next) =
             crate::intent_queue::select(&mut state.plan_queue, &mut state.review_intent)
         {
@@ -2867,6 +2980,9 @@ async fn execute(
             let reply = match reply {
                 Ok(reply) => reply,
                 Err(error) => {
+                    if cancel.load(Ordering::Relaxed) {
+                        return Err(error);
+                    }
                     if let Some(cutoff) =
                         error.downcast_ref::<crate::local_generation::GenerationCutoff>()
                     {
@@ -3019,7 +3135,34 @@ async fn execute(
             emit(app,id,&engineer.id,"operations","rust_write_precondition_bound",&json!({"path":args["path"],"expected_sha256":args["expected_sha256"],"model_supplied":false,"authority_granted":false,"scope":"host-added current-source hash precondition; authored content unchanged"})).await?;
         }
         let revision = capability_revision();
-        let verification_identity = if action == "rust_verify" {
+        let verification_identity = if action == "python_check" {
+            let authority = gents_local_mcp::default_authority(root.clone())?;
+            let scope = gents_local_mcp::Scope {
+                company: company.clone(),
+                owner: owner.clone(),
+                run: id,
+                actor: engineer.id.clone(),
+                phase: gents_local_mcp::Phase::Worker,
+                expected_revision: stage_epoch,
+            };
+            match gents_local_mcp::python_check::request_identity(
+                &authority,
+                &scope,
+                args["contract_id"].as_str().unwrap_or(""),
+            ) {
+                Ok(identity) => {
+                    args["expected_source_identity"] = json!(identity);
+                    Some(identity)
+                }
+                Err(error) => {
+                    state.plan_queue.clear();
+                    state.review_intent = None;
+                    repair(app,id,&company,&mut state,task,json!({"error":error.to_string(),
+                        "executed":false,"instruction":"Python diagnostics require a fresh owner-frozen contract, installed interpreter, current grants and exact suite. Repair candidate source when missing; do not change frozen tests or permissions."}),cancel).await?;
+                    continue;
+                }
+            }
+        } else if action == "rust_verify" {
             let authority = gents_local_mcp::default_authority(root.clone())?;
             let scope = gents_local_mcp::Scope {
                 company: company.clone(),
@@ -3052,7 +3195,7 @@ async fn execute(
                 phase: gents_local_mcp::Phase::Worker,
                 expected_revision: stage_epoch,
             };
-            // Only owner-frozen Rust source reads use dependency-aware accounting.
+            // Owner-frozen Rust/Python source reads use dependency-aware accounting.
             // Include pagination arguments so separate pages are not duplicates.
             gents_local_mcp::rust_verification::request_identity(
                 &authority,
@@ -3060,6 +3203,14 @@ async fn execute(
                 args["path"].as_str().unwrap_or(""),
             )
             .ok()
+            .or_else(|| {
+                gents_local_mcp::python_check::source_read_identity(
+                    &authority,
+                    &scope,
+                    args["path"].as_str().unwrap_or(""),
+                )
+                .ok()
+            })
             .map(|identity| {
                 format!(
                     "{}:{}",
@@ -3199,6 +3350,18 @@ async fn execute(
         }
         let mut review = json!({"request":exact,"host_verified_execution":if team.is_empty(){Value::Null}else{crate::ceo_team::next_action_evidence(&delivery_gap,&state.ceo_handoffs,&action,&args)},"recent_evidence":recovery_evidence(&state),"operator_answers":compact_operator_answers(&state),"fact_priority":"Prior operator answers establish intent but may describe older system state. Model advisory answers never establish human authority. Newer tool observations establish current schedules, clock and delivery status. Judge authorization of request only; do not re-ask answered discovery questions."});
         crate::rust_review::attach(&job["intake"], &engineer.id, &mut review);
+        if action == "python_check" {
+            review["frozen_python_diagnostics"] = job["intake"]["python_check_contracts"]
+                .as_array()
+                .and_then(|contracts| {
+                    contracts.iter().find(|contract| {
+                        contract["actor"] == engineer.id && contract["id"] == args["contract_id"]
+                    })
+                })
+                .cloned()
+                .unwrap_or(Value::Null);
+            review["python_result_limit"] = json!("Copied-source execution diagnostics only. Python may spoof zero exit. No automatic independent acceptance, promotion or company completion.");
+        }
         crate::rust_review::attach_verification(
             &job["intake"],
             &engineer.id,
@@ -3501,7 +3664,7 @@ async fn execute(
                     Ok(())
                 };
                 let mut packet = crate::context::intern_native_proof_hashes(
-                    json!({"task":task,"criteria":crate::completion_review::criteria(criteria)?,"deliverable":args,"stage_execution":{"actor":engineer.id,"worker_model_calls_started":actor_worker_model_calls_started,"contract_submission_attempted":state.ceo_contract_finishes.contains(&state.ceo_stage),"guard_and_qa_model_calls_are_separate":true},"completion_control":{"actor":engineer.id,"action":"finish","stage":"awaiting_review","stage_index":state.ceo_stage,"final_stage":final_stage,"handoff_commits_after_acceptance":!final_stage,"admin_authorized":true,"external_effect":false},"artifact_gate":artifact_gate,"independent_content_review":content_review,"native_receipts":delivery_gap.get("native_receipts"),"operator_scope_clarifications":compact_operator_answers(&state),"evidence":crate::review_context::tool_evidence(&state.history,delivery_gap.get("native_receipts")),"earlier_results":"Retained in numbered tool journals. Earlier QA verdicts are not fresh execution evidence. A canonical passing Rust check for current source bytes supersedes a failed check for older bytes of the same actor, test suite and policy epoch. This does not establish requirements beyond the frozen suite. If evidence is missing, require journal_read before acceptance."}),
+                    json!({"task":task,"criteria":crate::completion_review::criteria(criteria)?,"deliverable":args,"stage_execution":{"actor":engineer.id,"worker_model_calls_started":actor_worker_model_calls_started,"contract_submission_attempted":state.ceo_contract_finishes.contains(&state.ceo_stage),"guard_and_qa_model_calls_are_separate":true},"completion_control":{"actor":engineer.id,"action":"finish","stage":"awaiting_review","stage_index":state.ceo_stage,"final_stage":final_stage,"handoff_commits_after_acceptance":!final_stage,"admin_authorized":true,"external_effect":false},"artifact_gate":artifact_gate,"independent_content_review":content_review,"native_receipts":delivery_gap.get("native_receipts"),"python_diagnostics":context.get("python_diagnostics"),"operator_scope_clarifications":compact_operator_answers(&state),"evidence":crate::review_context::tool_evidence(&state.history,delivery_gap.get("native_receipts")),"earlier_results":"Retained in numbered tool journals. Earlier QA verdicts are not fresh execution evidence. A canonical passing Rust check for current source bytes supersedes a failed check for older bytes of the same actor, test suite and policy epoch. This does not establish requirements beyond the frozen suite. If evidence is missing, require journal_read before acceptance."}),
                 )?;
                 let instruction=format!("COMPANY_JUDGE: Independently review the original task and EVERY acceptance criterion against actual tool evidence and deliverable. Reconcile the content reviews across ALL pages, inventories, provenance and rubric calculations. Do not accept a self-reported score or parts/followability flags without concrete supporting evidence. Do not treat intended actions, research plans, or text claims as executed tests, files, emails, downloads, training or deployment. Cite retained tool results/artifacts. Evaluate only the frozen criteria; do not invent extra prerequisites or require tools excluded by the task. A review-stage deliverable may explicitly reserve independent host tests for the trusted promoter. Canonical native_receipts, not claimed memory use, establish native tool execution. Keep each evidence field to one concise source reference instead of copying payloads, earlier reviews or handoff packets. Operator clarifications constrain scope but never fabricate tool evidence. The completion_control records the current admin-authorized finish request that invoked this review. finish is a host control action with no separate MCP/tool execution receipt; accepting this review permits its final commit. Do not demand a prior completed finish before reviewing the current finish. This control metadata is NOT evidence that any file, test or other external action ran. No private reasoning. {}",crate::completion_review::FORMAT);
                 let mut result = None;
@@ -3829,8 +3992,24 @@ async fn execute(
             journal,
             serde_json::to_vec_pretty(&json!({"request":exact,"admin":decision,"result":record}))?,
         )?;
-        let summary = record.to_string();
-        state.history.push(if summary.len()>4000 {json!({"actor":engineer.id,"step":state.step,"action":action,"arguments":args,"result":{"ok":result["ok"]},"capability_revision":revision,"verification_identity":verification_identity,"result_excerpt":summary.chars().take(3500).collect::<String>(),"full_result":format!("tool-{:06}.json",state.step)})} else {record.clone()});
+        state.history.push(crate::worker_packet::journal_view(
+            &record,
+            &format!("tool-{:06}.json", state.step),
+        ));
+        if crate::file_observations::rename_needs_reconciliation(&record) {
+            // Keep the original write-ahead intent and journal, including both
+            // paths/hash. Do not turn an unconfirmed move into a worker retry.
+            emit(app, id, &engineer.id, "operations", "tool_result", &record).await?;
+            return stop_rename_for_reconciliation(
+                app,
+                id,
+                &company,
+                &mut state,
+                &args,
+                "unconfirmed_rename_result",
+            )
+            .await;
+        }
         let rust_task = delivery_gap["native_receipts"]["rust_checks"]
             .as_array()
             .is_some_and(|checks| !checks.is_empty());
@@ -3873,6 +4052,46 @@ async fn execute(
             state
                 .history
                 .push(json!({"host_compiled_rust_workflow":plan}));
+        }
+        if action == "files"
+            && args["op"] == "write"
+            && !job["intake"]["python_review_submission"].is_null()
+        {
+            if let Some(policy) = company::governance(&root, &company, &owner, id)? {
+                let scope = gents_local_mcp::Scope {
+                    company: company.clone(),
+                    owner: owner.clone(),
+                    run: id,
+                    actor: engineer.id.clone(),
+                    phase: gents_local_mcp::Phase::Worker,
+                    expected_revision: Some(policy.revision),
+                };
+                if let Some(plan) = crate::python_review_submission::after_write(
+                    &job["intake"],
+                    &scope,
+                    &policy,
+                    &exact,
+                    &result,
+                ) {
+                    let previous = std::mem::take(&mut state.plan_queue);
+                    state.history.push(json!({"python_workflow_replanned":{"unexecuted_steps_discarded":previous.len(),
+                        "previous_queue_sha256":gents_local_mcp::digest(serde_json::to_string(&previous)?.as_bytes()),
+                        "scope":"Future model steps are reconsidered only after current source readback and diagnostics; original model replies remain retained."}}));
+                    state.plan_queue = plan["calls"]
+                        .as_array()
+                        .context("compiled Python followups missing")?
+                        .clone();
+                    emit(
+                        app,
+                        id,
+                        &engineer.id,
+                        "operations",
+                        "python_frozen_followups",
+                        &plan,
+                    )
+                    .await?;
+                }
+            }
         }
         if rust_task && action == "rust_verify" && result["result"]["passed"] != true {
             state.plan_queue.clear();
@@ -4708,6 +4927,46 @@ mod tests {
             .history
             .push(json!({"step":3,"action":"resources","arguments":{},"result":{"ok":true}}));
         assert_eq!(repeat_count(&state, "schedule", &json!({"op":"list"})), 4);
+    }
+    #[test]
+    fn python_diagnostics_use_source_identity_without_relaxing_shell_replay() {
+        let mut state = Checkpoint::default();
+        let args = json!({"contract_id":"tests"});
+        for _ in 0..2 {
+            state
+                .history
+                .push(json!({"actor":"Author","action":"python_check",
+                "arguments":args,"verification_identity":"old","result":{"ok":true}}));
+            state
+                .history
+                .push(json!({"action":"shell","arguments":{"command":"python3 -m unittest"}}));
+        }
+        assert!(executive_action(
+            &json!({"python_check":"legacy"}),
+            &state,
+            &json!({"action":"python_check","arguments":args})
+        )
+        .is_none());
+        assert!(executive_action(
+            &json!({"python_check":{"source_bound_dispatch_guard":true}}),
+            &state,
+            &json!({"action":"python_check","arguments":args})
+        )
+        .is_some());
+        assert_eq!(
+            crate::verification_attempts::count(&state.history, "python_check", "Author", "old"),
+            2
+        );
+        assert_eq!(
+            crate::verification_attempts::count(&state.history, "python_check", "Author", "new"),
+            0
+        );
+        assert!(executive_action(
+            &json!({"shell":"legacy"}),
+            &state,
+            &json!({"action":"shell","arguments":{"command":"python3 -m unittest"}})
+        )
+        .is_none());
     }
     #[test]
     fn scoped_recovery_defers_source_bound_checks_to_the_dispatch_guard() {

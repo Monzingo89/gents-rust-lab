@@ -549,6 +549,9 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 8192
+          },
+          "metadata_only": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -583,6 +586,37 @@
           "op",
           "path",
           "content"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "op": {
+            "const": "rename"
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "destination": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "expected_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "minLength": 64,
+            "maxLength": 64
+          }
+        },
+        "required": [
+          "op",
+          "path",
+          "destination",
+          "expected_sha256"
         ],
         "additionalProperties": false
       }
@@ -852,6 +886,25 @@
       "evidence"
     ],
     "additionalProperties": false
+  },
+  "python_check": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "contract_id"
+    ],
+    "properties": {
+      "contract_id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      },
+      "expected_source_identity": {
+        "type": "string",
+        "minLength": 64,
+        "maxLength": 64
+      }
+    }
   },
   "rust_verify": {
     "type": "object",

@@ -1,5 +1,13 @@
 # Local Rust MCP
 
+The shared Rust `task_engine` module now supplies the first cache-first task path to the authenticated harness owner API: exact source lookup/extraction, scoped lexical retrieval, durable results and validated exact answers. It adds no worker grants or native MCP tools yet. [Architecture implementation and outstanding scope](../docs/148-ceo-cache-first-architecture.md) track the broader CEO/RAG/workflow refactor.
+
+Source-only candidate intakes can opt into `candidate_workflow.prompt_profile: "focused"`; omission retains the full legacy context. This immutable owner choice changes prompt context, not worker identity, native permissions, source/summary schema or source promotion. [Measured context and reviewed repairs](../docs/147-focused-author-context-and-reviewed-repairs.md) include retained failures and the separately reviewed company-test adoption.
+
+Candidate intakes may include bounded `candidate_feedback` reference data under a strict native schema. It can relay verified prior source/diagnostics to a predeclared follow-up author; it cannot grant tools, alter acceptance or constitute a receipt. [Conditional experiment evidence](../docs/146-conditional-experiment-continuation.md) includes an actual failed repair and the unchanged-source stop.
+
+The private host component adapter also supports pinned source/acceptance snapshot verification through the same isolated Rust verifier used by `rust_verify`. This adds no MCP tool or promotion authority. [Independent experiment results](../docs/145-independent-experiment-results.md) describe source custody, finite queue integration and the distinction between host observations and native run receipts.
+
 Status: working governed stdio and loopback Streamable HTTP/SSE core; migration and continuous company-learning
 integration are still in progress. This is synthetic local research, not a
 regulatory compliance certificate or a general-purpose privileged shell.
@@ -50,6 +58,61 @@ denial tests, not an independent certification. Frozen intake can require
 successful current-epoch receipts, not model claims. Additional document/chunk adapters,
 planner orchestration, tier lifecycle and real continual local eval/tuning remain required
 before the full user goal is complete.
+
+`python_check` is a native, owner-scoped **diagnostic** tool for repaired Python
+source. An owner freezes `python_check_contracts` with `id`, `actor`, explicit
+`source_paths`, top-level `tests_path`, `tests_sha256`, and `interpreter_sha256`.
+The launching host configures an absolute `GENTS_PYTHON` pointing directly to the
+installed interpreter (for python.org framework installs, its
+`Resources/Python.app/Contents/MacOS/Python` executable). The MCP client forwards
+only that path across its cleared environment. No interpreter is downloaded.
+The worker needs separate `python_check` and `files:read` grants. It supplies
+`contract_id`; the harness binds current source/policy/implementation identity
+before ordinary admin review, and native execution rechecks it before copying
+inputs. Frozen test files cannot be overwritten with native file/media tools.
+Unchanged identities retain the harness retry cap; generic shell replay rules
+are unchanged. Full original journals remain intact.
+
+The helper is embedded in the compiled MCP binary. Candidate code enters as
+JSON data, executes in a separate read-only macOS sandbox and returns bounded
+diagnostics through the existing native privacy gate and hashed receipt. A
+Python program can spoof zero exit: `reported_pass` never establishes independent
+acceptance, source promotion or company completion. No automatic acceptance gate
+was added. Runtime libraries are not fully content-addressed and no results are
+cached. See [experiment and limits](../docs/138-python-snapshot-verification-experiment.md).
+Workers receive current-source, receipt-verified diagnostic observations during
+planning; stale source results and later uncertain attempts are suppressed.
+These are factual context, not cached execution or acceptance. The first actual
+company trial regressed a passing repair and was stopped unqualified; see the
+[negative result and follow-up](../docs/139-native-python-diagnostics-and-rejected-repair.md).
+
+Fresh review-stage jobs may also approve `python_review_submission` with
+`version:1`, the exact actor and diagnostic `contract_id`, together with
+`deliverable_type:"python_review_candidate"` and a frozen `max_model_calls`.
+Current-source native write and complete paged-read custody plus a receipted
+`reported_pass` allow the host to propose `finish` once per source/contract
+fingerprint. Ordinary admin and final QA still run; rejection creates no right
+to repeat an unchanged automatic submission. This is explicit review-stage
+submission, never automatic correctness acceptance or source promotion.
+The attempt ceiling is run-wide, durable and includes failed preparation and
+uncertain attempts. It grants no tools and cannot be reset by model switching.
+See the [verified bounded trial and prior failures](../docs/140-bounded-python-review-submission.md).
+
+Frozen Python contracts can pin immutable source dependencies and optionally
+allow bounded, separate temporary scratch I/O. Confirmed candidate writes can
+queue native readback and diagnostics under the existing grants. Current source
+pages remain structured required worker material; source-bound rejection
+feedback never becomes a path-wide ban on checking repaired bytes. See the
+[observer trial and limits](../docs/141-observer-repair-and-python-followups.md).
+
+Inspect implementation metadata without starting a company or running models:
+
+```sh
+./target/debug/gents-local-mcp --implementation-catalog
+```
+
+This command grants no access and performs no task tool calls. Regenerate the
+reviewed cookbook from this catalog after reviewing new recipes and schemas.
 
 `Workspace` is a separate interface, with a macOS/Linux descriptor-relative
 adapter. `files:read`, `files:list` and `files:write` are independently grantable;
@@ -116,3 +179,11 @@ See docs/43-receipt-bound-native-inputs.md for the CEO form and verified limits.
 For source-byte approval, supply `table_read_json.expected_sha256` in the immutable input contract. A changed file imports nothing; whole-file reads now reject the 8192-byte ceiling before reading oversized bodies. See [approved source bytes and the three-call workflow](../docs/45-approved-source-byte-contracts.md).
 
 `table_join` provides bounded typed inner/left joins with explicit projections, stable row order and fail-closed output limits. Its two `/rows` inputs can come from independent native receipts. Pure computations declare `deterministic` separately from `read_only`; ordered-company scheduling can detect an already-observed exact source without fabricating another receipt. See [local joins and the reconciliation experiment](../docs/46-local-table-joins-and-reconciliation.md).
+
+
+`files` also supports worker-only exclusive rename with `files:rename` plus
+`files:read`, a mandatory source hash and an absent destination. Text and binary
+files up to 16 MiB are supported; frozen inputs cannot be moved or replaced.
+Use `read` with `metadata_only:true` (without paging) to inspect opaque file hashes.
+This does not establish text readback. An unconfirmed harness rename retains its
+intent and stops for reconciliation. See [contract and tests](../docs/143-governed-file-renames.md).

@@ -11,6 +11,7 @@ mod banking;
 mod campaign;
 mod candidate_workflow;
 mod ceo_contracts;
+mod ceo_fastpath;
 mod ceo_planning;
 mod ceo_team;
 mod company;
@@ -28,6 +29,7 @@ mod evidence;
 mod file_observations;
 mod governance;
 mod implementation_planning;
+mod inference_budget;
 mod intent_queue;
 mod judges;
 mod lease_clock;
@@ -62,6 +64,7 @@ mod planning_paths;
 mod poc;
 mod prepared_planning;
 mod provider;
+mod python_review_submission;
 mod reasoning_planning;
 mod recovery;
 mod recovery_scope;
@@ -82,6 +85,8 @@ mod skills;
 mod source_files;
 mod stage_acceptance;
 mod store;
+mod task_answers;
+mod task_frontdoor;
 mod verification_attempts;
 mod worker_packet;
 mod workflow;
@@ -144,6 +149,8 @@ struct Config {
     enterprise: Option<enterprise::Settings>,
     #[serde(default)]
     semantic_memory: Option<semantic_memory::Settings>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    task_answers: Option<task_answers::Settings>,
 }
 fn default_run_seconds() -> u64 {
     900
@@ -225,6 +232,9 @@ impl Config {
         if let Some(settings) = &self.semantic_memory {
             settings.validate(self)?;
         }
+        if let Some(settings) = &self.task_answers {
+            settings.validate()?;
+        }
         if self.campaign.is_some()
             && (!self.company_mode
                 || self.company_tools
@@ -287,6 +297,8 @@ struct Run {
     cancel: Arc<AtomicBool>,
     #[serde(default)]
     cancelled_by_operator: bool,
+    #[serde(default)]
+    inference_budget_stop: Option<inference_budget::Exhausted>,
     created_at_ms: u64,
     updated_at_ms: u64,
     idempotency_key: Option<String>,
@@ -309,6 +321,7 @@ struct App {
     recent_starts: Mutex<HashMap<String, Vec<std::time::Instant>>>,
     training_cancels: Mutex<HashMap<String, Arc<AtomicBool>>>,
     office: office_activity::Service,
+    task_answers: task_answers::Service,
 }
 type Shared = Arc<App>;
 type ApiError = (StatusCode, String);
@@ -521,6 +534,7 @@ async fn start(
             status: "running".into(),
             cancel: cancel.clone(),
             cancelled_by_operator: false,
+            inference_budget_stop: None,
             created_at_ms: now_ms(),
             updated_at_ms: now_ms(),
             idempotency_key: key,
@@ -636,12 +650,14 @@ fn launch_run(s: Shared, id: Uuid, input: Start, cancel: Arc<AtomicBool>) {
                 Ok(judges::Outcome {status:"timed_out",output:"Run deadline reached; an active provider call may still be billed. No automatic retry.".into()})
             }
         };
-        let operator_cancelled = s
-            .runs
-            .lock()
-            .await
-            .get(&id)
-            .is_some_and(|run| run.cancelled_by_operator);
+        let (operator_cancelled, budget_stop) = {
+            let runs = s.runs.lock().await;
+            let run = runs.get(&id);
+            (
+                run.is_some_and(|r| r.cancelled_by_operator),
+                run.and_then(|r| r.inference_budget_stop.clone()),
+            )
+        };
         let status = if operator_cancelled {
             "cancelled"
         } else if s.restart_requested.load(Ordering::Relaxed)
@@ -649,6 +665,8 @@ fn launch_run(s: Shared, id: Uuid, input: Start, cancel: Arc<AtomicBool>) {
                 && s.shutting_down.load(Ordering::Relaxed))
         {
             "interrupted"
+        } else if budget_stop.is_some() {
+            "budget_exhausted"
         } else if cancel.load(Ordering::Relaxed) {
             "cancelled"
         } else if let Ok(outcome) = &result {
@@ -656,9 +674,15 @@ fn launch_run(s: Shared, id: Uuid, input: Start, cancel: Arc<AtomicBool>) {
         } else {
             "failed"
         };
-        let message = match result {
-            Ok(out) => out.output,
-            Err(e) => format!("Run stopped: {e}"),
+        let message = if let Some(stop) = budget_stop {
+            serde_json::json!({"reason":stop.to_string(),"used":stop.used,"maximum":stop.maximum,
+                "provider_called_for_denied_attempt":false,"queued_work_retained":true,
+                "independent_acceptance":false,"scope":"Owner allowance consumed; no automatic retry or allowance renewal. Inspect the original run and its canonical receipts."}).to_string()
+        } else {
+            match result {
+                Ok(out) => out.output,
+                Err(e) => format!("Run stopped: {e}"),
+            }
         };
         if s.config.company_mode {
             cancel.store(true, Ordering::Relaxed);
@@ -1109,7 +1133,7 @@ async fn model_call(
     if cancel.load(Ordering::Relaxed) {
         bail!("cancelled before call");
     }
-    let context_profile = context::profile(actor.1);
+    let context_profile = context::protocol_profile(actor.1, prompt.0);
     let room = match actor.1 {
         "planner" => "planning",
         "router" => "routing",
@@ -1137,6 +1161,46 @@ async fn model_call(
         model: Some(format!("{} / {}", model.provider, model.model)),
         reply,
     };
+    let (tenant, retrieval_task) = {
+        let runs = s.runs.lock().await;
+        let run = runs.get(&id);
+        (
+            run.and_then(|r| r.company_id.as_ref().map(|c| (c.clone(), r.owner.clone()))),
+            run.map(|r| r.task.clone()).unwrap_or_default(),
+        )
+    };
+    let root = std::env::current_dir()?;
+    if let Some((company, owner)) = &tenant {
+        match inference_budget::reserve(&root, company, owner, id, call_id, actor) {
+            Ok(Some(reservation)) => {
+                record(
+                    s,
+                    id,
+                    event("inference_attempt_reserved", &reservation.to_string(), None),
+                )
+                .await?
+            }
+            Ok(None) => (),
+            Err(error) => {
+                if let Some(exhausted) = error.downcast_ref::<inference_budget::Exhausted>() {
+                    let mut runs = s.runs.lock().await;
+                    let run = runs.get_mut(&id).context("budgeted run missing")?;
+                    run.inference_budget_stop = Some(exhausted.clone());
+                    // Stop every branch sharing this run's cancellation token.
+                    // The persisted typed reason distinguishes this from an
+                    // operator cancellation; queued/native effects stay intact.
+                    cancel.store(true, Ordering::Relaxed);
+                }
+                record(
+                    s,
+                    id,
+                    event("inference_budget_denied", &error.to_string(), None),
+                )
+                .await?;
+                return Err(error);
+            }
+        }
+    }
     if matches!(model.provider.as_str(), "local" | "mlx") {
         emit(
             s,
@@ -1155,15 +1219,6 @@ async fn model_call(
         event("call_started", "Waiting for model response", None),
     )
     .await?;
-    let (tenant, retrieval_task) = {
-        let runs = s.runs.lock().await;
-        let run = runs.get(&id);
-        (
-            run.and_then(|r| r.company_id.as_ref().map(|c| (c.clone(), r.owner.clone()))),
-            run.map(|r| r.task.clone()).unwrap_or_default(),
-        )
-    };
-    let root = std::env::current_dir()?;
     let mut input = prompt.1.to_string();
     let mut admitted_policy_revision = 0;
     if let Some((company, owner)) = &tenant {
@@ -1607,6 +1662,34 @@ async fn main() -> Result<()> {
                 .save(id.to_string(), serde_json::to_string(&run)?)
                 .await?;
         }
+        // A crash may leave the stop reason persisted before the final lifecycle
+        // event. Reconcile the company journal before considering auto-resume.
+        if run.status == "interrupted" && run.inference_budget_stop.is_some() {
+            let mut canonical = "interrupted".to_owned();
+            if let Some(company) = &run.company_id {
+                canonical =
+                    company::interrupt_running(&std::env::current_dir()?, company, &run.owner, id)?;
+            }
+            if canonical == "interrupted" {
+                run.status = "budget_exhausted".into();
+                run.updated_at_ms = now_ms();
+                if let Some(company) = &run.company_id {
+                    company::outcome(
+                        &std::env::current_dir()?,
+                        company,
+                        &run.owner,
+                        id,
+                        "budget_exhausted",
+                    )?;
+                }
+                run.events.push(Event {company_id:run.company_id.clone(),run_id:Some(id),seq:run.events.len(),timestamp_ms:now_ms(),call_id:None,agent:"harness".into(),role:"system".into(),room:"done".into(),kind:"budget_exhausted".into(),message:"Recovered the persisted inference-budget stop; queued work retained without replay or allowance renewal.".into(),model:None,reply:None});
+            } else {
+                run.status = canonical;
+            }
+            store
+                .save(id.to_string(), serde_json::to_string(&run)?)
+                .await?;
+        }
         if run.status != "running"
             && run.status != "interrupted"
             && now_ms().saturating_sub(run.updated_at_ms) > retention * 3600000
@@ -1626,6 +1709,7 @@ async fn main() -> Result<()> {
         recent_starts: Mutex::new(HashMap::new()),
         training_cancels: Mutex::new(HashMap::new()),
         office: office_activity::Service::new(std::env::current_dir()?)?,
+        task_answers: task_answers::Service::default(),
         gateway: Gateway {
             client: reqwest::Client::builder()
                 .timeout(Duration::from_secs(600))
@@ -1743,6 +1827,7 @@ async fn main() -> Result<()> {
             get(run_attention).post(answer_attention),
         )
         .route("/api/companies/{company}", post(company_operation))
+        .route("/api/companies/{company}/tasks", post(task_operation).layer(DefaultBodyLimit::max(98304)))
         .route("/api/companies/{company}/planning", get(ceo_plan_list))
         .route("/api/companies/{company}/components",get(owned_component_list))
         .route("/api/companies/{company}/planning/{id}/blueprint", post(company_blueprint))
@@ -1836,7 +1921,7 @@ async fn main() -> Result<()> {
 
 async fn public_config(State(s): State<Shared>) -> Json<Value> {
     Json(
-        json!({"local_only":std::env::var("GENTS_LOCAL_ONLY").as_deref()!=Ok("0"),"company_mode":s.config.company_mode,"owned_selection_drafts":s.config.company_mode&&s.config.company_tools,"company_tools":s.config.company_tools,"admin_judge":s.config.admin_judge.as_ref().map(|m|m.model.clone()),"planning_model_policy":s.config.planning_model_policy.as_ref().map(planning_models::Policy::public_view),"tools":if s.config.company_tools {serde_json::from_str::<Value>(include_str!("../../../config/company-tools.json")).unwrap()}else{Value::Null},"task_evidence_version":1,"company_name":"The Gents Office Co.",
+        json!({"local_only":std::env::var("GENTS_LOCAL_ONLY").as_deref()!=Ok("0"),"company_mode":s.config.company_mode,"owned_selection_drafts":s.config.company_mode&&s.config.company_tools,"company_tools":s.config.company_tools,"admin_judge":s.config.admin_judge.as_ref().map(|m|m.model.clone()),"planning_model_policy":s.config.planning_model_policy.as_ref().map(planning_models::Policy::public_view),"tools":if s.config.company_tools {serde_json::from_str::<Value>(include_str!("../../../config/company-tools.json")).unwrap()}else{Value::Null},"task_evidence_version":1,"company_name":"The Gents Office Co.","grounded_answers_enabled":s.config.task_answers.is_some(),
         "agents":s.config.agents.iter().map(|a|json!({"id":a.id,"specialty":a.assignment,"planner_provider":a.planner.provider,"planner_model":a.planner.model,"worker_provider":a.worker.provider,"worker_model":a.worker.model})).collect::<Vec<_>>(),
         "catalog_providers":s.config.judges.as_ref().map(|j|j.models.values().map(|c|c.model.provider.clone()).collect::<std::collections::BTreeSet<_>>()).unwrap_or_default(),
         "judges":s.config.judges.as_ref().map(|j|json!({"router_provider":j.router.provider,"router_model":j.router.model,"completion_provider":j.completion.provider,"completion_model":j.completion.model,"max_rounds":j.max_rounds,"max_calls":j.max_calls})),
@@ -1987,11 +2072,36 @@ async fn ceo_plan_turn(
     let who = owner(&s, &h).await?;
     let root = std::env::current_dir().map_err(|e| storage_error(e.into()))?;
     if input["op"] == "abandon" {
-        return ceo_planning::abandon(&root, &company, &who, id, &input)
-            .map(Json)
-            .map_err(|e| (StatusCode::BAD_REQUEST, e.to_string()));
+        let abandoned = ceo_planning::abandon(&root, &company, &who, id, &input)
+            .map_err(|e| (StatusCode::BAD_REQUEST, e.to_string()))?;
+        if let Ok(task) =
+            serde_json::from_value::<Uuid>(abandoned["task_request"]["task_id"].clone())
+        {
+            let runtime = gents_local_mcp::digest(
+                &serde_json::to_vec(&s.config).map_err(|e| storage_error(e.into()))?,
+            );
+            let _ = s
+                .task_answers
+                .cancel(&root, &company, &who, &runtime, task)
+                .await;
+        }
+        return Ok(Json(abandoned));
     }
     owned_work::wait(async move { ceo_planning::turn(&s, &root, &company, &who, id, &input).await })
+        .await
+        .map(Json)
+        .map_err(|e| (StatusCode::BAD_REQUEST, e.to_string()))
+}
+
+async fn task_operation(
+    State(s): State<Shared>,
+    h: HeaderMap,
+    Path(company): Path<String>,
+    Json(input): Json<task_frontdoor::Operation>,
+) -> std::result::Result<Json<Value>, ApiError> {
+    let who = owner(&s, &h).await?;
+    let root = std::env::current_dir().map_err(|e| storage_error(e.into()))?;
+    owned_work::wait(async move { task_frontdoor::dispatch(s, root, company, who, input).await })
         .await
         .map(Json)
         .map_err(|e| (StatusCode::BAD_REQUEST, e.to_string()))

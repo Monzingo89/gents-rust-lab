@@ -2,17 +2,38 @@
 No automatic retries, publication, email, downloads or changes to existing policies.
 Fresh policy grants include the owner-controlled company-research.json defaults.
 """
-import argparse,hashlib,json,shutil,time,urllib.request,urllib.parse,uuid
+import argparse,hashlib,json,shutil,urllib.request,urllib.parse,uuid
 from pathlib import Path
 from company_research import fresh_access
-p=argparse.ArgumentParser(description=__doc__);p.add_argument('--spec',type=Path,required=True);p.add_argument('--server',default='http://127.0.0.1:8788');a=p.parse_args()
-root=Path(__file__).resolve().parents[1];spec=json.loads(a.spec.read_text());base=a.server.rstrip('/');target=urllib.parse.urlparse(base)
+from showcase_observer import EvidenceStore, observe_run
+p=argparse.ArgumentParser(description=__doc__);mode=p.add_mutually_exclusive_group(required=True);mode.add_argument('--spec',type=Path);mode.add_argument('--observe-run',help='Read an existing run without dispatching a task');p.add_argument('--server',default='http://127.0.0.1:8788');a=p.parse_args()
+root=Path(__file__).resolve().parents[1];base=a.server.rstrip('/');target=urllib.parse.urlparse(base)
 assert target.scheme=='http' and target.hostname=='127.0.0.1' and not target.username and not target.password and target.path=='', 'Loopback harness only'
-run=str(uuid.uuid4());folder=root/'data/local-showcase'/run;folder.mkdir(mode=0o700,parents=True)
-def save(name,data):(folder/name).write_text(json.dumps(data,indent=2)+'\n')
+run=a.observe_run or str(uuid.uuid4());folder=root/'data/local-showcase'/('observation-'+uuid.uuid4().hex if a.observe_run else run);folder.mkdir(mode=0o700,parents=True)
+def save(name,data):EvidenceStore(folder).write_if_changed(name,data)
 def api(path,body=None,headers=None):
  req=urllib.request.Request(base+path,data=None if body is None else json.dumps(body).encode(),headers={'Content-Type':'application/json',**(headers or {})})
  with urllib.request.urlopen(req,timeout=30) as r:return json.load(r)
+def observe():
+ previous=None
+ def read(path):
+  nonlocal previous
+  assert path in ('/api/runs/'+run,'/api/runs/'+run+'/attention'), 'Observer reads only its original run'
+  value=api(path)
+  if path=='/api/runs/'+run:
+   current=(value.get('status'),len(value.get('events',[])))
+   if current!=previous:
+    print(json.dumps({'run':run,'runtime_status':current[0],'events':current[1]}),flush=True);previous=current
+  return value
+ report=observe_run(read,run,folder)
+ summary={'run':run,**report,'observation_only':bool(a.observe_run)}
+ save('report.json',summary)
+ print(json.dumps({'folder':str(folder),**summary}),flush=True)
+if a.observe_run:
+ save('freeze.json',{'run':run,'mode':'observation_only','server':base,'task_dispatched':False,'scope':'Read original run only. Runtime state is separate from independent task acceptance.'})
+ observe()
+ raise SystemExit(0)
+spec=json.loads(a.spec.read_text())
 config=api('/api/config');assert config['local_only'] and config['company_tools']
 access_map,research_profile=fresh_access(root/'config/company-research.json',[actor['id'] for actor in config['agents']],spec['actor'],spec['tools'])
 spec['tools']=access_map[spec['actor']]['tools']
@@ -23,6 +44,12 @@ if spec.get('register'):api(route,{'op':'register','name':'Gents local capabilit
 intake={'idea':spec['task'],'acceptance':'\n'.join(spec['criteria']),'exclusions':'All tools outside the frozen grant','timeline':'Measured, no completion-time promise','company_signer':'Owner-authorized Gents campaign','provider_signer':'Local Gents Company','budget_usd':0,'deliverable_type':'agent'}
 if spec.get('candidate_workflow'):
  intake['candidate_workflow']=spec['candidate_workflow'];intake['deliverable_type']='candidate'
+if spec.get('python_check_contracts'):
+ intake['python_check_contracts']=spec['python_check_contracts']
+if 'max_model_calls' in spec:
+ intake['max_model_calls']=spec['max_model_calls']
+if 'python_review_submission' in spec:
+ intake['python_review_submission']=spec['python_review_submission'];intake['deliverable_type']='python_review_candidate'
 state=api(route,{'op':'intake','run_id':run,'intake':intake});job=next(j for j in state['jobs'] if j['run_id']==run);save('job.json',job)
 api(route,{'op':'approve','run_id':run,'digest':job['digest']})
 policy={'revision':1,'master':spec['actor'],'ceilings':access_map,'grants':access_map}
@@ -37,22 +64,7 @@ for item in spec.get('seed_files',[]):
  target=workspace/relative;target.parent.mkdir(parents=True,exist_ok=True);assert not target.exists();shutil.copyfile(source,target)
  inputs.append({'path':str(relative),'sha256':hashlib.sha256(source.read_bytes()).hexdigest()})
 save('reference-inputs.json',inputs)
-started=time.monotonic();save('dispatch-intent.json',{'run':run,'status':'pending; reconcile by run ID if response is lost'})
+save('dispatch-intent.json',{'run':run,'status':'pending; reconcile by run ID if response is lost'})
 result=api('/api/runs',{'company_id':spec['company'],'run_id':run,'task':spec['task'],'definition_of_done':spec['criteria'],'consent':False},{'Idempotency-Key':run});save('dispatch.json',result)
 print(json.dumps({'status':'STARTED','run':run,'folder':str(folder)}),flush=True)
-previous=None
-while True:
- state=api('/api/runs/'+run);save('observed-run.json',state)
- attention=api('/api/runs/'+run+'/attention');save('attention.json',attention)
- calls=[e for e in state.get('events',[]) if e.get('reply')]
- status={'run':run,'runtime_status':state['status'],'elapsed_seconds':round(time.monotonic()-started,2),'model_calls':len(calls),'provider_cost_usd':sum(e['reply']['usage']['cost_usd'] for e in calls)}
- assert status['provider_cost_usd']==0,'Unexpected provider cost; inspect original task'
- save('report.json',status)
- current=(state['status'],len(calls),len(state.get('events',[])))
- if current!=previous:print(json.dumps(status),flush=True);previous=current
- if state['status'] not in ('running','queued'):break
- if attention.get('attention') and not attention['attention'].get('answer'):
-  print(json.dumps({'status':'ATTENTION','run':run,'question':attention['attention']['question']}),flush=True);break
- if time.monotonic()-started>1800:
-  print(json.dumps({'status':'OBSERVATION_EXPIRED','run':run,'scope':'Task may remain active; inspect original ID, never redispatch.'}),flush=True);break
- time.sleep(3)
+observe()

@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "scope": "Independent frozen-suite results for bounded pure Rust source experiments, plus current-custody re-evaluation of retained company submissions. Not general correctness, native run completion, code promotion, autonomous discovery or completion of the full company goal.",
+  "implementation": {
+    "evaluation_optional": true,
+    "typed_candidate_max_bytes": 8192,
+    "acceptance_is_owner_frozen": true,
+    "candidate_and_acceptance_compile_separately": true,
+    "shared_with_governed_native_rust_verify": true,
+    "private_snapshot_result_is_mcp_receipt": false,
+    "private_snapshot_pass_satisfies_native_required_rust_checks": false,
+    "native_mcp_tools": 16,
+    "evaluation_claim_persisted_before_execution": true,
+    "uncertain_evaluation_replayed_automatically": false,
+    "custody_rechecked_after_execution": true,
+    "promotion_authorized": false,
+    "platform": "macOS supported isolation; unsupported hosts fail closed"
+  },
+  "verification": {
+    "host_system": "Darwin",
+    "host_architecture": "arm64",
+    "rust_passed": 568,
+    "rust_ignored": 27,
+    "new_private_rust_protocol_checks": 3,
+    "strict_offline_clippy": "passed",
+    "offline_workspace_build": "passed",
+    "python_tests_passed": 101,
+    "controller_checks": 26,
+    "host_evaluator_checks": 15,
+    "broker_checks": 32,
+    "actual_http_evaluation_fixture": "passed; source intents simulated, native source effects/readbacks and independent Rust execution actual",
+    "actual_http_admission_fixture": "passed; model decisions simulated",
+    "governed_native_rust_submission_sse": "passed; source intent/mock judges simulated, native acceptance actual",
+    "ten_page_site_checks": "passed",
+    "shell_python_syntax": "passed"
+  },
+  "retained_real_company_submissions": {
+    "new_company_model_calls": 0,
+    "new_company_input_tokens": 0,
+    "new_company_output_tokens": 0,
+    "provider_fees_usd": 0,
+    "submissions": 6,
+    "distinct_source_bodies": 5,
+    "passed_frozen_suite": 1,
+    "failed_frozen_suite": 5,
+    "canonical_native_source_receipts": 12,
+    "aggregate_evaluation_wall_seconds": 2.051,
+    "source_edits": false,
+    "source_adoption": false,
+    "blind_held_out_comparison": false,
+    "previously_guided_pass_is_new_discovery": false,
+    "trials": [
+      {
+        "run_id": "e4d010d1-75d4-4d01-9312-c9ba6722af04",
+        "source_sha256": "ad2f91f8e0061da8f40782a7e6c1dd78f9468d158872baad7178656768c57643",
+        "intake_sha256": "876e6c961e53134d1cca19c6352f3069b2d57edc6a19eb24c68eb7e8f7000b68",
+        "policy_revision": 1,
+        "canonical_native_source_audit_sequences": [
+          8,
+          9
+        ],
+        "passed_frozen_acceptance": false,
+        "native_stage": "acceptance",
+        "tests_count": 1,
+        "wall_seconds": 0.458,
+        "native_result_sha256": "924e64764b3d9bcf4c9cbbc13e4159ec8f847f3408ada92b9c4133d71b6f3b5f",
+        "guided_repair": false,
+        "new_company_model_calls": 0,
+        "source_adopted": false
+      },
+      {
+        "run_id": "b695ccc6-f9a5-49e6-b531-8c68de29eb77",
+        "source_sha256": "d04252dcc7196a3c04c12411379f2f03bfbd4d41ae2c96397a179185555a1a82",
+        "intake_sha256": "662ac6046be9c9014634509036d34a559bda08cf990c44a43378e101fc4dbe75",
+        "policy_revision": 1,
+        "canonical_native_source_audit_sequences": [
+          34,
+          35
+        ],
+        "passed_frozen_acceptance": false,
+        "native_stage": "acceptance",
+        "tests_count": 1,
+        "wall_seconds": 0.342,
+        "native_result_sha256": "c8a947d0b726df6ec108bbc8aad0a8530564cbefccedc9ea5efbee606d20c87c",
+        "guided_repair": false,
+        "new_company_model_calls": 0,
+        "source_adopted": false
+      },
+      {
+        "run_id": "e0d8aeda-3f0c-43a2-b8fb-fcab487315a1",
+        "source_sha256": "2997583b6c6278aa5479bc4e06f4a62c1bd8f9ca70081d8e837550d57d9958b5",
+        "intake_sha256": "662ac6046be9c9014634509036d34a559bda08cf990c44a43378e101fc4dbe75",
+        "policy_revision": 1,
+        "canonical_native_source_audit_sequences": [
+          73,
+          74
+        ],
+        "passed_frozen_acceptance": false,
+        "native_stage": "acceptance",
+        "tests_count": 1,
+        "wall_seconds": 0.34,
+        "native_result_sha256": "6798e699779553aa66d0f08f963ee27164abf1966ec1b87e87705d3953a068a9",
+        "guided_repair": false,
+        "new_company_model_calls": 0,
+        "source_adopted": false
+      },
+      {
+        "run_id": "25898847-cbe5-4479-baa7-6db5cf6128e2",
+        "source_sha256": "b05f9070715ee609e9f424d5805fa2d32419e89b2936b3c84001e2b5e8be684d",
+        "intake_sha256": "1115a8f294599e3c451fde4d9efc7400a8c613703e7739ff60c7f1c4f633e5e0",
+        "policy_revision": 1,
+        "canonical_native_source_audit_sequences": [
+          84,
+          85
+        ],
+        "passed_frozen_acceptance": false,
+        "native_stage": "acceptance",
+        "tests_count": 1,
+        "wall_seconds": 0.328,
+        "native_result_sha256": "1aad63b87d1d61da08bbad223f01c62bcfcbc86ce292354907858702f9a569b0",
+        "guided_repair": false,
+        "new_company_model_calls": 0,
+        "source_adopted": false
+      },
+      {
+        "run_id": "206c6dd6-15e7-4e6d-9232-63279a141b31",
+        "source_sha256": "9ccd9791122a3bc874a223525e67c2a468c787cd579e953ea4b5ef5425635205",
+        "intake_sha256": "dea05beae98d979582ec1e62f07e972bdb5a6fb622ea5e24596285549ff35f34",
+        "policy_revision": 1,
+        "canonical_native_source_audit_sequences": [
+          97,
+          98
+        ],
+        "passed_frozen_acceptance": true,
+        "native_stage": "acceptance",
+        "tests_count": 1,
+        "wall_seconds": 0.31,
+        "native_result_sha256": "41d83270fdb69badca7d264f1fdfdd50f23673c8df3d5f5d30a65509d9713c96",
+        "guided_repair": true,
+        "new_company_model_calls": 0,
+        "source_adopted": false
+      },
+      {
+        "run_id": "a8bb3355-d196-452c-b757-33909a2276a5",
+        "source_sha256": "ad2f91f8e0061da8f40782a7e6c1dd78f9468d158872baad7178656768c57643",
+        "intake_sha256": "876e6c961e53134d1cca19c6352f3069b2d57edc6a19eb24c68eb7e8f7000b68",
+        "policy_revision": 1,
+        "canonical_native_source_audit_sequences": [
+          48,
+          49
+        ],
+        "passed_frozen_acceptance": false,
+        "native_stage": "acceptance",
+        "tests_count": 1,
+        "wall_seconds": 0.273,
+        "native_result_sha256": "a66a89aa61685fe8e324e5a80d2b0aa7cae0a9dcf04cfd796f8057b33a52fab6",
+        "guided_repair": false,
+        "new_company_model_calls": 0,
+        "source_adopted": false
+      }
+    ]
+  },
+  "acceptance": {
+    "original_path": "scripts/fixtures/chunk-boundary-acceptance.rs",
+    "original_sha256": "9fb70f14f8881d2cc9d52ce1eb9f1c4684b017393fd35db17d7c8d13603dcfde",
+    "snapshot_sha256": "94f2bb5de1a1197070e971dea1348e23f25daafe9e6c0bdd520a771aed23b3ba",
+    "adapter_change": "Remove only the outer include!/env! candidate module line; the native verifier separately compiles the candidate library. All reference/test bodies and cases remain byte-for-byte unchanged.",
+    "reference_and_test_bodies_changed": false,
+    "failure_example": {
+      "text": "\u03b1",
+      "offset": 0,
+      "limit": 1,
+      "required": "None",
+      "five_failing_submissions_returned": "Some(0)"
+    }
+  },
+  "evaluation_executable_sha256": {
+    "adapter": "f61eda14bcd59b21bf670dadaaaa6a5c8d069945e2c6bdc9f8af3bbe51c4af4a",
+    "compiler": "1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1"
+  },
+  "source_sha256": {
+    "mcp/src/rust_verification/mod.rs": "b52b0eb5b21fb617b40d83c1ad46a1c7bca285cc949e555d870920980aaf70d5",
+    "mcp/src/bin/gents-rust-component.rs": "8575970c923e52baa53fb75f0b3722a0c609cc071999862a679adfe28d9223f3",
+    "mcp/tests/private_rust_acceptance.rs": "b335f57a1762ac210539af906e1f313da55663292cd40f1af314c5d17d24a5aa",
+    "scripts/experiment_loop.py": "a3e17618731222e33e045e562fe9398479179ea0b9724b5834725646cc9bffb8",
+    "scripts/experiment_evaluation.py": "c4c3f20c46cfc8f20569eed3162a95613ad937269b07f1b833e19920b2fa68e7",
+    "scripts/test_experiment_loop.py": "4bafd7a9c7104cb620dd47a3f99173e59a70f33b4ca6ff7a187dd2479f431e31",
+    "scripts/test_experiment_evaluation.py": "dda5d5348a619ccb9e98d517a12c2e1e216af5e6a928b1666f7359a24a13b095",
+    "scripts/experiment_evaluation_smoke.py": "f08d43ba6ed15ed533b46627655484c59a769adb655aa3039201902814a0cf39",
+    "scripts/company_tools.py": "7b4b7765bbfa520270020dca3de5b838594b2efc6ac2c8dedf89432cd92b0029",
+    "scripts/test_company_tools.py": "de3c4398722823d1e5648982aa65a368fec0799e927123a6f89ea52164681cd0",
+    "scripts/check.sh": "a97d8dd66481ed4864ba6e97b33d16a6d175aa4992a3f5b81247c1b36cda11c5",
+    "config/experiment-loop.rust-example.json": "169e105d1a490952a244cfe66ecd2dc7d27bb4d57dea20709d32188739d86024",
+    "site/achievements.mjs": "6392f286e1a047a1b3cdd1fd30ba869a202d0809e6e8502c42fce1d68a603f93",
+    "docs/145-independent-experiment-results.md": "6513e30440a11b270dadff09afeab6e56fbd943872ee35648f0b7f23a5d9f8c3"
+  },
+  "verification_artifact_sha256": {
+    "data/experiment-evaluation-verification/admission-smoke.log": "dc5f297c3c1f0fae970b20915194cff579233b02cdcd5decf8046464d1de5a3f",
+    "data/experiment-evaluation-verification/build.log": "c92508a29848820f033cd2ea015c85dde0953c88b07cc967ce34b7c08f610549",
+    "data/experiment-evaluation-verification/clippy.log": "ef7b8b1dd5f3ad51888b61b863af9e1d1b5cc05ab14b8c4c1efc8e737bedd8d5",
+    "data/experiment-evaluation-verification/evaluation-smoke.log": "baf54c0d56853448e9fcdfa52c85e5976b3e30a56d01d189a38c8661718992ae",
+    "data/experiment-evaluation-verification/native-rust-submission.log": "7deb02be314675f175425f2f3871ac2a63cacd580e27a9f7fb8f4f51689ddd6e",
+    "data/experiment-evaluation-verification/python-tests.log": "5368beb166f72833c30c2c3c0d5907fb6b641a5fd3c8cc803c2aaf55400f06d8",
+    "data/experiment-evaluation-verification/site-tests.log": "65178379ff5a0078f500aedffafb665671db1f5c8f3337a52ebcf8003d8d5230",
+    "data/experiment-evaluation-verification/workspace-tests.log": "d37e85c0550bade80b29dd7ca941f219ba036ac9988877fbaa4ae6eb9a452b03",
+    "data/retained-rust-evaluation/freeze.json": "f7ad5ffd15b2d0b404eec1899c17b56a29c31aa564eca3cf85ec159fa9c8d253",
+    "data/retained-rust-evaluation/report.json": "1bf8d1fff958354643061517041e4dadad73499003c4fdcfceb385707dca0e33",
+    "data/retained-rust-evaluation/review.py": "c31c50f5b144b4a800f27152efa13ce47613f187c1db98244924a7fa74a022cf"
+  },
+  "checkout": {
+    "revision": "8828798683ca0816d980871aa8048c88eb9b8a75",
+    "dirty": true,
+    "branch": "codex/feature/public-research-view"
+  },
+  "remaining": [
+    "Independent evaluation design and other-language/media adapters",
+    "Adaptive hypothesis selection and trial agenda",
+    "Blind held-out comparisons",
+    "Qualified promotion/rollback",
+    "24/7 soak",
+    "Rejected Python observer-test authoring",
+    "Broader weight/media and frontier-capability objective"
+  ],
+  "delivery": {
+    "local_changes_pending": true,
+    "committed": false,
+    "pushed": false,
+    "deployed": false,
+    "source_adopted": false,
+    "service_left_running": false,
+    "paid_api_used": false,
+    "download_performed": false,
+    "provider_fees_scope": "Company-model provider/tool fees only; publishing-assistant usage, hardware and electricity excluded"
+  },
+  "historical_snapshot": true,
+  "current_implementation_followup": "docs/146-conditional-experiment-continuation.md"
+}

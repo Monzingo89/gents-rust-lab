@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "scope": "Actual native workspace rename and metadata-only file inspection; no claim of model planning competence, arbitrary repository/root access, production deployment or completion of the full company goal.",
+  "capability": {
+    "tool": "files",
+    "rename_required_grants": [
+      "files:rename",
+      "files:read"
+    ],
+    "broad_files_grant_explicitly_includes_operations": true,
+    "worker_only_mutation": true,
+    "maximum_regular_file_bytes": 16777216,
+    "source_hash_required": true,
+    "destination_must_be_absent": true,
+    "existing_parents_required": true,
+    "text_binary_empty_supported": true,
+    "inode_mode_bytes_hash_preserved_in_tests": true,
+    "frozen_source_and_destination_protected": true,
+    "links_directories_hidden_and_traversal_rejected": true,
+    "metadata_read_returns_body": false,
+    "metadata_read_counts_as_text_readback": false,
+    "overwrite_or_copy_delete_fallback": false
+  },
+  "runtime_reconciliation": {
+    "terminal_status": "needs_reconciliation",
+    "pending_original_paths_and_hash_retained": true,
+    "failed_receipt_after_actual_binary_move_tested": true,
+    "startup_with_interrupted_pending_rename_tested": true,
+    "automatic_model_or_tool_replay_observed": false,
+    "ordinary_resume_of_terminal_unconfirmed_move_rejected": true
+  },
+  "verification": {
+    "host_system": "Darwin",
+    "host_architecture": "arm64",
+    "linux_execution_verified": false,
+    "rust_workspace_passed": 565,
+    "rust_workspace_ignored": 27,
+    "rename_native_tests": 9,
+    "stdio_and_sse_rename_and_binary_fingerprint": "passed",
+    "strict_offline_clippy": "passed",
+    "offline_workspace_build": "passed",
+    "real_http_reconciliation_fixture": "passed; decisions and initial queue simulated, native effect and audit failure actual",
+    "corrected_budget_native_rejection_fixture": "passed",
+    "broker_checks_passed": 32,
+    "native_tool_inventory_count": 16,
+    "real_model_inference_calls": 0,
+    "provider_cost_usd": 0,
+    "hardware_electricity_and_test_compute_unmeasured": true,
+    "site_checks": "passed; ten-page local build only"
+  },
+  "source_sha256": {
+    "mcp/src/functions/files.rs": "99d51b8cce4525edab6309c572b6efe2a40d3ff198630a46d9566f20661d960a",
+    "mcp/src/workspace.rs": "f3f396cfb539be3f8b5e25e0feadc08d86fa66b046a324074d2fc9ffc3be6795",
+    "mcp/src/lib.rs": "4ef1c0f1e2d0ce431a31e3b42a77b1b3eab18fc93948c8cbee58b84b1cc324c9",
+    "mcp/tests/workspace_rename.rs": "ad0735b9c00aa4cfc286d4a176f23893ced4cc2e456d84fa48fb88ec2315aacc",
+    "crates/harness/src/autonomy.rs": "d3ff173642a478b52f7fbe264d892c04ffad4116db5a84b10db8199d0fbeb985",
+    "crates/harness/src/file_observations.rs": "b6c9ae65aef50376adecd71bec3235b21e762550bb370ca027ac45440bfdf595",
+    "config/company-tool-inputs.json": "9c1784085dab889342846cbb82efc2cadbd84d5d073b0f047d781b308a36677f",
+    "scripts/rename_reconciliation_smoke.py": "bed112e3ed3751ec48f9aa9068cc11a1bba640980a5626d5a86fdfef63c0f4bd",
+    "scripts/inference_budget_smoke.py": "1231e9d3f6fc7ed7f66235595ddb169fc38b33833a30f997fdbe7ea89f72ae58"
+  },
+  "binary_sha256": {
+    "target/debug/gents-local-mcp": "a1d0b150f3bc918687a68da6c19a31efa7f443021f5b749341caa440b4a73c46",
+    "target/debug/gents-harness": "54583f1744cc8abe9cd0d4eadb85da9b7a5776e0c8b114294cec016e6e88d336"
+  },
+  "verification_artifact_sha256": {
+    "data/native-rename-verification/clippy.log": "fe84f270ce2451923c72f874c5679b3b0ab48a530942264fc47f9b123b2eb0f4",
+    "data/native-rename-verification/workspace-tests.log": "19d415d655eae124f611c7dde01373ff69a6debbd3c1d629aca5dcab33f94792",
+    "data/native-rename-verification/build.log": "86d7364aec9b27ce67e25cb911399b40adf48a6b712628b1b390beb3c1ed58ad",
+    "data/native-rename-verification/reconciliation-smoke.log": "892db63b6d4d86ea015346fdc0bce5d26644eeec7e2f551fdd580d427be0d728",
+    "data/native-rename-verification/budget-smoke.log": "57fde0b297208b0555d249dcad0b8d1fcd49cd7e627f6d043e7bb376a40a4603",
+    "data/native-rename-verification/broker-tests.log": "eee1717fdb9e80d92fdffb8a3f4fe25b46d193442e591a5332546804221face9",
+    "data/native-rename-verification/site-tests.log": "c9f97276a50d1270bf36ccb083cd78b4a5c89af3636e237482cb922a039f2077"
+  },
+  "website_deployed": false,
+  "source_published": false
+}

@@ -74,6 +74,11 @@ pub fn action_focus(request: &Value) -> Value {
 
 pub fn historical_evidence(rows: &mut [Value]) {
     for row in rows {
+        // Authorization needs the complete NEXT request, not duplicate source
+        // bodies from earlier reads. Keep their exact journal/hash provenance.
+        if historical_read(row) {
+            continue;
+        }
         let args = &row["arguments"];
         let result = &row["result"];
         let receipt = &result["mcp_receipt"];
@@ -117,6 +122,43 @@ pub fn historical_evidence(rows: &mut [Value]) {
     }
 }
 
+fn historical_read(row: &mut Value) -> bool {
+    let args = &row["arguments"];
+    let result = &row["result"];
+    let receipt = &result["mcp_receipt"];
+    let output = &result["result"];
+    let Some(text) = output["text"].as_str() else {
+        return false;
+    };
+    if row["action"] != "files"
+        || args["op"] != "read"
+        || result["ok"] != true
+        || text.len() < 1024
+        || text.len() > 8192
+        || output["bytes"].as_u64() != Some(text.len() as u64)
+        || receipt["tool"] != "files"
+        || receipt["phase"] != "worker"
+        || receipt["status"] != "completed"
+        || receipt["actor"] != row["actor"]
+        || !row["actor"].is_string()
+        || receipt["provider_cost_usd"] != 0
+        || !receipt["policy_revision"].as_u64().is_some_and(|r| r > 0)
+        || receipt["arguments_sha256"] != gents_local_mcp::digest(args.to_string().as_bytes())
+        || receipt["result_sha256"] != gents_local_mcp::digest(output.to_string().as_bytes())
+        || !args["path"].is_string()
+        || output["path"] != args["path"]
+    {
+        return false;
+    }
+    let view = json!({"kind":"historical_read_body_omitted","path":output["path"],"bytes":output["bytes"],
+        "offset_bytes":output["offset_bytes"],"next_offset_bytes":output["next_offset_bytes"],"source_sha256":output["sha256"],
+        "original_record_sha256":gents_local_mcp::digest(row.to_string().as_bytes()),"original_result_sha256":receipt["result_sha256"],
+        "policy_revision":receipt["policy_revision"],"scope":"Earlier receipt-linked source read; full text retained in the journal/checkpoint. Historical metadata only, not a current file observation, replayable request, authenticated receipt, permission or test success. The exact next request is retained separately and unchanged."});
+    row["result"] = json!({"ok":true,"historical_read_observation":view});
+    row["authorization_evidence_view"] = json!({"kind":"historical_read_body_omitted"});
+    true
+}
+
 pub fn metadata(packet: &Value) -> Value {
     let text = packet.to_string();
     let omitted = packet["proposal"]["recent_evidence"]
@@ -133,6 +175,36 @@ pub fn metadata(packet: &Value) -> Value {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn historical_read_source_is_omitted_without_touching_next_write_or_claiming_current_state() {
+        let args = json!({"op":"read","path":"tests.py"});
+        let output = json!({"path":"tests.py","text":"x".repeat(8192),"bytes":8192,"offset_bytes":0,"next_offset_bytes":8192,"sha256":"a".repeat(64)});
+        let receipt = json!({"actor":"Author","tool":"files","phase":"worker","status":"completed","policy_revision":1,"provider_cost_usd":0,
+            "arguments_sha256":gents_local_mcp::digest(args.to_string().as_bytes()),"result_sha256":gents_local_mcp::digest(output.to_string().as_bytes())});
+        let read = json!({"actor":"Author","action":"files","arguments":args,"result":{"ok":true,"result":output,"mcp_receipt":receipt},"full_result":"tool-000001.json"});
+        let mut rows = vec![read.clone()];
+        historical_evidence(&mut rows);
+        assert!(rows[0].to_string().len() < read.to_string().len() / 2);
+        assert_eq!(
+            rows[0]["result"]["historical_read_observation"]["next_offset_bytes"],
+            8192
+        );
+        assert!(rows[0]["result"].get("mcp_receipt").is_none());
+        assert_eq!(rows[0]["full_result"], "tool-000001.json");
+        let mut tampered = read.clone();
+        tampered["result"]["mcp_receipt"]["result_sha256"] = json!("forged");
+        let mut bad = vec![tampered.clone()];
+        historical_evidence(&mut bad);
+        assert_eq!(bad, vec![tampered]);
+        let request = json!({"action":"files","arguments":{"op":"write","path":"tests.py","content":"exact new content"}});
+        let mut packet = json!({"proposal":{"request":request,"recent_evidence":[read]}});
+        historical_evidence(
+            packet["proposal"]["recent_evidence"]
+                .as_array_mut()
+                .unwrap(),
+        );
+        assert_eq!(packet["proposal"]["request"], request);
+    }
     #[test]
     fn host_review_kind_separates_scope_admission_without_fabricating_an_action() {
         let proposal = json!({"request_admission":"scope","review_kind":"workflow_admission",

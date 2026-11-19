@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "scope": "Finite owner-frozen evidence-triggered experiment admission and runtime observation; not autonomous independent evaluation, training, code promotion or completion of the full company objective.",
+  "controller": {
+    "initial_dispatch": false,
+    "unchanged_evidence_http_requests": 0,
+    "unchanged_evidence_model_calls": 0,
+    "unchanged_evidence_ledger_rewrites": 0,
+    "evidence_is_content_hashed": true,
+    "consumed_fingerprints_never_replayed": true,
+    "durable_claim_precedes_external_mutations": true,
+    "reserved_trial_allowances_refunded": false,
+    "uncertain_mutations_automatically_replayed": false,
+    "resume_automatically_requested": false,
+    "source_promotion_authorized": false,
+    "automatic_independent_acceptance": false,
+    "owner_plan_finite": true,
+    "native_tools_added": 0
+  },
+  "verification": {
+    "host_system": "Darwin",
+    "host_architecture": "arm64",
+    "python_tests_passed": 81,
+    "controller_tests_passed": 21,
+    "broker_tests_passed": 32,
+    "actual_http_and_database_fixture": "passed; model decisions simulated, actual intake/approval/governance/dispatch/observations/native reservations",
+    "lost_actual_dispatch_response_reconciled_without_second_post": true,
+    "ten_page_site_checks": "passed",
+    "shell_and_python_syntax": "passed",
+    "rust_code_changed_this_pass": false,
+    "full_rust_suite_rerun_this_pass": false,
+    "no_lingering_owned_runtime_observed": true
+  },
+  "real_trial": {
+    "version": 1,
+    "source_adopted": false,
+    "independently_accepted": false,
+    "simulated": false,
+    "hypothesis": "Separate the same three-method repair into three one-method author calls",
+    "elapsed_seconds": 44.508,
+    "model": "Qwen3-Coder-30B-A3B-Instruct",
+    "input_tokens": 7512,
+    "output_tokens": 2021,
+    "provider_cost_usd": 0,
+    "reserved_model_calls": 3,
+    "canonical_native_receipts": 6,
+    "prior_frozen_contract": {
+      "frozen_inputs": {
+        "observer_qa_base.py": "4fbda98f0e6c56229c63845663add8f35fd72d8cc9875a4a8f08516381924eea",
+        "showcase_observer.py": "bacbf530a2507816fcefc93835d3f84b1bb1f01f581a540dc6ea77d83f050219"
+      },
+      "native_suite_sha256": "aeb59a065b77b85f3918c222e3ed4cb33384fe52a41aae35c352d012aea6c561",
+      "host_quality_sha256": "d27f8172ad410f5932102e6e2fa30e18b14ca418e29503e66a31ac15d6e798e2",
+      "mutable_method_names": [
+        "test_terminal_run_counts_calls_and_reports_zero_cost",
+        "test_pending_attention_returns_attention_and_answered_attention_continues",
+        "test_rejects_invalid_costs_and_unsafe_paths"
+      ],
+      "frozen_before_generation": true
+    },
+    "controller_snapshot_sha256": "00d0655e1df02bfaad2a25df4f47188b74375520c7652905f45f63d0ef7d67ca",
+    "trials": [
+      {
+        "method": "test_terminal_run_counts_calls_and_reports_zero_cost",
+        "run_id": "eed15bba-b268-4f47-a311-0469b22650de",
+        "source_sha256": "100cecc44e7c580039b918663b6cc49778006f74d6fdfc9ff73679c6feb2a2b0",
+        "source_bytes": 1731,
+        "intake_sha256": "b51fdc8b474526bbc5bca95ad3177b81fc73d8a27610ca897641a21e1f807b56",
+        "native_audit_sequences": [
+          8,
+          9
+        ],
+        "reserved_model_calls": 1,
+        "latency_seconds": 7.171,
+        "input_tokens": 2472,
+        "output_tokens": 465,
+        "provider_cost_usd": 0.0,
+        "invalid_imports": [
+          "m"
+        ],
+        "core_patch_targets": [],
+        "static_review": "rejected",
+        "findings": [
+          "Imports nonexistent module m instead of using the existing showcase_observer alias",
+          "Fixture always returns completed while asserting three distinct terminal states",
+          "Does not assert both API route calls or include a null reply event"
+        ],
+        "positive_and_mutation_tests": "not_run_static_rejection",
+        "source_adopted": false
+      },
+      {
+        "method": "test_pending_attention_returns_attention_and_answered_attention_continues",
+        "run_id": "683d2c7e-b3fe-4e4d-9e7c-fe5e35bce09b",
+        "source_sha256": "aa03b4754c14cb529d902746c842825312c14454897f2983bb8302181633b38b",
+        "source_bytes": 3544,
+        "intake_sha256": "13a2dc7de3a7a13cf802b2879deabe9eb7dd9f2aae4df10860864c1e31374577",
+        "native_audit_sequences": [
+          18,
+          19
+        ],
+        "reserved_model_calls": 1,
+        "latency_seconds": 12.457,
+        "input_tokens": 2517,
+        "output_tokens": 940,
+        "provider_cost_usd": 0.0,
+        "invalid_imports": [
+          "m"
+        ],
+        "core_patch_targets": [
+          "m.observe_run",
+          "time.time",
+          "time.time",
+          "time.sleep",
+          "time.sleep"
+        ],
+        "static_review": "rejected",
+        "findings": [
+          "Imports nonexistent module m instead of using the existing showcase_observer alias",
+          "Replaces core m.observe_run using patch, prohibited by the frozen author contract",
+          "Mock returns tuples while assertions treat results as dictionaries; no real two-poll behavior is exercised"
+        ],
+        "positive_and_mutation_tests": "not_run_static_rejection",
+        "source_adopted": false
+      },
+      {
+        "method": "test_rejects_invalid_costs_and_unsafe_paths",
+        "run_id": "c0a3570c-7846-4e87-be92-fdc4efe56735",
+        "source_sha256": "826ec2172a5c8179763e614c6f57322f3bbc234b59c8b47ad3155d62ed795126",
+        "source_bytes": 2036,
+        "intake_sha256": "fd9eb1c9bad5cba881e58a55173012e0091c165c293c42dd4cc5079d97692144",
+        "native_audit_sequences": [
+          28,
+          29
+        ],
+        "reserved_model_calls": 1,
+        "latency_seconds": 8.892,
+        "input_tokens": 2523,
+        "output_tokens": 616,
+        "provider_cost_usd": 0.0,
+        "invalid_imports": [
+          "m"
+        ],
+        "core_patch_targets": [],
+        "static_review": "rejected",
+        "findings": [
+          "Imports nonexistent module m instead of using the existing showcase_observer alias",
+          "Passes a string evidence directory instead of pathlib.Path",
+          "Missing-usage, missing-cost and symlink rejection cases are omitted"
+        ],
+        "positive_and_mutation_tests": "not_run_static_rejection",
+        "source_adopted": false
+      }
+    ],
+    "result": "All three drafts rejected at static admission before execution. No correctness gain established; token use increased relative to the earlier single-call trial. No new positive/mutation execution is claimed.",
+    "historical_snapshot": true
+  },
+  "real_trial_runtime_snapshot": {
+    "historical_snapshot": true,
+    "source_hashes_at_generation": {
+      "target/debug/gents-harness": "54583f1744cc8abe9cd0d4eadb85da9b7a5776e0c8b114294cec016e6e88d336",
+      "target/debug/gents-local-mcp": "a1d0b150f3bc918687a68da6c19a31efa7f443021f5b749341caa440b4a73c46",
+      "scripts/experiment_loop.py": "00d0655e1df02bfaad2a25df4f47188b74375520c7652905f45f63d0ef7d67ca",
+      "scripts/showcase_observer.py": "bacbf530a2507816fcefc93835d3f84b1bb1f01f581a540dc6ea77d83f050219"
+    },
+    "config_sha256": "bf46ae2e2e860e2a23df380f1482d6490066dfee8dce35dfb40d6e55b7120c7b",
+    "plan_sha256": "d9f7aad790d0fc853fd72a9f9b51ad0691f4cc24e25b3972c28e52699c3835f0",
+    "difference_from_final_controller": "Final controller subsequently added explicit incomplete/timed_out runtime-state handling; final controller checks and actual HTTP fixture rerun."
+  },
+  "final_source_sha256": {
+    "scripts/experiment_loop.py": "8bd897382f8e6721d9fadafae96808df1c37b1c01643bd89eb57711033990e05",
+    "scripts/test_experiment_loop.py": "baaf9966ff08ba1cbb310c6254792fa8851f0eb06021ba86f48fee732eb3b9a5",
+    "scripts/experiment_loop_smoke.py": "5ce0fda2ec0c5b22c10aa6333d6cd8bdfb79f9dc666064ec839cf91563cf15fe",
+    "scripts/company_tools.py": "dd02f314c15aa34f4b3a27d47e6b229fbde350f1dbcd184d699d4ddd38f2c728",
+    "scripts/test_company_tools.py": "b42737c9509565baa06e1130d35838a329db96dbba6615a04167d9166ecac1ae",
+    "scripts/check.sh": "863efb19e0fb460943af146ec5f1f74c9913b37ba88b6465e18131d4519464f5",
+    "config/experiment-loop.example.json": "4c18aa48ae92379157bbe564c2f534e3bf691f5c895d4f133365106b66bf4f89",
+    "site/achievements.mjs": "57f60c0701d24c86042682626ebb7ca6ec6f5e09c818d99eda7f3fc8566878ab",
+    "docs/144-evidence-triggered-experiments.md": "52312910e0a2387cba860f6d19f4563372a59b98483b0185ea0f3506a579b7c3"
+  },
+  "verification_log_sha256": {
+    "data/experiment-loop-verification/http-smoke.log": "dc5f297c3c1f0fae970b20915194cff579233b02cdcd5decf8046464d1de5a3f",
+    "data/experiment-loop-verification/python-tests.log": "85686df530f187b657c5bc42661557d0318c826073917e5634829c497d39fa5a",
+    "data/experiment-loop-verification/site-tests.log": "d252688dab49a406e463a1716af496c54e37f7f3d25349dcf1170d5d5e9306c9"
+  },
+  "remaining": [
+    "Automatic independently checked results",
+    "Adaptive hypothesis selection",
+    "Held-out comparisons and winner selection",
+    "Qualified procedure/model promotion and rollback",
+    "24/7 soak",
+    "Broader media/weight-training and frontier-capability objective"
+  ],
+  "delivery": {
+    "local_changes_pending": true,
+    "committed": false,
+    "pushed": false,
+    "deployed": false,
+    "service_left_running": false,
+    "candidate_adopted": false,
+    "download_performed": false,
+    "paid_api_used": false
+  },
+  "historical_snapshot": true,
+  "current_implementation_followup": "docs/145-independent-experiment-results.md"
+}

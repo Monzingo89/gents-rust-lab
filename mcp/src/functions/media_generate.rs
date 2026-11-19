@@ -51,6 +51,7 @@ macro_rules! tool {
             fn runtime_requirements(&self) -> RuntimeRequirements {
                 RuntimeRequirements {
                     installed_rustc: false,
+                    installed_python: false,
                     call_timeout_seconds: 180,
                 }
             }

@@ -56,6 +56,7 @@ fn proposal_mode_requires_an_explicit_frozen_proposal_only_contract() {
     for changes in [
         json!({"acceptance":"Complete the real task"}),
         json!({"deliverable_type":"production"}),
+        json!({"candidate_feedback":{"version":1,"tools":["shell"]}}),
         json!({"candidate_workflow":{"version":1,"actor":"Worker","path":"../outside","max_bytes":100,"max_attempts":3}}),
     ] {
         let f = configured();
@@ -76,6 +77,40 @@ fn proposal_mode_requires_an_explicit_frozen_proposal_only_contract() {
     };
     assert!(Repository::open(&f.authority, wrong).is_err());
     assert!(Repository::open(&f.authority, f.actor("Reader")).is_err());
+}
+#[test]
+fn prompt_profile_is_an_owner_frozen_enum_with_legacy_full_default() {
+    let f = configured();
+    let encoded: String = f
+        .db()
+        .query_row("SELECT intake FROM jobs", [], |r| r.get(0))
+        .unwrap();
+    let mut intake: Value = serde_json::from_str(&encoded).unwrap();
+    let full = proposals::from_intake(&intake).unwrap().unwrap();
+    assert_eq!(full.prompt_profile, proposals::PromptProfile::Full);
+    assert!(serde_json::to_value(full)
+        .unwrap()
+        .get("prompt_profile")
+        .is_none());
+    intake["candidate_workflow"]["prompt_profile"] = json!("focused");
+    assert_eq!(
+        proposals::from_intake(&intake)
+            .unwrap()
+            .unwrap()
+            .prompt_profile,
+        proposals::PromptProfile::Focused
+    );
+    f.db()
+        .execute("UPDATE jobs SET intake=?1", [intake.to_string()])
+        .unwrap();
+    assert!(
+        Repository::open(&f.authority, f.scope.clone()).is_err(),
+        "mode cannot change after approval without a new owner digest"
+    );
+    for invalid in [json!("auto"), json!(true), json!({"tools":["shell"]})] {
+        intake["candidate_workflow"]["prompt_profile"] = invalid;
+        assert!(proposals::from_intake(&intake).is_err());
+    }
 }
 #[test]
 fn actual_native_pages_submit_a_candidate_and_freeze_further_writes() {

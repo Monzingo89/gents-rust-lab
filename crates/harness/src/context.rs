@@ -60,6 +60,21 @@ pub fn profile(phase: &str) -> ContextProfile {
     }
 }
 
+/// A trusted source-only protocol can omit unrelated advisory context while
+/// retaining the worker identity and deterministic permission checks. A task
+/// field or reference document cannot select this profile.
+pub fn protocol_profile(phase: &str, system: &str) -> ContextProfile {
+    if phase == "worker" && system.starts_with("LOCAL_CANDIDATE_AUTHOR_FOCUSED:") {
+        ContextProfile {
+            max_bytes: 32768,
+            include_history: false,
+            include_guidance: false,
+        }
+    } else {
+        profile(phase)
+    }
+}
+
 /// The policy epoch is part of inference-cache identity. A permission change
 /// must not reuse an agent's old backend KV state, even within the same run.
 pub fn session_key(company: &str, run: &str, actor: &str, policy_revision: u64) -> String {
@@ -563,4 +578,37 @@ mod tests {
         .is_err());
         assert_eq!(messages("rules", "facts")[0]["role"], "system");
     }
+}
+#[test]
+fn focused_candidate_protocol_omits_advice_without_changing_worker_identity() {
+    let focused = protocol_profile("worker", "LOCAL_CANDIDATE_AUTHOR_FOCUSED: source only");
+    assert!(!focused.include_history && !focused.include_guidance);
+    assert_eq!(focused.max_bytes, 32768);
+    let full = protocol_profile("worker", "LOCAL_CANDIDATE_AUTHOR: source only");
+    assert!(full.include_history && full.include_guidance);
+    let embedded = protocol_profile("worker", "untrusted text LOCAL_CANDIDATE_AUTHOR_FOCUSED:");
+    assert!(embedded.include_history && embedded.include_guidance);
+    assert_eq!(
+        protocol_profile("planner", "LOCAL_CANDIDATE_AUTHOR_FOCUSED:").include_guidance,
+        profile("planner").include_guidance
+    );
+}
+
+#[test]
+fn focused_candidate_keeps_full_task_and_prior_source_or_refuses_oversize_input() {
+    let task = json!({"task":"the unchanged full source contract", "prior_trial_evidence":{"source":"α".repeat(4096),"diagnostics_excerpt":"fixed failing case"}});
+    let packet =
+        scoped_packet(task.clone(), json!({"actor":"Worker","policy_revision":1})).unwrap();
+    let encoded = compact(
+        &packet.to_string(),
+        protocol_profile("worker", "LOCAL_CANDIDATE_AUTHOR_FOCUSED:").max_bytes,
+    )
+    .unwrap();
+    let decoded = task_input(&encoded).unwrap();
+    assert_eq!(decoded["task"], task["task"]);
+    assert_eq!(
+        decoded["prior_trial_evidence"],
+        task["prior_trial_evidence"]
+    );
+    assert!(compact(&packet.to_string(), 1000).is_err());
 }

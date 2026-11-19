@@ -5,6 +5,7 @@ mod host_resources;
 mod media_generate;
 mod memory;
 mod owned_rust_call;
+mod python_check;
 mod rust_verify;
 mod skills;
 mod table;
@@ -26,6 +27,7 @@ pub fn builtins() -> Vec<Box<dyn crate::Tool>> {
         Box::new(files::Files),
         Box::new(host_resources::HostResources),
         Box::new(rust_verify::RustVerify),
+        Box::new(python_check::PythonCheck),
         Box::new(owned_rust_call::OwnedRustCall),
     ]
 }

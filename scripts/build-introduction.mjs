@@ -12,7 +12,24 @@ const production = process.argv.includes('--production');
 const imageEvidence = JSON.parse(await readFile(resolve(root,'docs/evidence/local-image-showcase-2026-11-15.json'),'utf8'));
 const imageBytes = await readFile(resolve(root,'assets/showcase/local-owl.png'));
 if(createHash('sha256').update(imageBytes).digest('hex') !== imageEvidence.artifact.sha256) throw Error('Showcase asset differs from accepted evidence.');
-const achievementContent = achievementsSection(JSON.parse(await readFile(resolve(root,'docs/evidence/local-image-showcase-2026-11-15.json'),'utf8')), JSON.parse(await readFile(resolve(root,'docs/evidence/reasoning-completion-2026-11-13.json'),'utf8')), await readFile(resolve(root,'docs/121-owned-mcp-cookbook.md'),'utf8'), JSON.parse(await readFile(resolve(root,'docs/evidence/local-context-repair-2026-11-15.json'),'utf8')));
+const researchEvidence = JSON.parse(await readFile(resolve(root,'docs/evidence/local-public-research-2026-11-15.json'),'utf8'));
+if(createHash('sha256').update(await readFile(resolve(root,researchEvidence.source.module))).digest('hex') !== researchEvidence.source.sha256) throw Error('Public research source differs from accepted evidence.');
+const pythonReviewEvidence = JSON.parse(await readFile(resolve(root,'docs/evidence/local-python-review-submission-2026-11-15.json'),'utf8'));
+for (const [path, expected] of [[pythonReviewEvidence.candidate.source_path,pythonReviewEvidence.candidate.source_sha256],[pythonReviewEvidence.host_acceptance.source_path,pythonReviewEvidence.host_acceptance.host_suite_sha256]]) {
+  if(createHash('sha256').update(await readFile(resolve(root,path))).digest('hex') !== expected) throw Error('Python candidate or host checks differ from accepted evidence.');
+}
+const observerEvidence = JSON.parse(await readFile(resolve(root,'docs/evidence/local-observer-repair-2026-11-15.json'),'utf8'));
+for (const [path, expected] of [[observerEvidence.source.path,observerEvidence.source.sha256],[observerEvidence.independent_acceptance.suite_path,observerEvidence.independent_acceptance.suite_sha256]]) {
+  if(createHash('sha256').update(await readFile(resolve(root,path))).digest('hex') !== expected) throw Error('Observer source or frozen checks differ from reviewed evidence.');
+}
+const focusedEvidence = JSON.parse(await readFile(resolve(root,'docs/evidence/local-focused-context-2026-11-15.json'),'utf8'));
+const companyTests = focusedEvidence.company_test_repair;
+if (!companyTests.host_review_accepted || companyTests.positive_methods !== 6 || companyTests.frozen_mutation_cases !== 7 || companyTests.host_method_logic_edits !== false || !companyTests.final_named_case_audit || !companyTests.adopted_tests_only) throw Error('Company-authored test repair lacks complete scoped review.');
+for (const item of [...companyTests.files, {path:companyTests.core_path,sha256:companyTests.core_sha256}]) {
+  if(createHash('sha256').update(await readFile(resolve(root,item.path))).digest('hex') !== item.sha256) throw Error('Company tests or core differ from reviewed evidence.');
+}
+observerEvidence.reviewed_company_tests = companyTests;
+const achievementContent = achievementsSection(JSON.parse(await readFile(resolve(root,'docs/evidence/local-image-showcase-2026-11-15.json'),'utf8')), JSON.parse(await readFile(resolve(root,'docs/evidence/reasoning-completion-2026-11-13.json'),'utf8')), await readFile(resolve(root,'docs/121-owned-mcp-cookbook.md'),'utf8'), JSON.parse(await readFile(resolve(root,'docs/evidence/local-context-repair-2026-11-15.json'),'utf8')), researchEvidence, pythonReviewEvidence, observerEvidence);
 const pages = [...contentPages.map(page=>page.file==='index.html'?{...page,body:page.body+achievementContent}:page), cookbookPage(await readFile(resolve(root,'docs/121-owned-mcp-cookbook.md'),'utf8'))];
 const hostedPreview = process.argv.includes('--vercel-preview');
 const label = production ? 'Open-source preview' : hostedPreview ? 'Evaluation preview' : 'Local preview';

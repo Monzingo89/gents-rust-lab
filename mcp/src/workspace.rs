@@ -14,6 +14,16 @@ pub trait Workspace {
     /// Metadata-only identity check for case/normalization aliases of frozen
     /// owner files. Confined descriptors, no content or implicit read grant.
     fn same_file(&self, left: &str, right: &str) -> Result<bool>;
+    /// Complete bounded file identity without returning or decoding its bytes.
+    fn fingerprint(&self, _path: &str) -> Result<Value> {
+        bail!("metadata-only file reads unavailable on this workspace adapter")
+    }
+    /// Atomic no-replace move of one existing bounded regular file. The source
+    /// hash must match; existing destination parents are required. No emulation
+    /// with copy/unlink and no overwrite fallback on unsupported filesystems.
+    fn rename(&self, _path: &str, _destination: &str, _expected: &str) -> Result<Value> {
+        bail!("exclusive rename unavailable on this workspace adapter")
+    }
     fn write(&self, path: &str, content: &str) -> Result<Value>;
     /// Create a new bounded binary artifact; never replace an existing name.
     fn create_bytes(&self, _path: &str, _content: &[u8]) -> Result<Value> {
@@ -185,19 +195,22 @@ mod unix {
             }
         }
         fn bytes_bounded(&self, path: &str, limit: usize) -> Result<Vec<u8>> {
+            let (parent, base) = self.parent(path, false)?;
+            let file = open_at(&parent, &base, libc::O_RDONLY | libc::O_NONBLOCK)?;
+            Self::stable_bytes(&file, limit)
+        }
+        fn stable_bytes(file: &File, limit: usize) -> Result<Vec<u8>> {
             anyhow::ensure!(
                 (1..=MAX_FILE).contains(&limit),
                 "invalid complete-file byte limit"
             );
-            let (parent, base) = self.parent(path, false)?;
-            let file = open_at(&parent, &base, libc::O_RDONLY | libc::O_NONBLOCK)?;
             let before = file.metadata()?;
             anyhow::ensure!(
                 before.is_file() && before.nlink() == 1 && before.len() <= limit as u64,
                 "complete read requires a bounded single-link regular file up to {limit} bytes"
             );
             let mut bytes = Vec::new();
-            (&file).take((limit + 1) as u64).read_to_end(&mut bytes)?;
+            file.take((limit + 1) as u64).read_to_end(&mut bytes)?;
             let after = file.metadata()?;
             anyhow::ensure!(
                 bytes.len() <= limit
@@ -243,6 +256,124 @@ mod unix {
         }
     }
     impl Workspace for Directory {
+        fn fingerprint(&self, path: &str) -> Result<Value> {
+            let bytes = self.bytes_bounded(path, MAX_FILE)?;
+            Ok(
+                json!({"path":path,"bytes":bytes.len(),"total_bytes":bytes.len(),"sha256":digest(&bytes),"metadata_only":true}),
+            )
+        }
+        fn rename(&self, path: &str, destination: &str, expected: &str) -> Result<Value> {
+            anyhow::ensure!(path != destination, "rename requires distinct paths");
+            anyhow::ensure!(
+                expected.len() == 64
+                    && expected
+                        .bytes()
+                        .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)),
+                "invalid expected_sha256"
+            );
+            let (source_parent, source_name) = self.parent(path, false)?;
+            let (destination_parent, destination_name) = self.parent(destination, false)?;
+            let mut metadata = std::mem::MaybeUninit::<libc::stat>::uninit();
+            // Reject every existing entry, including dangling symlinks and
+            // case/normalization aliases. The atomic flag below also guards
+            // destinations created after this non-following preflight check.
+            // SAFETY: owned directory fd, validated single component and valid
+            // output storage. No uninitialized stat fields are ever read.
+            if unsafe {
+                libc::fstatat(
+                    destination_parent.as_raw_fd(),
+                    destination_name.as_ptr(),
+                    metadata.as_mut_ptr(),
+                    libc::AT_SYMLINK_NOFOLLOW,
+                )
+            } == 0
+            {
+                bail!("rename destination already exists");
+            }
+            let error = std::io::Error::last_os_error();
+            if error.kind() != std::io::ErrorKind::NotFound {
+                return Err(error.into());
+            }
+            let source = open_at(
+                &source_parent,
+                &source_name,
+                libc::O_RDONLY | libc::O_NONBLOCK,
+            )?;
+            let before = source.metadata()?;
+            anyhow::ensure!(
+                before.is_file() && before.nlink() == 1 && before.len() <= MAX_FILE as u64,
+                "rename requires a bounded single-link regular file up to {MAX_FILE} bytes"
+            );
+            let bytes = Self::stable_bytes(&source, MAX_FILE)?;
+            anyhow::ensure!(
+                digest(&bytes) == expected,
+                "expected_sha256 does not match rename source"
+            );
+            let current = open_at(
+                &source_parent,
+                &source_name,
+                libc::O_RDONLY | libc::O_NONBLOCK,
+            )?
+            .metadata()?;
+            anyhow::ensure!(
+                current.dev() == before.dev()
+                    && current.ino() == before.ino()
+                    && current.len() == before.len()
+                    && current.mtime() == before.mtime()
+                    && current.mtime_nsec() == before.mtime_nsec()
+                    && current.ctime() == before.ctime()
+                    && current.ctime_nsec() == before.ctime_nsec()
+                    && current.nlink() == 1,
+                "rename source changed during precondition check"
+            );
+            // SAFETY: both descriptors are owned, live directories; names are
+            // validated NUL-terminated single components. Exclusive flags make
+            // destination nonexistence part of the atomic filesystem operation.
+            #[cfg(target_os = "macos")]
+            let status = unsafe {
+                libc::renameatx_np(
+                    source_parent.as_raw_fd(),
+                    source_name.as_ptr(),
+                    destination_parent.as_raw_fd(),
+                    destination_name.as_ptr(),
+                    libc::RENAME_EXCL,
+                )
+            };
+            #[cfg(target_os = "linux")]
+            let status = unsafe {
+                libc::syscall(
+                    libc::SYS_renameat2,
+                    source_parent.as_raw_fd(),
+                    source_name.as_ptr(),
+                    destination_parent.as_raw_fd(),
+                    destination_name.as_ptr(),
+                    libc::RENAME_NOREPLACE,
+                )
+            };
+            if status != 0 {
+                return Err(std::io::Error::last_os_error().into());
+            }
+            source_parent.sync_all()?;
+            destination_parent.sync_all()?;
+            let moved = open_at(
+                &destination_parent,
+                &destination_name,
+                libc::O_RDONLY | libc::O_NONBLOCK,
+            )?
+            .metadata()?;
+            anyhow::ensure!(
+                moved.dev() == before.dev()
+                    && moved.ino() == before.ino()
+                    && moved.nlink() == 1
+                    && moved.mode() == before.mode()
+                    && self.bytes_bounded(destination, MAX_FILE)? == bytes,
+                "rename effect requires path/hash reconciliation"
+            );
+            Ok(
+                json!({"source_path":path,"path":destination,"bytes":bytes.len(),"sha256":expected,
+                "atomic_rename":true,"replaced_existing":false,"retry_rule":"If the receipt is lost or errors, inspect BOTH paths and the expected hash before any retry. Filesystem and audit are not one transaction."}),
+            )
+        }
         fn create_bytes(&self, path: &str, content: &[u8]) -> Result<Value> {
             anyhow::ensure!(
                 !content.is_empty() && content.len() <= 8 * 1024 * 1024,

@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-15",
+  "status": "PASS",
+  "task": "Make bounded public documentation usable through a lossy company-authored view while retaining the final native privacy gate.",
+  "source_base_revision": "8828798683ca0816d980871aa8048c88eb9b8a75",
+  "source": {
+    "module": "scripts/public_research.py",
+    "sha256": "c17df6baf8ccaa74bc85a28a47364da6ba60281e46e5c53fe4204ef28191e702",
+    "implementation_author": "Qwen3.8-27B",
+    "implementation_logic_edited_by_host": false,
+    "host_assistance": "Frozen contract/tests, source-review feedback, broker metadata/output cap, protected source boundary, cache dependency wiring, qualification and publication."
+  },
+  "qualification": {
+    "frozen_independent_checks": 10,
+    "acceptance_sha256": "4c457dd12310bd80d6c4a0a44d5cdb0beed6b0f9cc938033f0aa966a51270a36",
+    "broker_regression_tests": 30,
+    "native_privacy_regression_tests": 2,
+    "strict_workspace_clippy": "PASS",
+    "workspace_tests": "PASS; opt-in model tests remain separate",
+    "fresh_workspace_build": "PASS",
+    "unchanged_privacy_sources": [
+      "mcp/src/safety.rs",
+      "crates/harness/src/security.rs"
+    ],
+    "residual_ssn_and_payment_card_fixtures_remain_blocked": true,
+    "output_budget_serialized_bytes": 96000
+  },
+  "governed_live_case": {
+    "status": "PASS",
+    "run": "57e5e316-6c0f-45a4-aca9-b9d272d0b794",
+    "policy_revision": 1,
+    "research_roles": 6,
+    "public_reads": [
+      {
+        "url": "https://docs.python.org/3/library/unittest.html",
+        "tool": "web_read",
+        "journal": "tool-000000.json",
+        "journal_sha256": "cc394dc6f198aec0a4bb69b4d52a4417ae9606b38538377aa9066a334c2de041",
+        "governed_result_ok": true,
+        "native_privacy_recheck": {
+          "level": "standard",
+          "indicators": [],
+          "handling": "local_private_default",
+          "persisted": true
+        },
+        "retrieved_at": 1794733333,
+        "tokens_removed": 11,
+        "lossy": true,
+        "view_source_sha256": "c17df6baf8ccaa74bc85a28a47364da6ba60281e46e5c53fe4204ef28191e702",
+        "capability_revision": "3abb3fc6c89d6d325c8d16ce67af8f24808383cc9f736c26f05d2e7351a28675"
+      },
+      {
+        "url": "https://docs.python.org/3/library/unittest.mock.html",
+        "tool": "web_read",
+        "journal": "tool-000001.json",
+        "journal_sha256": "28845f3d3fd3edbcec98aab2716e6f1dc837132f67919592d93452d58b71ab2f",
+        "governed_result_ok": true,
+        "native_privacy_recheck": {
+          "level": "standard",
+          "indicators": [],
+          "handling": "local_private_default",
+          "persisted": true
+        },
+        "retrieved_at": 1794733337,
+        "tokens_removed": 2,
+        "lossy": true,
+        "view_source_sha256": "c17df6baf8ccaa74bc85a28a47364da6ba60281e46e5c53fe4204ef28191e702",
+        "capability_revision": "3abb3fc6c89d6d325c8d16ce67af8f24808383cc9f736c26f05d2e7351a28675"
+      }
+    ],
+    "scope": "Actual new approved company trial, with normal action review and retained successful tool journals. The earlier blocked trial was stopped with no pending effect; its journals remain. The broader report is not yet accepted."
+  },
+  "timing": {
+    "campaign_wall_seconds": 1397.769,
+    "campaign_wall_minutes": 23.3,
+    "successful_author_trial_seconds": 162.51,
+    "rejected_author_trial_seconds": 18.05,
+    "scope": "First helper authoring trial through the second successful governed page read; includes failed draft, host wiring/checks and new-trial planning. Earlier blocked discovery and later source publication are separate."
+  },
+  "provider_tool_fees_usd": 0,
+  "downloads": 0,
+  "weight_training_performed": false,
+  "native_candidate_submission_remains_quarantined": true,
+  "limits": [
+    "At-sign tokens can include decorators; masked excerpts are not exact executable source.",
+    "This is not complete de-identification; final native privacy checks remain required.",
+    "Independent host qualification and source release are separate from candidate submission.",
+    "Hardware, electricity, existing services and host development are excluded from provider fees.",
+    "The broader research report and original observer task remain unqualified."
+  ]
+}

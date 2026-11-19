@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "company": "local-research",
+  "evidence_paths": ["data/experiment-inputs/local-research/evidence.json"],
+  "max_model_calls": 1,
+  "experiments": [
+    {
+      "id": "measurement-plan",
+      "actor": "Engineer Gent",
+      "task": "Draft a concise Markdown proposal for measuring whether a smaller local coding model reduces total input/output tokens while preserving independently checked correctness. Specify a frozen task set, failure accounting and stop conditions. You have not executed this experiment; do not claim measurements or improvements.",
+      "criteria": ["Submit a quarantined candidate with exact native readback; independent host review is required before execution or promotion."],
+      "tools": ["files:read", "files:write"],
+      "max_model_calls": 1,
+      "candidate_workflow": {
+        "version": 1,
+        "actor": "Engineer Gent",
+        "path": "measurement-plan.md",
+        "max_bytes": 4096,
+        "max_attempts": 1
+      }
+    }
+  ]
+}

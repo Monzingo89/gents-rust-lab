@@ -9,6 +9,18 @@ use rusqlite::{params, Connection, OptionalExtension, TransactionBehavior};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 pub const ACCEPTANCE:&str="Submit a quarantined candidate with exact native readback; independent host review is required before execution or promotion.";
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum PromptProfile {
+    #[default]
+    Full,
+    Focused,
+}
+impl PromptProfile {
+    fn is_full(&self) -> bool {
+        *self == Self::Full
+    }
+}
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Spec {
@@ -17,8 +29,11 @@ pub struct Spec {
     pub path: String,
     pub max_bytes: usize,
     pub max_attempts: u32,
+    #[serde(default, skip_serializing_if = "PromptProfile::is_full")]
+    pub prompt_profile: PromptProfile,
 }
 pub fn from_intake(intake: &Value) -> Result<Option<Spec>> {
+    crate::proposal_feedback::from_intake(intake)?;
     let Some(value) = intake.get("candidate_workflow") else {
         return Ok(None);
     };

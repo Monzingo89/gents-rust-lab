@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-15",
+  "scope": "One locally authored Python repair submitted through an explicit owner-frozen review-stage controller; separate bounded host acceptance. No general autonomy or frontier-equivalence claim.",
+  "status": "PASS",
+  "run": "8ddef557-d218-4dd7-abbb-063cadd30b52",
+  "candidate": {
+    "source_sha256": "9e22a17fc6d13de5e1cb5bb45fb21b3d5f7ba5b8fd4e638274f5a66cc6ef2e07",
+    "native_source_matches_model_write": true,
+    "promoted": false,
+    "source_path": "docs/evidence/python-review-candidate-2026-11-15.py"
+  },
+  "measurements": {
+    "elapsed_seconds": 108.38,
+    "recorded_model_replies": 13,
+    "reserved_attempts": 13,
+    "frozen_max_model_calls": 16,
+    "recorded_tokens": {
+      "input": 63408,
+      "output": 1703,
+      "cached_input": 1311
+    },
+    "reasoning_tokens": null,
+    "provider_cost_usd": 0
+  },
+  "governance": {
+    "policy_revision": 1,
+    "policy_changed": false,
+    "host_coaching_messages": 0,
+    "normal_admin_review_required": true,
+    "normal_final_qa_required": true,
+    "independent_acceptance_automatic": false,
+    "source_promotion_automatic": false,
+    "frozen_suite_sha256": "a9180938d03e57bacb4a31c9c0bebf1576ba399581be1cc5b572f15f0cd9d202",
+    "frozen_intake_digest": "e4dec978cf1e89ac4b2a07ce085549a14e26d6d40695230bf39188caca2ae45c"
+  },
+  "host_acceptance": {
+    "status": "PASS",
+    "scope": "One source-reviewed function; original four-case frozen native suite, plus six contract examples and 300 deterministic generated string lists. No imports or host I/O in actual source. No general Python or frontier-equivalence claim.",
+    "host_suite_sha256": "85318640a1901a8ff0da0cbc43dded4f2af75d48ba7713425502aeb7ef9d4cf4",
+    "source_sha256": "9e22a17fc6d13de5e1cb5bb45fb21b3d5f7ba5b8fd4e638274f5a66cc6ef2e07",
+    "source_path": "docs/evidence/python-review-host-checks-2026-11-15.py"
+  },
+  "native_journals": [
+    {
+      "file": "tool-000000.json",
+      "action": "python_check",
+      "arguments": {
+        "contract_id": "stable-unique",
+        "expected_source_identity": "75d3831e9d468a706a7ad058e1e75074d359bf39e7600c9daab28fa81eadf683"
+      },
+      "diagnostic_status": "reported_fail",
+      "receipt": {
+        "actor": "Engineer Gent",
+        "arguments_sha256": "9d378f76c41e7c59c3290c969762502cd19f7ea5d9e93e0f14edfc5a8551ac90",
+        "phase": "worker",
+        "policy_revision": 1,
+        "provider_cost_usd": 0,
+        "result_sha256": "da8377a3bca94d85159fcb06fc19fda6d8b6c8d0bae1a964d4f09d92452c27ca",
+        "status": "completed",
+        "tool": "python_check"
+      }
+    },
+    {
+      "file": "tool-000001.json",
+      "action": "files",
+      "arguments": {
+        "op": "read",
+        "path": "candidate.py"
+      },
+      "diagnostic_status": null,
+      "receipt": {
+        "actor": "Engineer Gent",
+        "arguments_sha256": "3ec8018ec33ab9c5fbd3eecca3aa023d80b660ae6e0f67dfb748b74828d891ed",
+        "phase": "worker",
+        "policy_revision": 1,
+        "provider_cost_usd": 0,
+        "result_sha256": "201827e83f73a3ccd1f25031e9297d0f12796a2f1515b805fa4d520e9dfcb9ee",
+        "status": "completed",
+        "tool": "files"
+      }
+    },
+    {
+      "file": "tool-000002.json",
+      "action": "files",
+      "arguments": {
+        "op": "write",
+        "path": "candidate.py"
+      },
+      "diagnostic_status": null,
+      "receipt": {
+        "actor": "Engineer Gent",
+        "arguments_sha256": "bc2b8ffb9569163957ab624694226c37f7bdffce0be19d40d23f9320d66b6c1b",
+        "phase": "worker",
+        "policy_revision": 1,
+        "provider_cost_usd": 0,
+        "result_sha256": "36172b3c4f82c85d8083e1eb28ca6efdd62d68fed8fa857930de997b52350c65",
+        "status": "completed",
+        "tool": "files"
+      }
+    },
+    {
+      "file": "tool-000003.json",
+      "action": "python_check",
+      "arguments": {
+        "contract_id": "stable-unique",
+        "expected_source_identity": "09a96cfbb522e48e1e71f6bae5c192db98a2e4fc596b218b21e5ebe92b464fd4"
+      },
+      "diagnostic_status": "reported_pass",
+      "receipt": {
+        "actor": "Engineer Gent",
+        "arguments_sha256": "ed9689d7418ba2f2ea572c190d05816c2dfeb9cba2e1ac0dbbbcadcf69db58c1",
+        "phase": "worker",
+        "policy_revision": 1,
+        "provider_cost_usd": 0,
+        "result_sha256": "29b91a0df5d8d9d58f02ee52793dffe5adcdf9dbe9db3b60f4ea160a131df074",
+        "status": "completed",
+        "tool": "python_check"
+      }
+    },
+    {
+      "file": "tool-000004.json",
+      "action": "files",
+      "arguments": {
+        "op": "read",
+        "path": "candidate.py"
+      },
+      "diagnostic_status": null,
+      "receipt": {
+        "actor": "Engineer Gent",
+        "arguments_sha256": "3ec8018ec33ab9c5fbd3eecca3aa023d80b660ae6e0f67dfb748b74828d891ed",
+        "phase": "worker",
+        "policy_revision": 1,
+        "provider_cost_usd": 0,
+        "result_sha256": "219df1211c016187f3e25647966ca52c14dd2a487ec41fb2e5301634360291a2",
+        "status": "completed",
+        "tool": "files"
+      }
+    }
+  ],
+  "submission_observation": {
+    "authority_granted": false,
+    "independent_acceptance": false,
+    "independent_qa_required": true,
+    "origin": "owner_frozen_python_review_submission",
+    "policy_revision": 1,
+    "promoted": false,
+    "source_identity": "09a96cfbb522e48e1e71f6bae5c192db98a2e4fc596b218b21e5ebe92b464fd4",
+    "sources": [
+      {
+        "path": "candidate.py",
+        "source_sha256": "9e22a17fc6d13de5e1cb5bb45fb21b3d5f7ba5b8fd4e638274f5a66cc6ef2e07"
+      }
+    ]
+  },
+  "negative_context_only_trial": {
+    "run": "8df4b47c-f208-488e-8e89-931c663e5c64",
+    "status": "cancelled",
+    "recorded_replies": 16,
+    "reserved_attempts": 16,
+    "budget_denials": 37,
+    "submission_completed": false,
+    "provider_cost_usd": 0,
+    "finding": "Current-source context alone did not settle the task. Passing source was retested and rewritten identically. The native attempt ceiling blocked all later model dispatches. No efficiency qualification or source promotion."
+  },
+  "source_sha256": {
+    "crates/harness/src/inference_budget.rs": "0f0bea5df2b3e270f95c816bca0dae0585daae175c550a6c44381d727003b4e8",
+    "crates/harness/src/python_review_submission.rs": "903d1e858f04d8dc93da4d025c2c4d9f5bf785fa33406347f157d2d978c4b2bc",
+    "crates/harness/src/autonomy.rs": "313230dfc5e7305c035e11f7b06cd2407b18edf51036c2098bc157d330f2e006",
+    "mcp/src/python_check.rs": "490ac0cb93cdd34162088241eec0e0f5632bdf6073850dd951e234e46e376809",
+    "mcp/src/python_custody.rs": "2f10e5750c4a6e26fb0e201e1e0e1ac086cb898351615e1a6dccf208e7947f8f"
+  },
+  "binary_sha256": {
+    "target/debug/gents-harness": "01bf2d75aafc374627dd833f995f5cbcf7bd0eb4c2c6380abaeac26f256e7e21",
+    "target/debug/gents-local-mcp": "bf30ac2dd2abf843a1a01afb25a1d6bf402cbb54537c372d8f73ec2d6b7f2639"
+  },
+  "verification": {
+    "strict_workspace_clippy": "PASS",
+    "offline_workspace_tests_passed": 549,
+    "ignored_opt_in_or_platform_tests": 27,
+    "fresh_offline_workspace_build": "PASS",
+    "broker_tests_passed": 32
+  },
+  "limits": [
+    "One synthetic function and one frozen four-case native suite; extra host checks cover six contract examples and 300 deterministic generated string lists.",
+    "The host probes were created after the first rejected trial and reused unchanged; no fresh held-out or general benchmark claim.",
+    "Worker/admin/QA used separate calls to the same local engine and can make correlated errors.",
+    "Owner-frozen submission mode and a durable attempt ceiling are additional controls; comparisons do not isolate a single causal factor.",
+    "Provider fees exclude hardware, electricity, existing models and frontier host development. No downloads or weight training.",
+    "Source and production-website publication remain separate from this local evidence."
+  ]
+}

@@ -9,6 +9,12 @@ enum Request {
     Describe {
         source: String,
     },
+    Verify {
+        source: String,
+        source_sha256: String,
+        tests: String,
+        tests_sha256: String,
+    },
     Invoke {
         source: String,
         source_sha256: String,
@@ -32,6 +38,17 @@ fn execute() -> anyhow::Result<Value> {
         .map_err(|_| anyhow::anyhow!("invalid component request shape"))?;
     match request {
         Request::Describe { source } => gents_local_mcp::component_api::describe(&source),
+        Request::Verify {
+            source,
+            source_sha256,
+            tests,
+            tests_sha256,
+        } => gents_local_mcp::rust_verification::verify_snapshot(
+            &source,
+            &source_sha256,
+            &tests,
+            &tests_sha256,
+        ),
         Request::Invoke {
             source,
             source_sha256,

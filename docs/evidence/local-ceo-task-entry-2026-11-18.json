@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "date": "2026-11-18",
+  "scope": "Cache-first existing CEO entry, typed request preservation, and one real local planning example; full architecture goal remains active",
+  "implemented": [
+    "Existing CEO/UI checks eligible exact cache/source answers before requiring a model",
+    "Typed original ask/context/constraints/format/criteria retained across planning",
+    "Owner criteria can bypass mandatory initial clarification and cannot be dropped from ready proposals",
+    "Frozen draft intake binds host task request and digest",
+    "Compilation carries typed owner context to the reviewed worker task"
+  ],
+  "real_local_intake": {
+    "company": "ceo-typed-ebd8b1b0e0",
+    "session": "14b3e8f8-5c9e-4179-9b13-ef37ff016eef",
+    "status": "ready",
+    "first_turn_ready": true,
+    "recorded_local_replies": 1,
+    "model": "Qwen3-8B installed local GGUF; no download or weight modification",
+    "input_tokens": 517,
+    "output_tokens": 146,
+    "wall_seconds": 6.32,
+    "provider_fees_usd": 0,
+    "original_request_preserved": true,
+    "worker_execution_started": false,
+    "native_tool_calls": 0,
+    "proposal_path": "docs/evidence/ceo-intake-proposal-2026-11-18.json",
+    "proposal_sha256": "0c5c67fdce8b270f98468c8c2ee0fa1642d6b25d044a999a86b10e41b7211351",
+    "harness_binary_sha256_at_trial": "cc4d4ddd64373c95e33b9c1dbf23a051505ffb465f80217ea26cbad04bd84f77",
+    "source_sha256_at_trial": {
+      "crates/harness/src/ceo_fastpath.rs": "8f4216ea660ef8d4b271813c0b61a37ec145b95c42bf5b07d33544be42c0529a",
+      "crates/harness/src/ceo_planning.rs": "753b2a093fbe838ad5e895fbce53d99abe60b874d5ef0a985939763c173fc853",
+      "crates/harness/src/reasoning_planning.rs": "e8443e17d9e78d394dbc12e3ae3056dcec3f9845b470a2eda692ed793af5fe1c",
+      "mcp/src/task_engine/contracts.rs": "a09cefadd8c0a18f3a141203bc1cf158d0dfb78ca516fa4eb770e916372ce318"
+    },
+    "source_snapshots": "data/ceo-intake-trial/source-snapshot (private retained sources; later test-only source additions are checked separately)",
+    "local_execution": {
+      "backend_pid": 3250,
+      "dispatched_at_ms": 1795028625162,
+      "finish_reason": "stop",
+      "generation_budget": {
+        "final_tokens_reserved": 1536,
+        "reasoning_tokens": 0,
+        "total_generation_tokens": 1536
+      },
+      "launch_policy": {
+        "configured_context_tokens": 8192,
+        "fit_margin_mib": 4096,
+        "requested_gpu_layers": "auto"
+      },
+      "observed_context_tokens": 8192,
+      "port": 57029,
+      "received_at_ms": 1795028628210,
+      "resident_kib": 6248128,
+      "separated_reasoning_observed": false,
+      "task_input_sha256": "f9d7f97c74978c733379b85316190f14af5499cc9e7447bee74ecc5c4d61b344"
+    }
+  },
+  "real_draft_provenance_check": {
+    "company": "ceo-typed-ebd8b1b0e0",
+    "session": "14b3e8f8-5c9e-4179-9b13-ef37ff016eef",
+    "draft_run": "4c4da49a-7283-4574-9b44-b1230152d54d",
+    "draft_intake_sha256": "af134e70905cdd7294e9017401f5789b5fb4d1bdad0e90b472e5327f7b3a4580",
+    "task_request_sha256": "0c6bea5f872003596b97154bd7426a2681cd957d9ebc3a3201bff60a5e6b4e33",
+    "frozen_task_id": "262a01cf-9a8f-4bb8-a5c5-eab363955e6d",
+    "state": "draft",
+    "approval": null,
+    "forged_provenance_rejected": [
+      "changed_request",
+      "changed_hash",
+      "missing_session"
+    ],
+    "planning_posts": 0,
+    "model_calls": 0,
+    "worker_dispatches": 0,
+    "policy_installs": 0,
+    "native_tool_calls": 0
+  },
+  "verification": {
+    "state": "passed_scoped_checks",
+    "focused_ceo_tests": 31,
+    "task_engine_integration_tests": 9,
+    "browser_fixture": "Actual office UI and HTTP; no page route interception, generator calls or worker starts; source/criteria fixture data are synthetic",
+    "private_log_directory": "data/ceo-entry-verification",
+    "screenshot": "data/task-architecture-verification/ceo-fastpath.png",
+    "rust_workspace_passed": 586,
+    "rust_workspace_ignored": 27,
+    "strict_offline_clippy": "passed",
+    "format": "passed",
+    "workspace_build": "passed",
+    "web_build": "passed",
+    "node_checks": 10,
+    "company_tool_boundary_checks": 32,
+    "current_source_sha256": {
+      "crates/harness/src/ceo_fastpath.rs": "8f4216ea660ef8d4b271813c0b61a37ec145b95c42bf5b07d33544be42c0529a",
+      "crates/harness/src/ceo_planning.rs": "1447a10739ab6fcfaca29fb4fd3e25d201967978cd1c148f6704c0cdeab78d0a",
+      "crates/harness/src/company.rs": "4f7c869988c6270308bbda25929e97478854ab48520c8180a92a4985808185b6",
+      "crates/harness/src/reasoning_planning.rs": "e8443e17d9e78d394dbc12e3ae3056dcec3f9845b470a2eda692ed793af5fe1c",
+      "crates/harness/src/task_frontdoor.rs": "89dd74a5016d85f4d7dd96e08252174997f04f70e289bceac0b752f77be91c16",
+      "mcp/src/task_engine/contracts.rs": "a09cefadd8c0a18f3a141203bc1cf158d0dfb78ca516fa4eb770e916372ce318",
+      "mcp/tests/task_engine.rs": "e746355bff270acc1fa4fce9bf20f9822e1d2c343f2c4cdf7941247855cf90c8",
+      "web/app.js": "f7393748da6dfb394f6293f40bbfadc05e2650db5d6324e71cd175bb9ba902ce",
+      "web/assets/ceo-execution.js": "5cf1a8042a5d7b06de971799c26416b3e5130aa802a6dd2a86e3a6866f849928",
+      "scripts/task_frontdoor_smoke.py": "c012de580d5ab65e9d4f4263d67097d48b62154252ecaa447eb98992087326a5",
+      "scripts/task_frontdoor_browser.mjs": "5cbd35ea32ed79ebe66b9edd5bbb116a9c084098fb000714fb939ce1ff546cfa",
+      "scripts/ceo-execution.test.mjs": "de654fc2c870840a392abc336fba049c7fab5d30a8a9a3e4acb0dd7580907a38"
+    },
+    "source_revision": "8828798683ca0816d980871aa8048c88eb9b8a75",
+    "source_dirty": true
+  },
+  "not_proven": [
+    "Requested sentence was not executed or independently judged",
+    "No generated RAG answer or semantic answer cache",
+    "No optimality/model-ranking/general accuracy claim",
+    "No full workflow/registry/resource/held-out completion claim",
+    "No deployment or source/weight promotion"
+  ],
+  "no_process_left_running": "All owned fixtures and the one real local trial completed and terminated their harnesses; final process inspection found no running harness or llama-server."
+}

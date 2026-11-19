@@ -16,6 +16,8 @@ enum Request {
         offset_bytes: usize,
         #[serde(default = "page_size")]
         max_bytes: usize,
+        #[serde(default)]
+        metadata_only: bool,
     },
     Write {
         path: String,
@@ -25,6 +27,11 @@ enum Request {
     },
     List {
         path: String,
+    },
+    Rename {
+        path: String,
+        destination: String,
+        expected_sha256: String,
     },
 }
 fn page_size() -> usize {
@@ -57,15 +64,21 @@ impl Tool for Files {
     ) -> Result<Option<Value>> {
         let mut schema = self.schema();
         if scope.phase == Phase::Planner {
-            schema["oneOf"]
-                .as_array_mut()
-                .unwrap()
-                .retain(|branch| branch["properties"]["op"]["const"] != "write");
+            schema["oneOf"].as_array_mut().unwrap().retain(|branch| {
+                !matches!(
+                    branch["properties"]["op"]["const"].as_str(),
+                    Some("write" | "rename")
+                )
+            });
         }
         if policy
             .authorize(&scope.actor, "files", &serde_json::json!({"op":"read"}))
             .is_err()
         {
+            schema["oneOf"]
+                .as_array_mut()
+                .unwrap()
+                .retain(|branch| branch["properties"]["op"]["const"] != "rename");
             for branch in schema["oneOf"].as_array_mut().unwrap() {
                 if branch["properties"]["op"]["const"] == "write" {
                     branch["properties"]
@@ -78,7 +91,7 @@ impl Tool for Files {
         Ok(Some(schema))
     }
     fn description(&self) -> &'static str {
-        "Governed run-workspace files: read bounded UTF-8 pages, atomically replace bounded text, or list bounded safe entries. Optional write expected_sha256 requires read permission and an existing matching file hash before replacement; MCP writers are serialized. Frozen owner inputs cannot be overwritten. No symlinks, secret files, subprocesses or arbitrary paths. Planner phase cannot write."
+        "Governed run-workspace files: read UTF-8 pages, atomically replace bounded text, list safe entries, or exclusively rename a regular text/binary file up to 16 MiB. Read metadata_only=true omits body/decoding and returns the complete file hash and byte count; omit pagination. Rename requires files:rename plus read authority, an exact source expected_sha256, an absent destination and existing parents; it preserves bytes/mode and never overwrites or emulates unsupported atomic flags. Optional write expected_sha256 also requires read authority. MCP effects are serialized; frozen owner inputs cannot be overwritten or moved. No symlinks, hard links, subprocesses or arbitrary paths. Planner phase cannot mutate. Lost/error receipts require BOTH rename paths and hash inspection before retry."
     }
     fn read_only(&self) -> bool {
         false
@@ -88,25 +101,42 @@ impl Tool for Files {
     }
     fn execute(&self, context: &ToolContext<'_>, arguments: Value) -> Result<Value> {
         EmbeddedContracts.validate(self.name(), &arguments)?;
+        if arguments["metadata_only"] == true
+            && (arguments.get("offset_bytes").is_some() || arguments.get("max_bytes").is_some())
+        {
+            bail!("metadata-only reads require omission of pagination arguments");
+        }
         let request: Request = serde_json::from_value(arguments)?;
-        let writing = matches!(request, Request::Write { .. });
+        let writing = matches!(request, Request::Write { .. } | Request::Rename { .. });
         if writing && context.scope.phase != Phase::Worker {
             bail!("planner phase cannot write workspace files");
         }
         let root = context.authority.workspace(context.scope)?;
-        let directory = workspace::open(&root, writing)?;
+        let directory = workspace::open(&root, matches!(request, Request::Write { .. }))?;
         match request {
             Request::Read {
                 path,
                 offset_bytes,
                 max_bytes,
-            } => directory.read(&path, offset_bytes, max_bytes),
+                metadata_only,
+            } => {
+                if metadata_only {
+                    directory.fingerprint(&path)
+                } else {
+                    directory.read(&path, offset_bytes, max_bytes)
+                }
+            }
             Request::Write {
                 path,
                 content,
                 expected_sha256,
             } => directory.write_if(&path, &content, expected_sha256.as_deref()),
             Request::List { path } => directory.list(&path),
+            Request::Rename {
+                path,
+                destination,
+                expected_sha256,
+            } => directory.rename(&path, &destination, &expected_sha256),
         }
     }
 }

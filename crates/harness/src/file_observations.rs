@@ -3,6 +3,18 @@
 //! linkage, never an authenticated signature or the file's current state.
 use serde_json::{json, Value};
 
+pub fn rename_needs_reconciliation(record: &Value) -> bool {
+    record["action"] == "files"
+        && record["arguments"]["op"] == "rename"
+        && record["result"]["ok"] != true
+}
+pub fn rename_reconciliation(arguments: &Value, reason: &str) -> Value {
+    json!({"source_path":arguments["path"],"destination":arguments["destination"],
+        "expected_sha256":arguments["expected_sha256"],"reason":reason,
+        "pending_intent_retained":true,"automatic_replay":false,"independent_acceptance":false,
+        "instruction":"Inspect BOTH original paths with authorized files read metadata_only=true (or list their parent if absent), reconcile their hashes and the canonical audit, and retain this run. No new move or acceptance was inferred."})
+}
+
 fn linked(record: &Value) -> bool {
     let args = &record["arguments"];
     let result = &record["result"];
@@ -68,6 +80,24 @@ pub fn readback(record: &Value, write: &Value) -> Option<Value> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn metadata_reads_do_not_prove_text_readback_and_unconfirmed_moves_need_reconciliation() {
+        let mut row = record("read", 1, "source");
+        row["result"]["result"] = json!({"path":"result.txt","sha256":gents_local_mcp::digest(b"source"),"bytes":6,"total_bytes":6,"offset_bytes":0,"truncated":false,"next_offset_bytes":null,"metadata_only":true});
+        row["result"]["mcp_receipt"]["result_sha256"] = json!(gents_local_mcp::digest(
+            row["result"]["result"].to_string().as_bytes()
+        ));
+        let written = written(&record("write", 0, "source")).unwrap();
+        assert!(readback(&row, &written).is_none());
+        let failed = json!({"action":"files","arguments":{"op":"rename","path":"old","destination":"new"},"result":{"ok":false}});
+        assert!(rename_needs_reconciliation(&failed));
+        let mut confirmed = failed.clone();
+        confirmed["result"]["ok"] = json!(true);
+        assert!(!rename_needs_reconciliation(&confirmed));
+        let mut read = failed;
+        read["arguments"]["op"] = json!("read");
+        assert!(!rename_needs_reconciliation(&read));
+    }
     fn record(op: &str, step: u64, text: &str) -> Value {
         let args = if op == "write" {
             json!({"op":op,"path":"result.txt","content":text})

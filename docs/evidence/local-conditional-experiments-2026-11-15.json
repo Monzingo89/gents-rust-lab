@@ -1,0 +1,218 @@
+{
+  "schema_version": 1,
+  "scope": "Owner-frozen conditional source trials driven by independently checked results; real failed repair and unchanged-source stop. Not improved coding correctness, generalized autonomy, model training, source promotion or completion of the full company objective.",
+  "capability": {
+    "conditions": [
+      "accepted",
+      "rejected"
+    ],
+    "predecessor_must_be_earlier": true,
+    "same_task_criteria_and_acceptance_hash_required": true,
+    "branches_actors_tools_paths_budgets_owner_frozen": true,
+    "result_and_feedback_checksummed": true,
+    "current_predecessor_custody_and_runtime_rechecked": true,
+    "diagnostic_excerpt_max_utf8_bytes": 1200,
+    "feedback_is_authority_or_receipt": false,
+    "conditional_followup_requires_external_file_edit": false,
+    "skipped_trials_create_jobs_or_reservations": false,
+    "ancestral_source_repetition_stops_continuation": true,
+    "unconfirmed_mutation_or_evaluation_replayed": false,
+    "promotion_authorized": false,
+    "native_tool_count": 16
+  },
+  "verification": {
+    "host_system": "Darwin",
+    "host_architecture": "arm64",
+    "rust_passed": 569,
+    "rust_ignored": 27,
+    "python_checks_passed": 114,
+    "strict_offline_clippy": "passed",
+    "offline_workspace_build": "passed",
+    "format_and_syntax_checks": "passed",
+    "actual_http_conditional_chain": "passed; source intents simulated, actual native writes/readbacks/acceptance and failure-to-followup-to-PASS with unused branch skipped",
+    "actual_http_independent_evaluation": "passed; source intents simulated, actual isolated evaluation and uncertain-result retention",
+    "actual_http_admission_and_dispatch_reconciliation": "passed; model decisions simulated, actual journals and lost dispatch response",
+    "ten_page_site_checks": "passed"
+  },
+  "real_local_campaign": {
+    "version": 1,
+    "simulated": false,
+    "scope": "Real source generation and result-driven continuation with the same frozen task and finite Unicode acceptance; failure retained, no repair/adoption claim.",
+    "wall_seconds": 25.445,
+    "model_calls": 2,
+    "maximum_frozen_calls": 3,
+    "unused_calls": 1,
+    "input_tokens": 5104,
+    "output_tokens": 521,
+    "provider_cost_usd": 0,
+    "input_changed_after_initial_signal": false,
+    "host_messages_between_calls": 0,
+    "source_edits_by_host": false,
+    "source_adopted": false,
+    "trials": [
+      {
+        "run_id": "3c1f7c92-ee75-4780-8384-5e363fd02c52",
+        "experiment": "baseline",
+        "source_sha256": "cad810d2bf6b1cce95cbd776f31341d216616bb2c97725247ffc9c525357ee62",
+        "intake_sha256": "b7465367e0e6f9a2587be808330119abff312b88991fa25cdf4df538d9e6b289",
+        "policy_revision": 1,
+        "native_audit_sequences": [
+          8,
+          9
+        ],
+        "actual_task_input_sha256": "67746dfd0451bdd55ec4916902dadc60d2b33aa1c481928c50db95b52304f5b5",
+        "feedback_reached_actual_model_input": false,
+        "latency_seconds": 4.547,
+        "usage": {
+          "cached_input": 0,
+          "cost_usd": 0.0,
+          "input": 2245,
+          "output": 248,
+          "reasoning": null,
+          "source": "local local response; provider charge is zero, electricity excluded"
+        },
+        "independently_accepted": false,
+        "native_stage": "acceptance"
+      },
+      {
+        "run_id": "5b53d766-4d8a-4e4d-a5f6-26edf9e4963f",
+        "experiment": "repair-1",
+        "source_sha256": "cad810d2bf6b1cce95cbd776f31341d216616bb2c97725247ffc9c525357ee62",
+        "intake_sha256": "3942fae38261fd016d0a54eb9c500b4a553b084b43caaa45d9f61e9acf6d9e08",
+        "policy_revision": 1,
+        "native_audit_sequences": [
+          18,
+          19
+        ],
+        "actual_task_input_sha256": "49bf385bd8561ee1e4d19e659f28643cf97c9a1368328907e60b219df7334882",
+        "feedback_reached_actual_model_input": true,
+        "latency_seconds": 5.478,
+        "usage": {
+          "cached_input": 0,
+          "cost_usd": 0.0,
+          "input": 2859,
+          "output": 273,
+          "reasoning": null,
+          "source": "local local response; provider charge is zero, electricity excluded"
+        },
+        "independently_accepted": false,
+        "native_stage": "acceptance"
+      }
+    ],
+    "skipped_trials": [
+      {
+        "after": {
+          "experiment": "repair-1",
+          "outcome": "rejected"
+        },
+        "experiment": "repair-2",
+        "reason": "predecessor repeated an earlier source; no new revision to continue"
+      }
+    ],
+    "independent_failure": {
+      "text": "",
+      "offset": 0,
+      "limit": 1,
+      "actual": "None",
+      "expected": "Some(0)"
+    },
+    "conclusion": "Automatic feedback was delivered, but the local author returned identical source. Both submissions failed; the stagnation rule prevented a third call."
+  },
+  "campaign_profile": {
+    "model": "Qwen3-Coder-30B-A3B-Instruct",
+    "context_tokens": 8192,
+    "reasoning_tokens": 0,
+    "final_tokens_reserved": 1536,
+    "simulated_source_or_model": false,
+    "frozen_plan_sha256": "d933bfc5591cbe8834239d8a081f2810a0829d5bd4e36cc5c9cba487aec3c811",
+    "frozen_config_sha256": "578ccd1cfb888e505180a5cd9a59db84d20cf975a5d53ed8b005ab5a1fad5ac5",
+    "original_acceptance_sha256": "9fb70f14f8881d2cc9d52ce1eb9f1c4684b017393fd35db17d7c8d13603dcfde",
+    "native_acceptance_sha256": "94f2bb5de1a1197070e971dea1348e23f25daafe9e6c0bdd520a771aed23b3ba",
+    "between_call_host_source_edits": false,
+    "between_call_host_messages": 0,
+    "source_and_binary_hashes_at_generation": {
+      "source": {
+        "scripts/experiment_loop.py": "212860b73fcfa9e50648a7186b42b18a2a7546dca61dc1ae7805edea8476e534",
+        "scripts/experiment_evaluation.py": "ac496703c301141cfcadca6e2d04585ff394d009c3d188bc866fc9e167d992a0",
+        "scripts/experiment_continuation.py": "836b4580d87a5c84f3c6cbfa15ff460000fb2479d5976633fe7e5ec6d7c0d9fc",
+        "crates/harness/src/candidate_workflow.rs": "79ea82990f5abfc666e10529093891f95688d52a82600d0f678fc2014ba4e812",
+        "mcp/src/proposal_feedback.rs": "ebd347c2c6dfbdabce521deb2e5035f08cae3929b39144e236537335125481e9",
+        "mcp/src/proposals.rs": "ac7aa40abbdd346ca51fddaca5a2df1e0c497e09c94ab536121e4ea1e8dbb587"
+      },
+      "binaries": {
+        "gents-harness": "e3f590a2a12898446fdd3e2e036f9c14bf951308235798c41ad4b370e82addea",
+        "gents-local-mcp": "782661e46be4f0dd38fa2692222d381a489754c692bfcaff8a642f0bf5b56a23",
+        "gents-rust-component": "388105b3d78f3ba1620add0aa3f5059ece82ef9f5298b17b050c83b759730b74"
+      }
+    }
+  },
+  "rejected_source": {
+    "path": "docs/evidence/conditional-rust-rejected-2026-11-15.rs",
+    "sha256": "cad810d2bf6b1cce95cbd776f31341d216616bb2c97725247ffc9c525357ee62",
+    "copied_verbatim": true,
+    "adopted": false
+  },
+  "current_source_sha256": {
+    "scripts/experiment_loop.py": "212860b73fcfa9e50648a7186b42b18a2a7546dca61dc1ae7805edea8476e534",
+    "scripts/experiment_continuation.py": "836b4580d87a5c84f3c6cbfa15ff460000fb2479d5976633fe7e5ec6d7c0d9fc",
+    "scripts/experiment_evaluation.py": "ac496703c301141cfcadca6e2d04585ff394d009c3d188bc866fc9e167d992a0",
+    "scripts/experiment_evaluation_smoke.py": "9d9a4c27e1ba4800e79d90a2d54d7681025d7d5fcf914ac5d7fb04e09f6d2a64",
+    "scripts/test_experiment_loop.py": "872c294f3a4dbc97ca9b738d02c037e4449d7c38dcb48af5fc1e668ba2af9db1",
+    "scripts/test_experiment_evaluation.py": "15aa30b0de7861868368bf81d2e319830dc04d9558cc61dd868aa80e48505b61",
+    "scripts/company_tools.py": "e3acc4ef2021c921964d3fe280027a28bf4688a270842e3bd91aa0a053a8faa4",
+    "scripts/test_company_tools.py": "d70f960df3779221ba546a6efa16353f1772e169e189fe650983ae9a429a252b",
+    "scripts/check.sh": "9d81bf87a372b7a44faf34e29383f1784ac8ad864f6cf3cb9814acfaf39ea1fb",
+    "mcp/src/proposal_feedback.rs": "ebd347c2c6dfbdabce521deb2e5035f08cae3929b39144e236537335125481e9",
+    "mcp/src/proposals.rs": "ac7aa40abbdd346ca51fddaca5a2df1e0c497e09c94ab536121e4ea1e8dbb587",
+    "mcp/src/lib.rs": "ed6af10a97a6692faa0afbf8ea36872dfbaf2d845eda658f563b59e96d981cc8",
+    "mcp/tests/proposals.rs": "278bc642610c94f6d117e08c9ef783281591bd9ea60f0d74ef8d295c72646d2f",
+    "crates/harness/src/candidate_workflow.rs": "79ea82990f5abfc666e10529093891f95688d52a82600d0f678fc2014ba4e812",
+    "config/experiment-loop.repair-example.json": "2de22ab653be13466deee9430eded69beb25bc92b768a0a3875529b0f2702f4b",
+    "site/achievements.mjs": "f78579ce8204dd63ab88e92ef29bf361012c0130a9b341b9aaae737aae27c13b",
+    "docs/146-conditional-experiment-continuation.md": "0660c1446ca08944100755cfb69455364e5fe58d160fc06718368c9c648b8f67"
+  },
+  "verification_artifact_sha256": {
+    "data/conditional-rust-verification/admission-smoke.log": "dc5f297c3c1f0fae970b20915194cff579233b02cdcd5decf8046464d1de5a3f",
+    "data/conditional-rust-verification/build.log": "4f27ac380b22e1d975eee20ce727fa8cbc09061177f6253af0777fd4de7b7506",
+    "data/conditional-rust-verification/clippy.log": "b24a49d5bc610acd34674917a591b87eae18aa638517251455ae71c5d72bb4a2",
+    "data/conditional-rust-verification/continuation-smoke.log": "5f6a5d460e33e2720af7efa2830fef79e4bad95762ea6731e61ea4890bcc8ef3",
+    "data/conditional-rust-verification/evaluation-smoke.log": "baf54c0d56853448e9fcdfa52c85e5976b3e30a56d01d189a38c8661718992ae",
+    "data/conditional-rust-verification/python-tests.log": "478b8fbf91bea5095aa5bb029beb32572db1ca6c12fa3f4fa5814ca56bc7b8fe",
+    "data/conditional-rust-verification/real-trial-review.log": "eabe2a8bae864014a360f56d08d9f3904eaa6958b903da681c6b29485ebdd5e1",
+    "data/conditional-rust-verification/site-tests.log": "e0e3cde9a656641ba63c0bfb3ece746a9089d31c76303a05fe16e6d2f4087098",
+    "data/conditional-rust-verification/workspace-tests.log": "3697000f3c7f3d9efda39b9b53f37a6326bfc6e1f4d8d19d483dcfad895ff5e0",
+    "data/conditional-rust-trial/review.py": "b0a5d551c5909f980b0296bd975306820b779bbc7f721df1fac7c9292a138e69",
+    "data/conditional-rust-trial/review.json": "eabe2a8bae864014a360f56d08d9f3904eaa6958b903da681c6b29485ebdd5e1",
+    "data/conditional-rust-trial/report.json": "9ecfbdfc84a1d43d146be5e818dbaf7bc453ca5e5c8490c9ba330e6ea896be5b",
+    "data/conditional-rust-trial/freeze.json": "85fc172cc32fd4e644408cc17a4e820f64599c27d7cc06ddd32e037edbbafa58",
+    "data/conditional-rust-trial/plan.json": "d933bfc5591cbe8834239d8a081f2810a0829d5bd4e36cc5c9cba487aec3c811"
+  },
+  "checkout": {
+    "revision": "8828798683ca0816d980871aa8048c88eb9b8a75",
+    "branch": "codex/feature/public-research-view",
+    "dirty": true
+  },
+  "remaining": [
+    "Actual successful automatic repair",
+    "Independent suite design",
+    "Broader adaptive research agenda",
+    "Blind held-out comparisons",
+    "Qualified promotion/rollback",
+    "Weight/media and other-language evaluation",
+    "24/7 soak",
+    "Broader frontier-capability objective"
+  ],
+  "delivery": {
+    "local_pending_changes": true,
+    "committed": false,
+    "pushed": false,
+    "deployed": false,
+    "source_adopted": false,
+    "service_left_running": false,
+    "paid_api_used": false,
+    "downloads": false,
+    "provider_fees_scope": "Actual local company-model/tool fees; publishing-assistant usage, hardware and electricity excluded"
+  },
+  "historical_snapshot": true,
+  "current_implementation_followup": "docs/147-focused-author-context-and-reviewed-repairs.md"
+}

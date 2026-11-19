@@ -186,7 +186,20 @@ impl LanguageModel for Gateway {
         let start = Instant::now();
         if m.provider == "mock" {
             tokio::time::sleep(std::time::Duration::from_millis(1000)).await;
-            let text = if system.starts_with("COMPANY_ADMIN") {
+            let text = if system.starts_with("LOCAL_GROUNDED_ANSWER:") {
+                // Explicit provider=mock only: protocol coverage, never evidence
+                // of real generation quality, factual accuracy or token use.
+                let value: Value = serde_json::from_str(input)?;
+                if m.model == "mock-grounded-insufficient" {
+                    json!({"status":"insufficient","answer":"","citations":[],"missing_evidence":["SIMULATED missing support fixture"]}).to_string()
+                } else {
+                    let text = value["passages"][0]["text"]
+                        .as_str()
+                        .context("mock grounded passage absent")?;
+                    let quote: String = text.chars().take(200).collect();
+                    json!({"status":"answer","answer":quote,"citations":[{"passage":0,"quote":if m.model=="mock-grounded-invalid" {"SIMULATED invented quote"} else {&quote}}],"missing_evidence":[]}).to_string()
+                }
+            } else if system.starts_with("COMPANY_ADMIN") {
                 if m.model == "mock-invalid-authorization" {
                     bail!("SIMULATED authorization preparation failure; no verdict or tool effect");
                 }

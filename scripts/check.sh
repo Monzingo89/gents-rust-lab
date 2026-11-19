@@ -5,7 +5,13 @@ cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo test --workspace --locked
 cargo build --workspace --locked
+RESEARCH_CANDIDATE="$PWD/scripts/public_research.py" python3 scripts/fixtures/public-research/acceptance.py
 python3 -m unittest discover -s scripts -p 'test_company_research.py'
+python3 -m unittest discover -s scripts -p 'test_python_snapshot_check.py'
+python3 -m unittest discover -s scripts -p 'test_showcase_observer.py'
+python3 -m unittest discover -s scripts -p 'test_experiment_loop.py'
+python3 -m unittest discover -s scripts -p 'test_experiment_evaluation.py'
+python3 -m unittest discover -s scripts -p 'test_research_agenda.py'
 python3 -m unittest discover -s scripts -p 'test_local_sqlite.py'
 python3 -m unittest discover -s scripts -p 'test_completed_memory_proof.py'
 python3 scripts/audio_inspect_interop.py
@@ -17,6 +23,13 @@ python3 scripts/owned_discovery_smoke.py
 python3 scripts/company_factory_smoke.py
 python3 scripts/coordination_smoke.py
 python3 scripts/autonomy_smoke.py
+python3 scripts/inference_budget_smoke.py
+python3 scripts/rename_reconciliation_smoke.py
+python3 scripts/experiment_loop_smoke.py
+python3 scripts/experiment_evaluation_smoke.py
+python3 scripts/experiment_evaluation_smoke.py --continuation
+python3 scripts/experiment_evaluation_smoke.py --research
+python3 scripts/task_frontdoor_smoke.py
 python3 scripts/intent_retention_smoke.py
 python3 scripts/qa_recovery_smoke.py
 python3 scripts/frozen_artifact_gate_smoke.py

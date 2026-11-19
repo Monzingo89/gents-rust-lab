@@ -36,6 +36,7 @@ fn parse(intake: &Value) -> Result<Vec<RequiredCall>> {
 pub fn validate(intake: &Value) -> Result<()> {
     parse(intake)?;
     crate::rust_verification::validate(intake)?;
+    crate::python_check::validate(intake)?;
     if crate::owned_components::specs(intake)?
         .iter()
         .any(|s| s.input_recipe.is_some())

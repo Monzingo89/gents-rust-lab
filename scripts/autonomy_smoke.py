@@ -20,6 +20,7 @@ with tempfile.TemporaryDirectory(prefix="gents-autonomy-smoke-") as temporary:
     (root / "scripts").mkdir()
     shutil.copyfile(ROOT / "scripts/company_tools.py", root / "scripts/company_tools.py")
     shutil.copyfile(ROOT / "scripts/public_network.py", root / "scripts/public_network.py")
+    shutil.copyfile(ROOT / "scripts/public_research.py", root / "scripts/public_research.py")
     (root / "config").mkdir()
     shutil.copyfile(ROOT / "config/public-network-policy.json", root / "config/public-network-policy.json")
     model = {"provider": "mock", "model": "autonomy-fixture"}

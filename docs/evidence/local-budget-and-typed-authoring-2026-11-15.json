@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "scope": "Local budget lifecycle repair and three source-authoring attempts on the same real test repair; all company test candidates rejected. No paid API, downloads, training or automatic promotion.",
+  "budget_control": {
+    "terminal_status": "budget_exhausted",
+    "queued_work_preserved": true,
+    "restart_does_not_renew": true,
+    "manual_resume_rejected": true,
+    "crash_window_reconciled": true,
+    "http_fixture": "scripts/inference_budget_smoke.py",
+    "fixture_sha256": "41e88b4849d2986d5b8560e21a92abaeff40d52a54fb2afc7bd714ea4c331bc6",
+    "model_decisions_in_fixture": "simulated; actual HTTP/native file tool/databases",
+    "production_modules": {
+      "crates/harness/src/inference_budget.rs": "5abc686318c39ae06812e0519c138b8b693b57c78a3d14ef447c598e61aa4638",
+      "crates/harness/src/main.rs": "9b5c4707610c3e6f746d8d6806d9851169850618eb93d757c86c99dd1e26b07b",
+      "crates/harness/src/autonomy.rs": "bf32e78550ea89f32b29d83aa82953c178622f781388fa965f5645292bc1d1a3",
+      "crates/harness/src/observability.rs": "77dadbd7bc2b3c1c2a3b1b198e727600360166303161db4c1979775adade75c0"
+    },
+    "real_model_inference_calls_in_fixture": 0
+  },
+  "task_correctness_contract": {
+    "real_positive_methods": 6,
+    "frozen_regressions": 7,
+    "host_quality_sha256": "d27f8172ad410f5932102e6e2fa30e18b14ca418e29503e66a31ac15d6e798e2",
+    "base_test_module_sha256": "4fbda98f0e6c56229c63845663add8f35fd72d8cc9875a4a8f08516381924eea",
+    "observer_core_sha256": "bacbf530a2507816fcefc93835d3f84b1bb1f01f581a540dc6ea77d83f050219",
+    "criteria_relaxed": false
+  },
+  "authoring_trials": [
+    {
+      "runtime_status": "candidate_submitted",
+      "elapsed_seconds": 18.26,
+      "recorded_model_replies": 1,
+      "reserved_attempts": 1,
+      "reported_local_tokens": {
+        "input": 2424,
+        "output": 1332,
+        "cached_input": 0
+      },
+      "reported_provider_cost_usd": 0.0,
+      "source_sha256": "55c77f44ea2a5fda0e100f3fb335720e381148decda95a95550ad872c292e314",
+      "native_write_receipts": 1,
+      "native_read_receipts": 1,
+      "independent_host_acceptance_passed": false,
+      "methods_host_edited": false,
+      "candidate_adopted": false,
+      "live_coaching_messages": 0,
+      "scope": "One source-author reply and actual native write/readback; unchanged real six-method/seven-regression quality criteria rejected candidate. Reduced call count is not accepted-task efficiency.",
+      "model_config": {
+        "provider": "local",
+        "model": "Qwen3-Coder-30B Python diagnostic trial",
+        "path": "models/qwen3-coder-30b-worker/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf",
+        "context_tokens": 16384,
+        "local_reasoning_tokens": 0,
+        "local_final_tokens": 4096
+      },
+      "config_sha256": "d1097906e54eaaf06c32fa154e16c3d8cc045ff89e8e2dfadecb44ca9d762b2a",
+      "runtime_binary_sha256": "08cd4eea24c2bbbf3843163055a069c0dd2b4b2a2348c5b0edf0aee406142769",
+      "task_sha256": "a5775d82aa01c6af406a161ad978fdb8e32251044eef2fa09d58def3392ccdd6",
+      "approval_digest": "c60ed15d416995c552d7d840d2c647b49cba6b2314f82803cbce9edd2df5604f",
+      "canonical_candidate_and_two_native_receipts_verified": true
+    },
+    {
+      "runtime_status": "candidate_submitted",
+      "elapsed_seconds": 242.67,
+      "recorded_model_replies": 1,
+      "reserved_attempts": 1,
+      "raw_usage": [
+        {
+          "cached_input": 0,
+          "cost_usd": 0.0,
+          "input": 2466,
+          "output": 4132,
+          "reasoning": null,
+          "source": "local local response; provider charge is zero, electricity excluded"
+        }
+      ],
+      "reported_provider_cost_usd": 0.0,
+      "source_sha256": "3ae7d374e7c713cba3ee860f743adc5036a32503815ccff28bbaf0626de460a1",
+      "native_write_receipts": 1,
+      "native_read_receipts": 1,
+      "independent_host_acceptance_passed": false,
+      "methods_host_edited": false,
+      "candidate_adopted": false,
+      "live_coaching_messages": 0,
+      "separated_reasoning_observed": [
+        true
+      ],
+      "scope": "Same typed authoring controller, original task and host criteria; changed installed model and bounded reasoning profile. Three positive-control errors; rejected, not a quality gain.",
+      "model_config": {
+        "provider": "local",
+        "model": "Qwen3.8-27B bounded Python author",
+        "path": "models/qwen3.8-27b-planner-judge/Qwen3.8-27B-UD-Q4_K_M.gguf",
+        "context_tokens": 16384,
+        "local_reasoning_tokens": 2048,
+        "local_final_tokens": 4096
+      },
+      "config_sha256": "c574dbcf90a7b296c80509420f9bba555eb5d9bb458a387e62126781c5918900",
+      "runtime_binary_sha256": "08cd4eea24c2bbbf3843163055a069c0dd2b4b2a2348c5b0edf0aee406142769",
+      "task_sha256": "a5775d82aa01c6af406a161ad978fdb8e32251044eef2fa09d58def3392ccdd6",
+      "approval_digest": "c60ed15d416995c552d7d840d2c647b49cba6b2314f82803cbce9edd2df5604f",
+      "canonical_candidate_and_two_native_receipts_verified": true
+    },
+    {
+      "runtime_status": "candidate_submitted",
+      "elapsed_seconds": 95.19,
+      "recorded_model_replies": 1,
+      "reserved_attempts": 1,
+      "raw_usage": [
+        {
+          "cached_input": 0,
+          "cost_usd": 0.0,
+          "input": 2741,
+          "output": 1475,
+          "reasoning": null,
+          "source": "local local response; provider charge is zero, electricity excluded"
+        }
+      ],
+      "reported_provider_cost_usd": 0.0,
+      "source_sha256": "8ccbfcaae2b085b1e75b935f40a4fccf18317aa9e189058dd62dfadf32335ebf",
+      "native_write_receipts": 1,
+      "native_read_receipts": 1,
+      "independent_host_acceptance_passed": false,
+      "standalone_patch_positive_control_passed": false,
+      "methods_host_edited": false,
+      "candidate_adopted": false,
+      "live_coaching_messages": 0,
+      "pre_dispatch_diagnostic_feedback": true,
+      "separated_reasoning_observed": [
+        true
+      ],
+      "scope": "One bounded author call with exact nested-reply schema mentoring. Positive control still fails and two targeted observer regressions escape detection. No criteria relaxation, host logic edits, accepted-task efficiency, or source adoption.",
+      "model_config": {
+        "provider": "local",
+        "model": "Qwen3.8-27B bounded Python author",
+        "path": "models/qwen3.8-27b-planner-judge/Qwen3.8-27B-UD-Q4_K_M.gguf",
+        "context_tokens": 16384,
+        "local_reasoning_tokens": 512,
+        "local_final_tokens": 4096
+      },
+      "config_sha256": "a3a8240a17b89f21f9fafb93949eb2a37bb141b0c73c5a04f3c2929d41538d7b",
+      "runtime_binary_sha256": "3a314866b817bac189b077ac26aa91187402e2f69f37aff510da7880bbf02a2c",
+      "task_sha256": "2690006bdc157ae89a91959787335296735f9154ee9715cdea52b479ee9ba0ff",
+      "approval_digest": "96ec67855fdb9c603cb90ae11a6d382a635df16ca1fcb1a544009946f02ad208",
+      "canonical_candidate_and_two_native_receipts_verified": true
+    }
+  ],
+  "qualified_company_test_candidates": 0,
+  "automatic_source_promotion": false,
+  "website_deployed": false,
+  "verification": {
+    "rust_workspace_passed": 555,
+    "rust_workspace_ignored": 27,
+    "offline_clippy": "passed",
+    "offline_build": "passed",
+    "final_http_budget_lifecycle": "passed",
+    "existing_autonomy_restart_smoke": "passed",
+    "broker_checks_passed": 32,
+    "observer_checks_passed": 16,
+    "site_checks": "passed; ten pages, source/local build only",
+    "real_model_task_quality_candidates_accepted": 0
+  },
+  "verification_artifacts": {
+    "data/observer-typed-author-repair/workspace-tests.log": "512142645feb0a0ecdc4ddc03adf4b03fc2ece5981ffd2556315f1ce806fffa3",
+    "data/observer-typed-author-repair/budget-smoke.log": "57fde0b297208b0555d249dcad0b8d1fcd49cd7e627f6d043e7bb376a40a4603",
+    "data/observer-typed-author-repair/clippy.log": "dee7100b2b969812766a3501bc2e754954b1979058a0daa292fa9af240c361e5",
+    "data/observer-typed-author-repair/build.log": "1e1ef55e8b035e6940374ae89ce6431f9b18e90ba30b4b6821d03fca9cf16a61"
+  },
+  "historical_snapshot": true,
+  "snapshot_note": "Recorded experiment evidence; current workspace/runtime capabilities and test counts may differ. New rename evidence is recorded separately."
+}

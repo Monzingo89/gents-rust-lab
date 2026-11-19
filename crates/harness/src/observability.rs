@@ -65,6 +65,10 @@ impl TraceProjector for LocalTraceProjector {
             if matches!(
                 kind,
                 "call_failed"
+                    | "inference_budget_denied"
+                    | "budget_exhausted"
+                    | "rename_needs_reconciliation"
+                    | "needs_reconciliation"
                     | "failed"
                     | "blocked"
                     | "timed_out"
@@ -122,6 +126,17 @@ impl TraceProjector for LocalTraceProjector {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn exhausted_budget_is_an_issue_without_a_dispatched_model_call() {
+        let events = vec![
+            json!({"kind":"inference_budget_denied","call_id":"denied","agent":"A"}),
+            json!({"kind":"budget_exhausted","agent":"harness"}),
+        ];
+        let result = LocalTraceProjector.project("run", "budget_exhausted", &json!({}), &events);
+        assert_eq!(result["issues"].as_array().unwrap().len(), 2);
+        assert!(result["calls"][0]["started_at_ms"].is_null());
+        assert_ne!(result["calls"][0]["state"], "running");
+    }
 
     #[test]
     fn ceo_handoffs_publish_only_trace_metadata_and_do_not_invent_model_calls() {

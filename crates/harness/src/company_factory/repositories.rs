@@ -6,7 +6,7 @@ use crate::Config;
 fn supported_platform(os: &str, tool: &str, isolated_rust: bool) -> bool {
     (!isolated_rust || os == "macos")
         && (tool != "files" || matches!(os, "macos" | "linux"))
-        && (!matches!(tool, "image_generate" | "audio_generate") || os == "macos")
+        && (!matches!(tool, "image_generate" | "audio_generate" | "python_check") || os == "macos")
 }
 
 pub struct InstalledRepositories<'a> {
@@ -127,6 +127,7 @@ impl ToolRepository for InstalledRepositories<'_> {
                         | "skill_list"
                         | "skill_read"
                         | "rust_verify"
+                        | "python_check"
                         | "owned_rust_call"
                 );
                 Ok(Tool {

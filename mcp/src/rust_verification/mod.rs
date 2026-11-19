@@ -122,22 +122,13 @@ pub fn execute(context: &crate::ToolContext<'_>, path: &str) -> Result<Value> {
         .as_str()
         .context("Rust source text missing")?;
     let tests_text = tests["text"].as_str().context("acceptance text missing")?;
-    crate::safety::require_persistable(source_text)?;
-    crate::safety::require_persistable(tests_text)?;
-    let outcome = (|| -> Result<Value> {
-        source_policy::validate(source_text, false)?;
-        let count = source_policy::validate(tests_text, true)?;
-        sandbox::verify(source_text, tests_text, count)
-    })();
-    let mut result = match outcome {
-        Ok(value) => value,
-        Err(error) => json!({"passed":false,"stage":"admission","diagnostics":error.to_string()}),
-    };
+    let mut result = verify_snapshot(
+        source_text,
+        source["sha256"].as_str().context("source hash missing")?,
+        tests_text,
+        &spec.tests_sha256,
+    )?;
     result["source_path"] = json!(path);
-    result["source_sha256"] = source["sha256"].clone();
-    result["tests_sha256"] = tests["sha256"].clone();
-    result["provider_cost_usd"] = json!(0);
-    result["promotion_authorized"] = json!(false);
     if context
         .policy
         .authorize(
@@ -167,6 +158,39 @@ pub fn execute(context: &crate::ToolContext<'_>, path: &str) -> Result<Value> {
             result.to_string()
         ],
     )?;
+    Ok(result)
+}
+
+/// Private trusted-host snapshot evaluation, also used by the governed tool.
+/// Receives bytes and identities, never paths or authority. A returned PASS is
+/// scoped to this frozen suite; it is not a native run receipt or promotion.
+pub fn verify_snapshot(
+    source: &str,
+    source_sha256: &str,
+    tests: &str,
+    tests_sha256: &str,
+) -> Result<Value> {
+    ensure!(
+        crate::digest(source.as_bytes()) == source_sha256
+            && crate::digest(tests.as_bytes()) == tests_sha256,
+        "snapshot source or acceptance identity mismatch"
+    );
+    crate::safety::require_persistable(source)?;
+    crate::safety::require_persistable(tests)?;
+    let outcome = (|| -> Result<Value> {
+        source_policy::validate(source, false)?;
+        let count = source_policy::validate(tests, true)?;
+        sandbox::verify(source, tests, count)
+    })();
+    let mut result = match outcome {
+        Ok(value) => value,
+        Err(error) => json!({"passed":false,"stage":"admission","diagnostics":error.to_string()}),
+    };
+    result["source_sha256"] = json!(source_sha256);
+    result["tests_sha256"] = json!(tests_sha256);
+    result["provider_cost_usd"] = json!(0);
+    result["promotion_authorized"] = json!(false);
+    crate::safety::require_persistable(&result.to_string())?;
     Ok(result)
 }
 pub fn completion(

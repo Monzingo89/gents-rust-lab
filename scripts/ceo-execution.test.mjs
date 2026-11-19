@@ -3,6 +3,18 @@ import assert from 'node:assert/strict';
 import {prepareCeoExecution,confirmFrozenCeoJob} from '../web/assets/ceo-execution.js';
 const session=()=>({id:'saved',revision:2,status:'ready',messages:[{role:'user',message:'Calculate and save the native result'},{role:'ceo',message:{question:'Which inputs?'}},{role:'user',message:'Use the agreed inputs'}],proposal:{definition_of_done:['Readback equals the native result'],assignments:[{actor:'analyst',task:'Calculate',tools:['integer_arithmetic'],acceptance:['Native calculation']},{actor:'writer',task:'Save',tools:['files:write','files:read'],acceptance:['Exact readback']}]}});
 const prepare=s=>prepareCeoExecution(s,[],['analyst','writer']);
+test('typed owner context reaches compiled execution and frozen review without replacing the original ask',()=>{
+ const s=session(),original=s.messages[0].message;
+ s.task_request={schema_version:1,task_id:'host-generated-id',original_ask:original,objective:original,input:{original_ask:original,supplied_context:{unit:'integer cents'},constraints:['Preserve the source'],proposed_acceptance:['Readback equals the native result'],output:{format:'text',language:'en'}}};
+ const retained=structuredClone(s.task_request),draft=prepare(s);
+ assert.match(draft.task,/integer cents/);assert.match(draft.task,/Preserve the source/);
+ assert.deepEqual(draft.intake.ceo_task_request,retained);
+ const job={run_id:'run',digest:'frozen',state:'draft',intake:structuredClone(draft.intake)};
+ assert.equal(confirmFrozenCeoJob(draft,job).digest,'frozen');
+ job.intake.ceo_task_request.input.supplied_context.unit='dollars';
+ assert.throws(()=>confirmFrozenCeoJob(draft,job),/ceo_task_request/);
+ s.task_request.original_ask='Replaced goal';assert.throws(()=>prepare(s),/original task/);
+});
 test('review grants preserve role separation and cannot admit unrelated or duplicate actors',()=>{
  const draft=prepare(session());
  assert.deepEqual(draft.policy.grants.analyst,{tools:['integer_arithmetic','finish'],skills:[],memory_from:[]});

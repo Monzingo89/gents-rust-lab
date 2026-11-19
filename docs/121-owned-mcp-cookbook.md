@@ -1,6 +1,6 @@
 # Owned native MCP cookbook
 
-This covers all 15 tools in the local native implementation catalog captured on 2026-11-13. It is a source-derived recipe/reference, not a list of an agent's grants, proof that every task works, a security attestation or a migration claim for legacy Python tools. Tool calls target $0 provider fees; models, hardware and electricity are separate.
+This covers all 16 tools in the local native implementation catalog captured on 2026-11-15. It is a source-derived recipe/reference, not a list of an agent's grants, proof that every task works, a security attestation or a migration claim for legacy Python tools. Tool calls target $0 provider fees; models, hardware and electricity are separate.
 
 ## Before calling any tool
 
@@ -26,13 +26,14 @@ Native receipts record source/action/result identities and current policy. A suc
 | --- | --- | --- |
 | [audio_generate](#audio-generate) | Speak a short script locally | worker |
 | [audio_inspect](#audio-inspect) | Check the structure of a small WAV | planner, worker |
-| [files](#files) | Read, write or list a task workspace | planner, worker |
+| [files](#files) | Read, write, list or rename a task file | planner, worker |
 | [host_resources](#host-resources) | Check local capacity before choosing a model | planner, worker |
 | [image_generate](#image-generate) | Create a small image locally | worker |
 | [integer_arithmetic](#integer-arithmetic) | Calculate exact integer rows | planner, worker |
 | [memory_append](#memory-append) | Keep an attributable advisory or experiment | planner, worker |
 | [memory_search](#memory-search) | Retrieve currently allowed memory | planner, worker |
 | [owned_rust_call](#owned-rust-call) | Use an admitted pure function | worker |
+| [python_check](#python-check) | Retest copied Python source after a repair | worker |
 | [rust_verify](#rust-verify) | Check a quarantined pure Rust candidate | worker |
 | [skill_list](#skill-list) | Discover assigned instructions | planner, worker |
 | [skill_read](#skill-read) | Read one assigned instruction set | planner, worker |
@@ -44,7 +45,7 @@ Native receipts record source/action/result identities and current policy. A suc
 
 **Recipe: Speak a short script locally.** Freeze an approved confined output_path and grant audio_generate to the assigned worker. Supply the exact text and supported local voice. The installed pinned Piper model creates a WAV without network or downloads. Inspect the actual receipt and WAV properties; the generic voice is not cloned, and speech quality still needs listening. Existing destinations and frozen inputs cannot be overwritten.
 
-Implementation: [mcp/src/functions/media_generate.rs](../mcp/src/functions/media_generate.rs). Descriptor snapshot SHA-256: `d7fcb0866dac99e104507bcc1b9a956f8c97829c15da7fcaf37de82a3550fb4b`.
+Implementation: [mcp/src/functions/media_generate.rs](../mcp/src/functions/media_generate.rs). Descriptor snapshot SHA-256: `5cff6f43a102b751a83fef0e13af4c2500505332f416a00451784f06576cfbb1`.
 
 <details>
 <summary>Exact parameters, result shape, limits and implementation metadata</summary>
@@ -62,6 +63,7 @@ Implementation: [mcp/src/functions/media_generate.rs](../mcp/src/functions/media
   "external_effects": true,
   "runtime_requirements": {
     "call_timeout_seconds": 180,
+    "installed_python": false,
     "installed_rustc": false
   },
   "data_input_fields": [],
@@ -166,7 +168,7 @@ Implementation: [mcp/src/functions/media_generate.rs](../mcp/src/functions/media
 
 **Recipe: Check the structure of a small WAV.** Freeze its confined path and complete file hash, then inspect PCM16 frame/rate/channel statistics. Inspect the native receipt and exact source hash. Do not infer speech, content, health, clipping or transcription from these statistics.
 
-Implementation: [mcp/src/functions/audio_inspect.rs](../mcp/src/functions/audio_inspect.rs). Descriptor snapshot SHA-256: `726dacb654f69c663f0644f220cbd5854a1737af9ff6c7d37aca8b59927a9c11`.
+Implementation: [mcp/src/functions/audio_inspect.rs](../mcp/src/functions/audio_inspect.rs). Descriptor snapshot SHA-256: `9b9cd4acdae44a2f6db23e7fce46e5aca3c267e7f6bd7af0b5996ec15d717503`.
 
 <details>
 <summary>Exact parameters, result shape, limits and implementation metadata</summary>
@@ -185,6 +187,7 @@ Implementation: [mcp/src/functions/audio_inspect.rs](../mcp/src/functions/audio_
   "external_effects": false,
   "runtime_requirements": {
     "call_timeout_seconds": 10,
+    "installed_python": false,
     "installed_rustc": false
   },
   "data_input_fields": [],
@@ -378,9 +381,9 @@ Implementation: [mcp/src/functions/audio_inspect.rs](../mcp/src/functions/audio_
 
 ## files
 
-**Recipe: Read, write or list a task workspace.** Use a specific operation grant. Read bounded pages and check whole-file hashes when completeness matters. A worker may atomically replace authorized text; a planner may not write. For a lost write response, reconcile the canonical receipt and actual file before any retry.
+**Recipe: Read, write, list or rename a task file.** Use explicit operation grants. Read bounded UTF-8 pages, or use read metadata_only=true without pagination to fingerprint bounded text/binary without exposing its body. Worker-only rename requires files:rename plus files:read, the exact source expected_sha256, an absent destination and existing parents. It preserves regular-file bytes/mode up to 16 MiB; no overwrite, links, directory moves or copy/delete fallback. Frozen inputs cannot be moved or replaced. Lost/error receipts require BOTH paths/hash and canonical audit reconciliation; the harness retains unconfirmed rename intents and stops.
 
-Implementation: [mcp/src/functions/files.rs](../mcp/src/functions/files.rs). Descriptor snapshot SHA-256: `4ea609e085febe83f0bb21b964a61f43e71f539482c372150d7bc56ba676ba83`.
+Implementation: [mcp/src/functions/files.rs](../mcp/src/functions/files.rs). Descriptor snapshot SHA-256: `91a5c525450f0c158023ba67d8104bad5d9df6fb0b851decbe685b5d7dfd6567`.
 
 <details>
 <summary>Exact parameters, result shape, limits and implementation metadata</summary>
@@ -388,7 +391,7 @@ Implementation: [mcp/src/functions/files.rs](../mcp/src/functions/files.rs). Des
 ```json
 {
   "name": "files",
-  "description": "Governed run-workspace files: read bounded UTF-8 pages, atomically replace bounded text, or list bounded safe entries. Optional write expected_sha256 requires read permission and an existing matching file hash before replacement; MCP writers are serialized. Frozen owner inputs cannot be overwritten. No symlinks, secret files, subprocesses or arbitrary paths. Planner phase cannot write.",
+  "description": "Governed run-workspace files: read UTF-8 pages, atomically replace bounded text, list safe entries, or exclusively rename a regular text/binary file up to 16 MiB. Read metadata_only=true omits body/decoding and returns the complete file hash and byte count; omit pagination. Rename requires files:rename plus read authority, an exact source expected_sha256, an absent destination and existing parents; it preserves bytes/mode and never overwrites or emulates unsupported atomic flags. Optional write expected_sha256 also requires read authority. MCP effects are serialized; frozen owner inputs cannot be overwritten or moved. No symlinks, hard links, subprocesses or arbitrary paths. Planner phase cannot mutate. Lost/error receipts require BOTH rename paths and hash inspection before retry.",
   "source": "mcp/src/functions/files.rs",
   "phases": [
     "planner",
@@ -399,6 +402,7 @@ Implementation: [mcp/src/functions/files.rs](../mcp/src/functions/files.rs). Des
   "external_effects": true,
   "runtime_requirements": {
     "call_timeout_seconds": 10,
+    "installed_python": false,
     "installed_rustc": false
   },
   "data_input_fields": [],
@@ -430,6 +434,9 @@ Implementation: [mcp/src/functions/files.rs](../mcp/src/functions/files.rs). Des
             "maximum": 8192,
             "minimum": 1,
             "type": "integer"
+          },
+          "metadata_only": {
+            "type": "boolean"
           },
           "offset_bytes": {
             "minimum": 0,
@@ -478,6 +485,37 @@ Implementation: [mcp/src/functions/files.rs](../mcp/src/functions/files.rs). Des
           "content"
         ],
         "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "properties": {
+          "destination": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "expected_sha256": {
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "op": {
+            "const": "rename"
+          },
+          "path": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "op",
+          "path",
+          "destination",
+          "expected_sha256"
+        ],
+        "type": "object"
       }
     ],
     "type": "object"
@@ -492,7 +530,7 @@ Implementation: [mcp/src/functions/files.rs](../mcp/src/functions/files.rs). Des
 
 **Recipe: Check local capacity before choosing a model.** Read the host estimate and any observed Linux process limit. Keep unobserved GPU memory unknown, preserve a context/runtime allowance and fail capacity admission when required process limits are unknown. This does not download or select a model.
 
-Implementation: [mcp/src/functions/host_resources.rs](../mcp/src/functions/host_resources.rs). Descriptor snapshot SHA-256: `7daa00b05dfdb02e2be06f0603f0bde46a0b9efc8f028880b6682c0e47d94735`.
+Implementation: [mcp/src/functions/host_resources.rs](../mcp/src/functions/host_resources.rs). Descriptor snapshot SHA-256: `a308486eb64eace3ba95badc258d40c4870ac2dd526f7a592974ba3269be8aa5`.
 
 <details>
 <summary>Exact parameters, result shape, limits and implementation metadata</summary>
@@ -511,6 +549,7 @@ Implementation: [mcp/src/functions/host_resources.rs](../mcp/src/functions/host_
   "external_effects": false,
   "runtime_requirements": {
     "call_timeout_seconds": 10,
+    "installed_python": false,
     "installed_rustc": false
   },
   "data_input_fields": [],
@@ -643,7 +682,7 @@ Implementation: [mcp/src/functions/host_resources.rs](../mcp/src/functions/host_
 
 **Recipe: Create a small image locally.** Freeze an approved confined output_path and grant image_generate to the assigned worker. Supply prompt, dimensions, seed and the bounded step count. The installed pinned FLUX model runs locally with no network or downloads. Inspect the created PNG hash and dimensions; a valid PNG does not establish that the image matches the prompt. Existing destinations and frozen inputs cannot be overwritten.
 
-Implementation: [mcp/src/functions/media_generate.rs](../mcp/src/functions/media_generate.rs). Descriptor snapshot SHA-256: `033f64ebda2f48f7f47d34fe55abf7b9f2223ec215cf647eae765ea09e685439`.
+Implementation: [mcp/src/functions/media_generate.rs](../mcp/src/functions/media_generate.rs). Descriptor snapshot SHA-256: `04580b2c3cc3f20f200fc0f6c50cba1fd17f497dc163f2f2b37544de5dd1b7d2`.
 
 <details>
 <summary>Exact parameters, result shape, limits and implementation metadata</summary>
@@ -661,6 +700,7 @@ Implementation: [mcp/src/functions/media_generate.rs](../mcp/src/functions/media
   "external_effects": true,
   "runtime_requirements": {
     "call_timeout_seconds": 180,
+    "installed_python": false,
     "installed_rustc": false
   },
   "data_input_fields": [],
@@ -803,7 +843,7 @@ Implementation: [mcp/src/functions/media_generate.rs](../mcp/src/functions/media
 
 **Recipe: Calculate exact integer rows.** Supply bounded calculations with stable IDs, integer values and an explicit subtract field. Use the actual returned row/field through approved bindings; do not calculate an expected answer during CEO planning.
 
-Implementation: [mcp/src/functions/arithmetic.rs](../mcp/src/functions/arithmetic.rs). Descriptor snapshot SHA-256: `1f584e19622b47585e07fb40d8d7e16a7f792c8db9821c037d124443cb12dca5`.
+Implementation: [mcp/src/functions/arithmetic.rs](../mcp/src/functions/arithmetic.rs). Descriptor snapshot SHA-256: `fcf9278d7b9e2c8434e17add0b64a419e2ffbf57cc64bf5a8f512e3de070de76`.
 
 <details>
 <summary>Exact parameters, result shape, limits and implementation metadata</summary>
@@ -822,6 +862,7 @@ Implementation: [mcp/src/functions/arithmetic.rs](../mcp/src/functions/arithmeti
   "external_effects": false,
   "runtime_requirements": {
     "call_timeout_seconds": 10,
+    "installed_python": false,
     "installed_rustc": false
   },
   "data_input_fields": [],
@@ -919,7 +960,7 @@ Implementation: [mcp/src/functions/arithmetic.rs](../mcp/src/functions/arithmeti
 
 **Recipe: Keep an attributable advisory or experiment.** Supply the bounded body and kind, plus source references where available. The host supplies sender/run/phase/epoch. A record called fact is not automatically verified truth, a permission, or completed-task promotion.
 
-Implementation: [mcp/src/functions/memory.rs](../mcp/src/functions/memory.rs). Descriptor snapshot SHA-256: `8fff77d353f5d74d7c25363b241a8d520cbe6c8a07a43e60a2dbcbad02951239`.
+Implementation: [mcp/src/functions/memory.rs](../mcp/src/functions/memory.rs). Descriptor snapshot SHA-256: `2f562f7fc09f67f9c707b164b75323f33a4c494b77a2d8e73b29ee7f188dff32`.
 
 <details>
 <summary>Exact parameters, result shape, limits and implementation metadata</summary>
@@ -938,6 +979,7 @@ Implementation: [mcp/src/functions/memory.rs](../mcp/src/functions/memory.rs). D
   "external_effects": false,
   "runtime_requirements": {
     "call_timeout_seconds": 10,
+    "installed_python": false,
     "installed_rustc": false
   },
   "data_input_fields": [],
@@ -999,7 +1041,7 @@ Implementation: [mcp/src/functions/memory.rs](../mcp/src/functions/memory.rs). D
 
 **Recipe: Retrieve currently allowed memory.** Supply a literal keyword query and bounded limit. The native policy filters senders/run/epoch before limiting. Check truncated previews and source identities; retrieval cannot expand communication grants.
 
-Implementation: [mcp/src/functions/memory.rs](../mcp/src/functions/memory.rs). Descriptor snapshot SHA-256: `dab5a952fde12817e9526d0b660681ad3e7a73271b0a4e6da3e5aa15f61fd19b`.
+Implementation: [mcp/src/functions/memory.rs](../mcp/src/functions/memory.rs). Descriptor snapshot SHA-256: `5a41815772dd6cd334537096076d5d4b69eb1eddb522062aac13ef901a786596`.
 
 <details>
 <summary>Exact parameters, result shape, limits and implementation metadata</summary>
@@ -1018,6 +1060,7 @@ Implementation: [mcp/src/functions/memory.rs](../mcp/src/functions/memory.rs). D
   "external_effects": false,
   "runtime_requirements": {
     "call_timeout_seconds": 10,
+    "installed_python": false,
     "installed_rustc": false
   },
   "data_input_fields": [],
@@ -1051,7 +1094,7 @@ Implementation: [mcp/src/functions/memory.rs](../mcp/src/functions/memory.rs). D
 
 **Recipe: Use an admitted pure function.** The owner freezes actor, source/API hashes, function and binding first. Supply binding_id and positional arguments with the documented wire types. Approved dependencies use canonical producer receipts; do not paste invented upstream answers. Inspect unchanged source and independent task QA after native success.
 
-Implementation: [mcp/src/functions/owned_rust_call.rs](../mcp/src/functions/owned_rust_call.rs). Descriptor snapshot SHA-256: `a98a07df51c90bd38eaf9a3d04ce04803073226c4a3f2f142a0d88da88964a6f`.
+Implementation: [mcp/src/functions/owned_rust_call.rs](../mcp/src/functions/owned_rust_call.rs). Descriptor snapshot SHA-256: `7964fd07ef9b0b387ba6031d7e99dacb1ecd9a66ec6967d4917cf24b6a1f16d3`.
 
 <details>
 <summary>Exact parameters, result shape, limits and implementation metadata</summary>
@@ -1069,6 +1112,7 @@ Implementation: [mcp/src/functions/owned_rust_call.rs](../mcp/src/functions/owne
   "external_effects": false,
   "runtime_requirements": {
     "call_timeout_seconds": 110,
+    "installed_python": false,
     "installed_rustc": true
   },
   "data_input_fields": [
@@ -1128,11 +1172,198 @@ Implementation: [mcp/src/functions/owned_rust_call.rs](../mcp/src/functions/owne
 
 </details>
 
+## python check
+
+**Recipe: Retest copied Python source after a repair.** The owner freezes explicit source paths, a top-level unittest suite/hash, actor and installed interpreter hash in python_check_contracts. Supply contract_id; the host binds the current source identity before independent review. Each invocation executes fresh copied sources. frozen_inputs pins immutable dependencies; scratch_bytes defaults to zero and may admit bounded isolated temporary I/O. No shell, network, run-workspace writes, package installation or downloads. Inspect reported_fail diagnostics and repair actual source before checking again. Python can spoof a zero exit: reported_pass is not independent acceptance, source promotion or company completion. Currently macOS only with owner-configured GENTS_PYTHON.
+
+Implementation: [mcp/src/functions/python_check.rs](../mcp/src/functions/python_check.rs). Descriptor snapshot SHA-256: `f1d7f72b5d8e4cb7ebb2893de9ab12ef236e2e7718bfa1a7f80a136eb5b5cbc0`.
+
+<details>
+<summary>Exact parameters, result shape, limits and implementation metadata</summary>
+
+```json
+{
+  "name": "python_check",
+  "description": "Owner-scoped local Python unittest DIAGNOSTICS for explicit copied .py inputs. Provide contract_id only; the host binds expected_source_identity. The owner must freeze python_check_contracts with actor, source_paths, tests_path/tests_sha256 and interpreter_sha256. Requires current python_check and files:read grants and installed macOS isolation. Optional frozen_inputs pins immutable source dependencies. scratch_bytes defaults to zero; owner-frozen values through 8388608 allow private scratch data/create/rename/delete I/O with sampled byte/entry limits and no mode changes. No shell, network, run-workspace writes, subprocesses, downloads, result cache, promotion or acceptance. Python can spoof its test exit; reported_pass is not independent correctness or company completion. Source changes permit a new reviewed diagnostic; unchanged state remains retry-limited.",
+  "source": "mcp/src/functions/python_check.rs",
+  "phases": [
+    "worker"
+  ],
+  "read_only": false,
+  "deterministic": false,
+  "external_effects": true,
+  "runtime_requirements": {
+    "call_timeout_seconds": 12,
+    "installed_python": true,
+    "installed_rustc": false
+  },
+  "data_input_fields": [],
+  "file_input_fields": [],
+  "provider_cost_usd": 0,
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "contract_id": {
+        "maxLength": 80,
+        "minLength": 1,
+        "type": "string"
+      },
+      "expected_source_identity": {
+        "maxLength": 64,
+        "minLength": 64,
+        "type": "string"
+      }
+    },
+    "required": [
+      "contract_id"
+    ],
+    "type": "object"
+  },
+  "resultSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "authority_granted": {
+        "const": false
+      },
+      "contract_id": {
+        "maxLength": 80,
+        "minLength": 1,
+        "type": "string"
+      },
+      "elapsed_ms": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "exit_code": {
+        "type": "integer"
+      },
+      "inputs_sha256": {
+        "maxProperties": 32,
+        "type": "object"
+      },
+      "interpreter_sha256": {
+        "maxLength": 64,
+        "minLength": 64,
+        "type": "string"
+      },
+      "model_calls": {
+        "const": 0
+      },
+      "output_truncated": {
+        "type": "boolean"
+      },
+      "promoted": {
+        "const": false
+      },
+      "provider_cost_usd": {
+        "const": 0
+      },
+      "python_version": {
+        "type": "string"
+      },
+      "qualified": {
+        "const": false
+      },
+      "resident_memory_limit": {
+        "type": "boolean"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "scratch_limit_bytes": {
+        "maximum": 8388608,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "scratch_limit_exceeded": {
+        "type": "boolean"
+      },
+      "scratch_observed_bytes": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "scratch_observed_entries": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "snapshot_unchanged": {
+        "type": "boolean"
+      },
+      "source_identity": {
+        "maxLength": 64,
+        "minLength": 64,
+        "type": "string"
+      },
+      "status": {
+        "enum": [
+          "reported_pass",
+          "reported_fail",
+          "indeterminate"
+        ],
+        "type": "string"
+      },
+      "stderr": {
+        "maxLength": 16384,
+        "type": "string"
+      },
+      "stdout": {
+        "maxLength": 16384,
+        "type": "string"
+      },
+      "suite_sha256": {
+        "maxLength": 64,
+        "minLength": 64,
+        "type": "string"
+      },
+      "timed_out": {
+        "type": "boolean"
+      },
+      "verification_identity": {
+        "maxLength": 64,
+        "minLength": 64,
+        "type": "string"
+      }
+    },
+    "required": [
+      "status",
+      "source_identity",
+      "inputs_sha256",
+      "suite_sha256",
+      "snapshot_unchanged",
+      "interpreter_sha256",
+      "python_version",
+      "exit_code",
+      "timed_out",
+      "resident_memory_limit",
+      "output_truncated",
+      "stdout",
+      "stderr",
+      "elapsed_ms",
+      "model_calls",
+      "provider_cost_usd",
+      "qualified",
+      "promoted",
+      "authority_granted",
+      "scope",
+      "verification_identity",
+      "contract_id",
+      "scratch_limit_bytes",
+      "scratch_observed_bytes",
+      "scratch_observed_entries",
+      "scratch_limit_exceeded"
+    ],
+    "type": "object"
+  }
+}
+```
+
+</details>
+
 ## rust verify
 
 **Recipe: Check a quarantined pure Rust candidate.** The owner freezes the separate acceptance executable and hash for the assigned worker. Supply only the confined source_path. Review actual compiler/test diagnostics, current source hash and full readback. Failure remains failure; the tool does not promote source or certify the task.
 
-Implementation: [mcp/src/functions/rust_verify.rs](../mcp/src/functions/rust_verify.rs). Descriptor snapshot SHA-256: `38784e0448639b0174a5470beb50d3a040f754630be9b519456e1594ecbb0bbb`.
+Implementation: [mcp/src/functions/rust_verify.rs](../mcp/src/functions/rust_verify.rs). Descriptor snapshot SHA-256: `746d60098f8b84ed25312d0d7e62e0e3ed59824abacc77a92252d3d2474f47db`.
 
 <details>
 <summary>Exact parameters, result shape, limits and implementation metadata</summary>
@@ -1150,6 +1381,7 @@ Implementation: [mcp/src/functions/rust_verify.rs](../mcp/src/functions/rust_ver
   "external_effects": true,
   "runtime_requirements": {
     "call_timeout_seconds": 110,
+    "installed_python": false,
     "installed_rustc": true
   },
   "data_input_fields": [],
@@ -1335,7 +1567,7 @@ Implementation: [mcp/src/functions/rust_verify.rs](../mcp/src/functions/rust_ver
 
 **Recipe: Discover assigned instructions.** Use an empty object. The result lists only reviewed skills assigned to this actor and its process-bound planner/worker phase. The implementation catalog is not a substitute for these assignments.
 
-Implementation: [mcp/src/functions/skills.rs](../mcp/src/functions/skills.rs). Descriptor snapshot SHA-256: `e9d95c1f20279163e5fc80619f2050f6f4fa87926d081427cb652704cbd3e155`.
+Implementation: [mcp/src/functions/skills.rs](../mcp/src/functions/skills.rs). Descriptor snapshot SHA-256: `6fa5c17055771f4bb479206b4ed48ea79401d3fd32599b877f8ac94711731121`.
 
 <details>
 <summary>Exact parameters, result shape, limits and implementation metadata</summary>
@@ -1354,6 +1586,7 @@ Implementation: [mcp/src/functions/skills.rs](../mcp/src/functions/skills.rs). D
   "external_effects": false,
   "runtime_requirements": {
     "call_timeout_seconds": 10,
+    "installed_python": false,
     "installed_rustc": false
   },
   "data_input_fields": [],
@@ -1375,7 +1608,7 @@ Implementation: [mcp/src/functions/skills.rs](../mcp/src/functions/skills.rs). D
 
 **Recipe: Read one assigned instruction set.** Use an ID returned by the authorized skill list. Instructions can guide work but never install policy, authorize a tool, broaden data scope or override the frozen task.
 
-Implementation: [mcp/src/functions/skills.rs](../mcp/src/functions/skills.rs). Descriptor snapshot SHA-256: `8b5e5b149f0656b45c42b8e724ed91de24cf21402211d3f07b13a5e114faa7d1`.
+Implementation: [mcp/src/functions/skills.rs](../mcp/src/functions/skills.rs). Descriptor snapshot SHA-256: `cd58f89500c5a24352a6ea7af4a5580c79c6e33a426cd8008dc51135a9c6a79b`.
 
 <details>
 <summary>Exact parameters, result shape, limits and implementation metadata</summary>
@@ -1394,6 +1627,7 @@ Implementation: [mcp/src/functions/skills.rs](../mcp/src/functions/skills.rs). D
   "external_effects": false,
   "runtime_requirements": {
     "call_timeout_seconds": 10,
+    "installed_python": false,
     "installed_rustc": false
   },
   "data_input_fields": [],
@@ -1423,7 +1657,7 @@ Implementation: [mcp/src/functions/skills.rs](../mcp/src/functions/skills.rs). D
 
 **Recipe: Group exact integer data.** Supply flat scalar rows, group_by, value_field and an explicit filter or null. Preserve duplicate rows and zero-total groups. Feed actual /groups or /total through approved source bindings; unsupported floats/coercion/expressions fail rather than being guessed.
 
-Implementation: [mcp/src/functions/table.rs](../mcp/src/functions/table.rs). Descriptor snapshot SHA-256: `79e1a004c1f5f7a2e3fadd54d3dd3c42c946c5bc26dab65a053484c302e65da2`.
+Implementation: [mcp/src/functions/table.rs](../mcp/src/functions/table.rs). Descriptor snapshot SHA-256: `87eebf38ce9f339ae22739c4a85269de190081dddd588eff5534eba5db857046`.
 
 <details>
 <summary>Exact parameters, result shape, limits and implementation metadata</summary>
@@ -1442,6 +1676,7 @@ Implementation: [mcp/src/functions/table.rs](../mcp/src/functions/table.rs). Des
   "external_effects": false,
   "runtime_requirements": {
     "call_timeout_seconds": 10,
+    "installed_python": false,
     "installed_rustc": false
   },
   "data_input_fields": [
@@ -1616,7 +1851,7 @@ Implementation: [mcp/src/functions/table.rs](../mcp/src/functions/table.rs). Des
 
 **Recipe: Combine two bounded flat tables.** Choose inner or left based on the confirmed treatment of unmatched records. Supply exact typed keys and explicit output columns. Preserve duplicate matches and native output ordering. Use actual /rows downstream; missing fields and output overflow must stop the task.
 
-Implementation: [mcp/src/functions/table_join.rs](../mcp/src/functions/table_join.rs). Descriptor snapshot SHA-256: `a7a0d64318471403420659af57d551be16d487cdb0ce443ddc2be44fbb4f336b`.
+Implementation: [mcp/src/functions/table_join.rs](../mcp/src/functions/table_join.rs). Descriptor snapshot SHA-256: `e16fa6d10240f0e90ce32b70563458adc1a6c64a5a3bc8847db224835bb3e73c`.
 
 <details>
 <summary>Exact parameters, result shape, limits and implementation metadata</summary>
@@ -1635,6 +1870,7 @@ Implementation: [mcp/src/functions/table_join.rs](../mcp/src/functions/table_joi
   "external_effects": false,
   "runtime_requirements": {
     "call_timeout_seconds": 10,
+    "installed_python": false,
     "installed_rustc": false
   },
   "data_input_fields": [
@@ -1830,7 +2066,7 @@ Implementation: [mcp/src/functions/table_join.rs](../mcp/src/functions/table_joi
 
 **Recipe: Import a complete bounded JSON table.** Freeze the confined input path and, when required, complete source hash. Check returned source identity/size and preserve row order, duplicates and scalar types. A truncated page, duplicate decoded key or unsupported nested/float value imports nothing.
 
-Implementation: [mcp/src/functions/table_read.rs](../mcp/src/functions/table_read.rs). Descriptor snapshot SHA-256: `9ab0df32e8754a5934b87b728bc92595946606e2197025a64e0a64c943497b1d`.
+Implementation: [mcp/src/functions/table_read.rs](../mcp/src/functions/table_read.rs). Descriptor snapshot SHA-256: `f7254f41b85e5b675b24455f96a581b0ad34ba85a55810481fca613edfba3375`.
 
 <details>
 <summary>Exact parameters, result shape, limits and implementation metadata</summary>
@@ -1849,6 +2085,7 @@ Implementation: [mcp/src/functions/table_read.rs](../mcp/src/functions/table_rea
   "external_effects": false,
   "runtime_requirements": {
     "call_timeout_seconds": 10,
+    "installed_python": false,
     "installed_rustc": false
   },
   "data_input_fields": [],

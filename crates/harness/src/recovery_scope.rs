@@ -54,6 +54,18 @@ pub fn for_assignment(
             tool["source_bound_read_paths"] = json!(paths);
         }
     }
+    if intake["python_check_contracts"]
+        .as_array()
+        .is_some_and(|contracts| {
+            contracts
+                .iter()
+                .any(|contract| contract["actor"] == assigned.actor)
+        })
+    {
+        if let Some(tool) = catalog.get_mut("python_check") {
+            tool["source_bound_dispatch_guard"] = json!(true);
+        }
+    }
     Ok(Some(View {
         actor: assigned.actor.clone(),
         catalog: Value::Object(catalog),

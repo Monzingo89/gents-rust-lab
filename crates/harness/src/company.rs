@@ -222,6 +222,31 @@ pub fn operation(root: &Path, company: &str, owner: &str, input: &Value) -> Resu
                 );
                 frozen_intake["ceo_planning_revision"] = planning["revision"].clone();
                 frozen_intake["ceo_planning_mode"] = planning["planning_mode"].clone();
+                if !planning["task_request"].is_null() {
+                    let request: gents_local_mcp::task_engine::contracts::TaskRequest =
+                        serde_json::from_value(planning["task_request"].clone())?;
+                    request.validate()?;
+                    let request = serde_json::to_value(request)?;
+                    let hash = gents_local_mcp::digest(&serde_json::to_vec(&request)?);
+                    anyhow::ensure!(
+                        frozen_intake["ceo_task_request"].is_null()
+                            || frozen_intake["ceo_task_request"] == request,
+                        "supplied task request differs from the retained owner request"
+                    );
+                    anyhow::ensure!(
+                        frozen_intake["ceo_task_request_sha256"].is_null()
+                            || frozen_intake["ceo_task_request_sha256"] == hash,
+                        "supplied task request digest differs from retained owner request"
+                    );
+                    frozen_intake["ceo_task_request"] = request;
+                    frozen_intake["ceo_task_request_sha256"] = json!(hash);
+                } else {
+                    anyhow::ensure!(
+                        frozen_intake["ceo_task_request"].is_null()
+                            && frozen_intake["ceo_task_request_sha256"].is_null(),
+                        "legacy conversation has no typed owner request to freeze"
+                    );
+                }
                 let proposal = &planning["proposal"];
                 let stages = crate::ceo_team::parse(proposal)?;
                 let proposed_bindings =
@@ -239,6 +264,9 @@ pub fn operation(root: &Path, company: &str, owner: &str, input: &Value) -> Resu
                     &mut frozen_intake,
                 )?;
                 for stage in &stages {
+                    if stage.tools.iter().any(|tool| tool == "python_check") {
+                        anyhow::ensure!(frozen_intake["python_check_contracts"].as_array().is_some_and(|checks|checks.iter().any(|check|check["actor"]==stage.actor)),"CEO-selected python_check requires owner-frozen diagnostic contracts for its assigned actor before intake");
+                    }
                     if stage.tools.iter().any(|tool| tool == "rust_verify") {
                         anyhow::ensure!(frozen_intake["required_rust_checks"].as_array().is_some_and(|checks|checks.iter().any(|check|check["actor"]==stage.actor)),"CEO-selected rust_verify requires owner-frozen required_rust_checks for its assigned actor before intake");
                     }
@@ -303,6 +331,11 @@ pub fn operation(root: &Path, company: &str, owner: &str, input: &Value) -> Resu
                         && frozen_intake["ceo_owned_invocations"].is_null(),
                     "CEO plan or source attachments require a retained planning session"
                 );
+                anyhow::ensure!(
+                    frozen_intake["ceo_task_request"].is_null()
+                        && frozen_intake["ceo_task_request_sha256"].is_null(),
+                    "typed CEO task provenance requires a retained planning session"
+                );
             }
             crate::company_factory::preparation::validate_frozen(&frozen_intake)?;
             crate::company_factory::guided::validate_frozen(&frozen_intake)?;
@@ -314,6 +347,8 @@ pub fn operation(root: &Path, company: &str, owner: &str, input: &Value) -> Resu
             }
             let intake = &frozen_intake;
             gents_local_mcp::completion::validate(intake)?;
+            crate::inference_budget::validate(intake)?;
+            crate::python_review_submission::validate(intake)?;
             let bindings = gents_local_mcp::artifact_bindings::parse(intake)?;
             if !bindings.is_empty()
                 || intake["ceo_plan"]["planning_constraints"]["separate_source_writers"] == true

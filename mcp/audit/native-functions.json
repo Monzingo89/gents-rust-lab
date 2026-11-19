@@ -19,6 +19,18 @@
   ],
   "functions": [
     {
+      "id": "python_check",
+      "source": "src/functions/python_check.rs",
+      "effects": "Owner-frozen Python diagnostic contract; explicit source copies; embedded host helper; installed hash-pinned interpreter; read-only macOS test isolation. Python exit status is untrusted and cannot qualify or promote source. External execution and receipt persistence remain separate.",
+      "security_tests": [
+        "contracts_fail_closed_and_do_not_add_grants_or_completion_requirements",
+        "native_python_repair_receipts_revocation_and_both_transports",
+        "python_diagnostics_use_source_identity_without_relaxing_shell_replay",
+        "test_network_host_reads_writes_source_mutation_and_subprocesses_denied",
+        "test_test_code_can_spoof_exit_and_is_never_independent_acceptance"
+      ]
+    },
+    {
       "id": "integer_arithmetic",
       "source": "src/functions/arithmetic.rs",
       "effects": "pure bounded integer arithmetic",
@@ -66,7 +78,7 @@
       "id": "files",
       "source": "src/functions/files.rs",
       "adapter": "src/workspace.rs",
-      "effects": "bounded run-workspace read/list or atomic text replacement; granular operation grants; planner writes denied",
+      "effects": "bounded workspace UTF-8 or metadata-only read/list, atomic text replacement, or exclusive hash-pinned regular-file rename; operation grants plus read authority for rename; frozen source/destination protection; failed rename intent retained for reconciliation",
       "security_tests": [
         "independent_path_contract_checks_unicode_controls_and_exact_boundaries",
         "native_write_list_and_paged_read_preserve_source_hash_and_private_modes",
@@ -75,7 +87,14 @@
         "limits_sensitive_patterns_completed_jobs_and_revocation_fail_closed",
         "actual_stdio_preserves_escaped_source_and_returns_a_bounded_page",
         "admitted_write_errors_are_not_falsely_audited_as_effect_free",
-        "filesystem_write_surviving_audit_failure_is_reported_uncertain_not_success"
+        "filesystem_write_surviving_audit_failure_is_reported_uncertain_not_success",
+        "text_binary_and_empty_files_keep_bytes_inode_mode_and_hash_without_overwrite",
+        "rename_needs_its_own_grant_read_authority_worker_phase_current_epoch_and_active_job",
+        "frozen_owner_inputs_are_protected_at_source_destination_and_case_aliases",
+        "external_creation_race_cannot_be_overwritten_by_the_rename",
+        "lost_rename_audit_is_uncertain_and_reconciliation_does_not_repeat_the_move",
+        "actual_stdio_and_sse_return_canonical_rename_receipts_without_implicit_grants",
+        "metadata_only_read_fingerprints_binary_without_text_and_never_accepts_pagination"
       ]
     },
     {

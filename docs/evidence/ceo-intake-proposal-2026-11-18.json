@@ -1,0 +1,23 @@
+{
+  "assignments": [
+    {
+      "acceptance": [
+        "The final sentence must include both supplied facts.",
+        "Return exactly one sentence in English."
+      ],
+      "actor": "Writer Gent",
+      "task": "Write a one-sentence English status update that includes both facts: 'The checksum check passed' and 'The worker process is stopped'.",
+      "tools": []
+    }
+  ],
+  "definition_of_done": [
+    "The final sentence must include both supplied facts.",
+    "Return exactly one sentence in English."
+  ],
+  "native_contracts": {
+    "artifacts": [],
+    "sources": []
+  },
+  "question": "",
+  "status": "ready"
+}

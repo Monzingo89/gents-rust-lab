@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-15",
+  "scope": "Native diagnostic capability and one rejected local-company repair trial; no autonomous-code or efficiency qualification.",
+  "native_protocol_checks": {
+    "bad_source_then_repair": true,
+    "actual_stdio_and_http_sse": true,
+    "frozen_tests_protected": true,
+    "current_actor_phase_policy_and_file_grants": true,
+    "stale_identity_rejected": true,
+    "sensitive_output_rejected": true,
+    "audit_failure_uncertain": true
+  },
+  "company_trial": {
+    "run": "9a000dfa-58f4-4957-835f-c33a4449cbd9",
+    "status": "cancelled",
+    "elapsed_seconds": 358.09,
+    "recorded_model_replies": 30,
+    "recorded_local_tokens": {
+      "input": 213963,
+      "output": 5533,
+      "cached_input": 20510
+    },
+    "reasoning_tokens": null,
+    "interrupted_call_usage": "unknown; not included in recorded totals",
+    "provider_cost_usd": 0,
+    "diagnostic_sequence": [
+      "reported_fail",
+      "reported_pass",
+      "reported_pass",
+      "reported_fail"
+    ],
+    "policy_revision": 1,
+    "host_coaching_messages": 1,
+    "pending_effect_at_stop": false,
+    "final_source_sha256": "54b69aec93ecf0e31ccb35fbf17bfa6cf865632dc39a73764848989c26af6868",
+    "independent_acceptance": false,
+    "promoted": false,
+    "finding": "The worker authored a correct first repair, then changed a passing source to case-insensitive comparison. The frozen suite caught that regression. Repeated ineffective repairs followed despite a source-linked host clarification. The owner stopped this bounded trial to avoid further unproductive inference. The earlier host-checked source is not the final source."
+  },
+  "follow_up": {
+    "implemented": "Current-source native diagnostic observations in worker context, with canonical receipt lookup, source/policy/implementation invalidation and uncertain-latest-attempt suppression. No result cache or authority is created.",
+    "live_efficiency_gain_verified": false
+  },
+  "source_sha256": {
+    "mcp/src/python_check.rs": "31018acd447966605a49abfa9e812d366ca09bb674ac622fa87358d5febd8a9a",
+    "mcp/src/functions/python_check.rs": "96b4ed7cead3fc839604e5a7a8632f52049decda255688d4752e0285d734f0c3",
+    "mcp/src/owner_inputs.rs": "3e6caa6bbbb5b806e7225c6be237ba4568a7c09c160a687bf700740964639c3e",
+    "mcp/src/client.rs": "60ea78d01f052a376ddc4c04c3b3c8cf1de77d1e2f07890f51ec2dc301541539",
+    "crates/harness/src/autonomy.rs": "d49ffd302d67ac435b1fe16c0686105c500450eb867bc80aa820f28ff7215b3f",
+    "scripts/python_snapshot_check.py": "d566c72cd0d9b3067afb37e08c9af55998ec873e60c3991fe3d8af217c5f32a4",
+    "mcp/tests/python_check.rs": "192f504907baf12cf70e6b2e154efd251b8d8fe6c8cc59f14cf8369a2980424a"
+  },
+  "limits": [
+    "Host-authored native adapter; local worker authored only the candidate repair.",
+    "One synthetic case on installed local Qwen3-Coder-30B; same engine in separate worker/admin roles can make correlated errors.",
+    "No model downloads or weight training. Provider fees exclude hardware, electricity and frontier host development.",
+    "No change to original observer job or generic shell replay guard.",
+    "No perpetual-runtime, automatic promotion or frontier-equivalence claim."
+  ],
+  "source_snapshot_scope": "Historical snapshot at the initial native-diagnostics checkpoint. Later custody and review-submission changes are documented separately in local-python-review-submission-2026-11-15.json.",
+  "verification": {
+    "strict_workspace_clippy": "PASS",
+    "offline_workspace_tests_passed": 546,
+    "ignored_opt_in_or_platform_tests": 27,
+    "fresh_offline_workspace_build": "PASS",
+    "snapshot_regression_tests_passed": 6,
+    "broker_tests_passed": 31,
+    "research_default_tests_passed": 5,
+    "synthetic_factory_smoke": "PASS",
+    "synthetic_autonomy_restart_and_uncertain_effect_smoke": "PASS",
+    "local_site_build_and_static_checks": "PASS",
+    "production_deployment_verified": false
+  }
+}
