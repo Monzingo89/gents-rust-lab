@@ -52,6 +52,8 @@ macro_rules! tool {
                 RuntimeRequirements {
                     installed_rustc: false,
                     installed_python: false,
+                    installed_dotnet: false,
+                    installed_angular: false,
                     call_timeout_seconds: 180,
                 }
             }

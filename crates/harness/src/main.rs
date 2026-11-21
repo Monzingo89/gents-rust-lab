@@ -40,7 +40,9 @@ mod memory;
 mod memory_archive;
 mod memory_consumption;
 mod memory_handoff;
+mod mlx_prompt;
 mod model_artifact;
+mod model_package;
 #[cfg(all(test, unix))]
 #[path = "../../../mcp/tests/support/mod.rs"]
 mod native_fixture;
@@ -87,6 +89,8 @@ mod stage_acceptance;
 mod store;
 mod task_answers;
 mod task_frontdoor;
+mod task_native;
+mod task_workflows;
 mod verification_attempts;
 mod worker_packet;
 mod workflow;
@@ -151,6 +155,8 @@ struct Config {
     semantic_memory: Option<semantic_memory::Settings>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     task_answers: Option<task_answers::Settings>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    task_workflows: Option<task_workflows::Settings>,
 }
 fn default_run_seconds() -> u64 {
     900
@@ -233,6 +239,9 @@ impl Config {
             settings.validate(self)?;
         }
         if let Some(settings) = &self.task_answers {
+            settings.validate()?;
+        }
+        if let Some(settings) = &self.task_workflows {
             settings.validate()?;
         }
         if self.campaign.is_some()
@@ -322,6 +331,7 @@ struct App {
     training_cancels: Mutex<HashMap<String, Arc<AtomicBool>>>,
     office: office_activity::Service,
     task_answers: task_answers::Service,
+    task_workflows: task_workflows::Service,
 }
 type Shared = Arc<App>;
 type ApiError = (StatusCode, String);
@@ -1242,6 +1252,22 @@ async fn model_call(
         }
         let mut role_skills = skills::for_phase(actor.1)?;
         let mut role_capabilities = skills::capabilities_for_phase(actor.1)?;
+        if role_capabilities.iter().any(|c| c["id"] == "angular_check") {
+            use rusqlite::OptionalExtension;
+            let db = company::connect(&root, company, owner, false)?;
+            let encoded: Option<String> = db
+                .query_row(
+                    "SELECT intake FROM jobs WHERE run_id=?1",
+                    [id.to_string()],
+                    |r| r.get(0),
+                )
+                .optional()?;
+            let intake = encoded
+                .map(|s| serde_json::from_str::<Value>(&s))
+                .transpose()?
+                .unwrap_or_else(|| json!({}));
+            skills::scope_sdk_capabilities(&mut role_capabilities, &intake);
+        }
         if let Some(policy) = &policy {
             if let Some(grant) = policy.grants.get(actor.0) {
                 role_skills = skills::for_assignment(actor.1, &grant.skills)?;
@@ -1581,6 +1607,37 @@ async fn execute(s: &App, id: Uuid, task: &str, cancel: &AtomicBool) -> Result<S
 #[tokio::main]
 async fn main() -> Result<()> {
     let arguments = std::env::args().skip(1).collect::<Vec<_>>();
+    if arguments.len() == 2
+        && matches!(
+            arguments[0].as_str(),
+            "--model-package-pin" | "--adapter-package-pin"
+        )
+    {
+        let kind = if arguments[0] == "--model-package-pin" {
+            model_package::Kind::Model
+        } else {
+            model_package::Kind::Adapter
+        };
+        let relative = &arguments[1];
+        anyhow::ensure!(
+            model_package::safe_relative(relative)
+                && relative.starts_with(if kind == model_package::Kind::Model {
+                    "models/"
+                } else {
+                    "data/companies/"
+                }),
+            "package root outside supported local artifacts"
+        );
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&model_package::inspect(
+                &std::env::current_dir()?,
+                relative,
+                kind
+            )?)?
+        );
+        return Ok(());
+    }
     if arguments == ["--native-runtime-probe"] {
         println!(
             "{}",
@@ -1710,6 +1767,7 @@ async fn main() -> Result<()> {
         training_cancels: Mutex::new(HashMap::new()),
         office: office_activity::Service::new(std::env::current_dir()?)?,
         task_answers: task_answers::Service::default(),
+        task_workflows: task_workflows::Service::default(),
         gateway: Gateway {
             client: reqwest::Client::builder()
                 .timeout(Duration::from_secs(600))
@@ -1725,6 +1783,13 @@ async fn main() -> Result<()> {
         tokio::spawn(memory::maintain(s.clone()));
     }
     tokio::spawn(office_activity::monitor(s.clone()));
+    if s.config
+        .task_workflows
+        .as_ref()
+        .is_some_and(|settings| settings.native_mcp)
+    {
+        tokio::spawn(task_native::monitor(s.clone(), std::env::current_dir()?));
+    }
     if s.config.company_tools || s.config.enterprise.is_some() {
         let mut runs = s.runs.lock().await;
         let mut resumable = Vec::new();

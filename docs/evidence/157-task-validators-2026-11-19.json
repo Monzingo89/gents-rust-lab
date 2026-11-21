@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-19",
+  "goal_status": "active_incomplete",
+  "scope": "Executable profile validator registry and source-bound native .NET task receipts; no Angular/Cosmos/API or independent specialist qualification",
+  "source_sha256": {
+    "mcp/src/task_engine/validators.rs": "f068713092e642af2faca6d3b67f53c0a81d04bf115f3445040048e5a9961c04",
+    "mcp/src/task_engine/contracts.rs": "367a2f2379347b1297490282def501cafee3245e5044e5a684d1ecc8639ed717",
+    "mcp/src/task_engine/routing.rs": "2f40d8989a3df1d2f600b2113b51b2d84a1b8f708e0ba74c6d1d6c0aa6240b35",
+    "mcp/src/task_engine/workflows.rs": "655866ebd3c07773a5f801fccee409cb8d61b58ad869585c427b9d7746ad65a8",
+    "mcp/src/task_engine/native.rs": "0b1a1abd88b439682b1d8010102d4a7f053697d3bafad2fd6205719d7ef8bba0",
+    "mcp/src/task_engine/mod.rs": "8f10ba1a614f2dc813d7cbb355233f654c5d21fd4e476d55b1c5a8fb7a0748f3",
+    "mcp/src/task_engine/repository.rs": "a4f96c463a0ad78d7335f0ada23ad13aff9e80ba77570230fc674c170c816774",
+    "mcp/src/dotnet_check.rs": "1f0b716a638e2a03afa7fad7bc5ae4c70401161a635c41e76ecd4149f81689f5",
+    "mcp/src/dotnet_check/sandbox.rs": "49773b1a67c13dfe958bdd1fd9322ac34b6c8bfc1b7c22890d39dd2ba1a6dc5e",
+    "mcp/src/registry_dotnet.rs": "56da5f4729c7904d00912b078daf7746b12ab28300bc34981fbf59a9e5ec675c",
+    "mcp/src/functions/dotnet_check.rs": "41d7faea34acb4a6f70fc4b21871b5f4756508bd66c779fd566e6ce9325dd2c0",
+    "mcp/src/functions/tasks.rs": "27e9301cc8c83b0fff8ee9a4c0b638c7de595465a334275846c372dd26799f40",
+    "mcp/src/lib.rs": "4cbf3e56e55443ed7e80a76d25a047bbe2ca12ff5a994eadf5066fa205f477f4",
+    "mcp/src/client.rs": "45238ebcd099e259cfb44692888ecea66671cefd76b0711a9552693aa6e64fea",
+    "mcp/tests/task_validators.rs": "595d1f84ea379ad84d0b2ebe2ca6f5090368d88955e160fa58faee37b28f8b5e",
+    "mcp/tests/dotnet_check.rs": "263eac0acd2cf65ba83423ac9714ba2ed1a4557d52ff230a91f5063a8c141ebc",
+    "mcp/tests/adaptive_tasks.rs": "539993a9c7fc6691fad1f67fa6d87bdc754aba10a2ff91cde0da1d9daf7c5873",
+    "mcp/tests/intake_replans.rs": "351dcfb879bae8e3f156bf308a99c9af58c2560b61ed04a2cc3193bbd26db3bb",
+    "crates/harness/src/task_workflows.rs": "b676ec85401ecea9c8b169656da3d39f8ecfca8885bf6ca1a2dc68bf4043450a",
+    "scripts/task_validation_smoke.py": "6d50d703aa29d65360a0704191f25e383fb6276c815b7087edae7fee3c3ecf09",
+    "scripts/task_workflows_smoke.py": "099e13b2c3a1be23b9ba2fe0137d63d057fb3af79fcf309313471ac2abf53e81",
+    "scripts/check.sh": "215d7a498b839a015c17ecb8d4fd6f90f19bb2edcf1832f0be3b3520034df07f",
+    "config/schemas/task-engine-v1.json": "d8cf7ca88183fa5e4fe651878dc2e35df1a3c781dc2a268236ef3278b9f9a03c",
+    "docs/157-executable-task-validators.md": "0b0f900c2e499f075e90196a75080f547ccc7dc645e1f6c25885ef0a215cfec7",
+    "docs/151-task-engine-completion-audit.md": "078a0b549e78ff7a9bd74d8293166f1c90f98de3ff3984a6f415e79fdf69fb61",
+    "mcp/README.md": "39d868fe2b97a62302768e8c428e5935910866d9dc31e3971d1188be919bd357"
+  },
+  "full_repository_check": {
+    "command": "CARGO_NET_OFFLINE=true bash scripts/check.sh",
+    "exit_code": 0,
+    "log_sha256": "39ce953a61a2c97012245b4299284353b0ff34ee1b30a678507a82782b04c257",
+    "archived_log": "data/task-validator-live/2026-11-19-native-check/gents-validators-full-check-final.log",
+    "rust_passed": 671,
+    "rust_failed": 0,
+    "rust_ignored": 28,
+    "scope": "Strict format/Clippy, Rust tests/build, Python/Node/HTTP/native stdio+SSE fixtures, web build and site checks; model providers in protocol fixtures are mocked"
+  },
+  "retained_initial_full_check_failure": {
+    "exit_code": 1,
+    "log_sha256": "713fe8a7da0d0874406fc7ca2687383d9b00decca9815a25ddc9db81ab9fe883",
+    "boundary": "Workspace workflow fixture assumed first acceptance row was not_run",
+    "repair": "Select independent_factual_or_build_acceptance by name; keep it not_run while host custody/shape checks pass",
+    "focused_regression_log_sha256": "c66bca928d2f4a22280bc4eb94d0c00a8f564a4138a42dc71a6377cc9cf95d78",
+    "focused_regression_exit_code": 0
+  },
+  "live_native_task_checks": [
+    {
+      "report": "data/task-validator-live/2026-11-19-native-check/dotnet-stdio-evidence.json",
+      "report_sha256": "413613640bf3ec3e1fbef6d1a6c39c48105d717cf162b70f8dd43daf99a00b0c",
+      "transport": "actual native MCP stdio, HTTP owner admission and SQLite",
+      "native_binary_sha256": "5859d70cc9e2b4c26db51108e2b0803da2107a1fa4ea260c098bb4c7278a0654",
+      "harness_binary_sha256": "57119a79abed619fc379220110b234413a4ecef5e0d016943fc04851df7dfa1f",
+      "sdk": "actual installed SDK 10.0.401",
+      "worker": "mock only; zero model inference and no specialist qualification",
+      "checks": {
+        "actual_sdk_build": true,
+        "three_stage_one_validation": true,
+        "shared_tool_budget": true,
+        "source_change_invalidated": true,
+        "compiler_failure_blocked": true,
+        "completed_build_not_replayed_or_cached": true,
+        "canonical_native_receipt_required": true,
+        "wrong_actor_denied": true,
+        "inflight_source_change_stopped_sdk": true
+      },
+      "frozen_intake_matches_approval": true,
+      "current_implementation_input_identities_verified": 3,
+      "canonical_sdk_results_verified": 3,
+      "task_statuses": [
+        "generated",
+        "blocked",
+        "generated"
+      ],
+      "task_tool_attempts": [
+        1,
+        1,
+        1
+      ],
+      "sdk_elapsed_ms": [
+        1234,
+        1198,
+        1239
+      ],
+      "provider_cost_usd": 0,
+      "qualified": false,
+      "promoted": false
+    },
+    {
+      "report": "data/task-validator-live/2026-11-19-native-check/dotnet-sse-evidence.json",
+      "report_sha256": "715db473adfbd24cd37d207f5aad38e4aabaaa1f97056a4877b35d47bea2bbf7",
+      "transport": "actual native MCP sse, HTTP owner admission and SQLite",
+      "native_binary_sha256": "5859d70cc9e2b4c26db51108e2b0803da2107a1fa4ea260c098bb4c7278a0654",
+      "harness_binary_sha256": "57119a79abed619fc379220110b234413a4ecef5e0d016943fc04851df7dfa1f",
+      "sdk": "actual installed SDK 10.0.401",
+      "worker": "mock only; zero model inference and no specialist qualification",
+      "checks": {
+        "actual_sdk_build": true,
+        "three_stage_one_validation": true,
+        "shared_tool_budget": true,
+        "source_change_invalidated": true,
+        "compiler_failure_blocked": true,
+        "completed_build_not_replayed_or_cached": true,
+        "canonical_native_receipt_required": true,
+        "wrong_actor_denied": true,
+        "inflight_source_change_stopped_sdk": true
+      },
+      "frozen_intake_matches_approval": true,
+      "current_implementation_input_identities_verified": 3,
+      "canonical_sdk_results_verified": 3,
+      "task_statuses": [
+        "generated",
+        "blocked",
+        "generated"
+      ],
+      "task_tool_attempts": [
+        1,
+        1,
+        1
+      ],
+      "sdk_elapsed_ms": [
+        1253,
+        1168,
+        1231
+      ],
+      "provider_cost_usd": 0,
+      "qualified": false,
+      "promoted": false
+    }
+  ],
+  "live_component": {
+    "command": "GENTS_DOTNET=/opt/homebrew/bin/dotnet cargo test --offline -p gents-local-mcp --test dotnet_check -- --include-ignored --nocapture",
+    "exit_code": 0,
+    "report": "data/task-validator-live/2026-11-19-native-check/detached-sdk-revocation.json",
+    "report_sha256": "3d57447dbdb5b0a993a746576d028b6e8c9ea0593308cfdc74575a5db78e59bd",
+    "checks": {
+      "canonical_receipt_required": true,
+      "current_access_required": true,
+      "frozen_project_write_denied": true,
+      "midbuild_source_change_rejected": true,
+      "negative_compile": true,
+      "owner_revocation_during_sdk_rejected_commit": true,
+      "planner_denied": true,
+      "source_change_invalidates": true,
+      "sqlite_writer_available_during_sdk": true,
+      "sse_build": true,
+      "stale_identity_denied": true,
+      "stdio_build": true,
+      "unlisted_code_and_targets_excluded": true,
+      "wrong_actor_denied": true
+    },
+    "model_calls": 0,
+    "provider_cost_usd": 0
+  },
+  "independent_evidence_checks": {
+    "frozen_parent_intakes_match_approved_digests": true,
+    "sdk_source_identities_recomputed_from_current_implementation_and_frozen_inputs": true,
+    "canonical_sdk_result_hashes_match_native_audits_and_task_refs": true,
+    "current_runtime_binary_hashes_match_live_reports": true
+  },
+  "remaining_work": [
+    "Angular build/test and Cosmos/API/integration runtime validators",
+    "Admission binding for runtime checks first selected by later model intake",
+    "Broader existing backend/provider and multi-host integration",
+    "Independent factual/grounding/intake/specialist quality qualification after earlier calibration failures",
+    "Optional optimization engines remain unavailable; promotion gate is not an executed optimization"
+  ],
+  "limitations": [
+    "SDK checks compile package-free explicit snapshots only, not whole repositories or candidate applications.",
+    "SDK/runtime library closure is not fully content-addressed.",
+    "Memory is sampled process-group RSS; the 2 GiB reservation is a conservative limit estimate.",
+    "Citation membership and output parsing do not establish entailment, factual correctness or specialist expertise.",
+    "Generated answers and passing builds remain unverified for independent acceptance; no automatic promotion or verified-cache insertion."
+  ],
+  "publication": {
+    "commit": false,
+    "push": false,
+    "deploy": false
+  },
+  "model_downloads": 0,
+  "cloud_inference_calls": 0,
+  "provider_cost_usd": 0
+}

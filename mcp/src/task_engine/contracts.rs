@@ -7,21 +7,21 @@ use uuid::Uuid;
 pub const VERSION: u32 = 1;
 pub const COMPATIBILITY: &str = "task-engine-v1/exact-extraction-v1";
 
-#[derive(Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(schemars::JsonSchema, Clone, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum Intent {
     #[default]
     Answer,
     Action,
 }
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(schemars::JsonSchema, Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct Extraction {
     pub source_id: String,
     pub start_byte: usize,
     pub end_byte: usize,
 }
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(schemars::JsonSchema, Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct OutputSpec {
     pub format: String,
@@ -35,7 +35,7 @@ impl Default for OutputSpec {
         }
     }
 }
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(schemars::JsonSchema, Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct TaskInput {
     pub original_ask: String,
@@ -56,7 +56,7 @@ pub struct TaskInput {
     #[serde(default)]
     pub extraction: Option<Extraction>,
 }
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(schemars::JsonSchema, Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct TaskRequest {
     pub schema_version: u32,
@@ -138,12 +138,32 @@ impl TaskRequest {
             "host objective changed"
         );
         Self::from_input(self.input.clone())?;
+        ensure!(
+            self.assumptions.len() <= 16
+                && self.confirmed_facts.len() <= 16
+                && self.clarification_questions.len() <= 4
+                && self
+                    .assumptions
+                    .iter()
+                    .chain(&self.confirmed_facts)
+                    .chain(&self.clarification_questions)
+                    .all(|s| !s.trim().is_empty() && s.len() <= 2000),
+            "unbounded request annotations"
+        );
+        for annotation in self
+            .assumptions
+            .iter()
+            .chain(&self.confirmed_facts)
+            .chain(&self.clarification_questions)
+        {
+            crate::safety::require_persistable(annotation)?;
+        }
         Ok(())
     }
 }
 
 /// Constructed by the authenticated host. Never deserialize this from a model.
-#[derive(Clone, Debug, Serialize)]
+#[derive(schemars::JsonSchema, Clone, Debug, Serialize)]
 pub struct AccessScope {
     pub tenant: String,
     pub subject: String,
@@ -154,7 +174,7 @@ pub struct AccessScope {
     pub conversation_sha256: String,
     pub allowed_sources: BTreeSet<String>,
 }
-#[derive(Clone, Debug, Serialize)]
+#[derive(schemars::JsonSchema, Clone, Debug, Serialize)]
 pub struct ExecutionPolicy {
     pub schema_version: u32,
     pub scope: AccessScope,
@@ -169,6 +189,14 @@ pub struct ExecutionPolicy {
     pub cache_ttl_ms: u64,
     pub max_cache_entries: usize,
     pub max_evidence_bytes: usize,
+    pub permitted_tools: BTreeSet<String>,
+    #[serde(skip_serializing_if = "BTreeSet::is_empty")]
+    pub permitted_validators: BTreeSet<String>,
+    pub workspace_roots: Vec<String>,
+    pub network_allowed: bool,
+    pub allowed_provider_endpoints: BTreeSet<String>,
+    pub retention_ms: u64,
+    pub evidence_required: bool,
 }
 impl ExecutionPolicy {
     pub fn read_only(scope: AccessScope, now: u64) -> Self {
@@ -186,9 +214,17 @@ impl ExecutionPolicy {
             cache_ttl_ms: 3600000,
             max_cache_entries: 256,
             max_evidence_bytes: 8192,
+            permitted_tools: BTreeSet::from(["search_knowledge".into()]),
+            permitted_validators: BTreeSet::new(),
+            workspace_roots: vec![],
+            network_allowed: false,
+            allowed_provider_endpoints: BTreeSet::new(),
+            retention_ms: 3600000,
+            evidence_required: false,
         }
     }
     pub fn validate(&self, now: u64) -> Result<()> {
+        super::validators::Registry::validate_names(&self.permitted_validators)?;
         ensure!(
             self.schema_version == VERSION && self.deadline_ms > now && now <= i64::MAX as u64,
             "task policy deadline expired"
@@ -200,16 +236,45 @@ impl ExecutionPolicy {
             "invalid trusted scope"
         );
         ensure!(
+            self.permitted_tools
+                .iter()
+                .all(|t| super::read_tools::NAMES.contains(&t.as_str()))
+                && self.workspace_roots.len() <= 4
+                && self
+                    .workspace_roots
+                    .iter()
+                    .all(|p| std::path::Path::new(p).is_absolute()),
+            "unknown read tool or invalid trusted workspace roots"
+        );
+        ensure!(
+            !self
+                .permitted_tools
+                .iter()
+                .any(|t| t.starts_with("workspace_"))
+                || !self.workspace_roots.is_empty(),
+            "workspace read authority requires a trusted root"
+        );
+        ensure!(
             (1..=1024).contains(&self.max_cache_entries)
                 && self.cache_ttl_ms <= 86400000
                 && (1..=16384).contains(&self.max_evidence_bytes),
             "invalid storage/evidence limits"
         );
+        ensure!(
+            self.max_model_calls <= 64
+                && self.max_tokens <= 131072
+                && self.max_retries <= 2
+                && (1..=8).contains(&self.max_concurrency)
+                && (1..=8).contains(&self.max_depth)
+                && (1..=8).contains(&self.max_fan_out)
+                && self.retention_ms <= 86400000,
+            "invalid trusted global budgets"
+        );
         Ok(())
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(schemars::JsonSchema, Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum Coordination {
     Single,
@@ -218,14 +283,14 @@ pub enum Coordination {
     Hierarchy,
     PeerCollaboration,
 }
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(schemars::JsonSchema, Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum Scheduling {
     Sequential,
     Parallel,
     Mixed,
 }
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(schemars::JsonSchema, Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum Strategy {
     ExactLookup,
@@ -236,7 +301,7 @@ pub enum Strategy {
     CritiqueRevision,
     CandidateExploration,
 }
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(schemars::JsonSchema, Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct PlanNode {
     pub id: String,
@@ -247,7 +312,7 @@ pub struct PlanNode {
     pub tools: Vec<String>,
     pub validators: Vec<String>,
 }
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(schemars::JsonSchema, Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct ExecutionPlan {
     pub schema_version: u32,
@@ -263,8 +328,12 @@ pub struct ExecutionPlan {
     pub nodes: Vec<PlanNode>,
     pub routing_justification: String,
     pub cache_decision: String,
+    #[serde(default)]
+    pub evidence_required: bool,
+    #[serde(default)]
+    pub resolved_models: BTreeMap<String, String>,
 }
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(schemars::JsonSchema, Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct TaskAnalysis {
     pub schema_version: u32,
@@ -280,8 +349,16 @@ pub struct TaskAnalysis {
     pub decomposition_useful: Option<bool>,
     pub subtasks: Vec<PlanNode>,
     pub routing_justification: String,
+    #[serde(default)]
+    pub atomic_subtasks: Vec<String>,
+    #[serde(default)]
+    pub observed_dates_or_ranges: Vec<String>,
+    #[serde(default)]
+    pub tool_environment_requirements: Vec<String>,
+    #[serde(default)]
+    pub candidate_capabilities: Vec<String>,
 }
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(schemars::JsonSchema, Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum CheckStatus {
     Passed,
@@ -289,14 +366,14 @@ pub enum CheckStatus {
     NotRun,
     Unsupported,
 }
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(schemars::JsonSchema, Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct AcceptanceCheck {
     pub name: String,
     pub status: CheckStatus,
     pub detail: String,
 }
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[derive(schemars::JsonSchema, Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct Evidence {
     pub source_id: String,
@@ -309,7 +386,7 @@ pub struct Evidence {
     pub observed_at_ms: u64,
     pub valid_until_ms: u64,
 }
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(schemars::JsonSchema, Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Measurements {
     pub generative_model_calls: Option<u32>,
@@ -321,7 +398,7 @@ pub struct Measurements {
     pub provider_cost_usd: Option<u64>,
     pub memory_bytes: Option<u64>,
 }
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(schemars::JsonSchema, Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct CacheProvenance {
     pub decision: String,
@@ -331,7 +408,7 @@ pub struct CacheProvenance {
     pub expires_at_ms: Option<u64>,
     pub work_avoided: String,
 }
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(schemars::JsonSchema, Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct TaskResult {
     pub schema_version: u32,
@@ -342,9 +419,17 @@ pub struct TaskResult {
     pub evidence: Vec<Evidence>,
     pub blockers: Vec<String>,
     pub acceptance_checks: Vec<AcceptanceCheck>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub validation_receipts: Vec<super::validators::NativeReceipt>,
     pub actual_path: String,
     pub verification_state: String,
     pub cache: CacheProvenance,
     pub measurements: Measurements,
     pub plan: Option<ExecutionPlan>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub analysis: Option<TaskAnalysis>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub clarification_questions: Vec<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub assumptions: Vec<String>,
 }

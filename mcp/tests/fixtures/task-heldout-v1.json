@@ -1,0 +1,433 @@
+{
+  "version": 1,
+  "frozen_criteria": "Exact historical lookup and reviewed true paraphrase only; hard negatives miss. Default evidence work stays one RAG node regardless of prompt length/count; domain checks remain explicit.",
+  "cases": [
+    {
+      "id": "cache-01",
+      "input": {
+        "original_ask": "Who was US president in 1976?",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "exact"
+    },
+    {
+      "id": "cache-02",
+      "input": {
+        "original_ask": "Name the US president in 1976.",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "semantic"
+    },
+    {
+      "id": "cache-03",
+      "input": {
+        "original_ask": "Who was US president in 1974?",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-04",
+      "input": {
+        "original_ask": "Who won the 1976 US election?",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-05",
+      "input": {
+        "original_ask": "Who is the current US president?",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-06",
+      "input": {
+        "original_ask": "Who was UK president in 1976?",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-07",
+      "input": {
+        "original_ask": "Who was not US president in 1976?",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-08",
+      "input": {
+        "original_ask": "Who was US president in 1977?",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-09",
+      "input": {
+        "original_ask": "Who was president in 1976?",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-10",
+      "input": {
+        "original_ask": "Who served before 1976?",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-11",
+      "input": {
+        "original_ask": "Who served after 1976?",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-12",
+      "input": {
+        "original_ask": "Who became US president in January 1977?",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-13",
+      "input": {
+        "original_ask": "Who was US president in 1976 in kilograms?",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-14",
+      "input": {
+        "original_ask": "Who was US president in 1976 in pounds?",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-15",
+      "input": {
+        "original_ask": "Who is he?",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-16",
+      "input": {
+        "original_ask": "Who was US president in 1976? Answer in JSON.",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-17",
+      "input": {
+        "original_ask": "Name the US election winner in 1976.",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-18",
+      "input": {
+        "original_ask": "Who was US president in 1976, except Ford?",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-19",
+      "input": {
+        "original_ask": "Who was France president in 1976?",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-20",
+      "input": {
+        "original_ask": "Who was US president in 1976 today?",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-21",
+      "input": {
+        "original_ask": "Name the US president in 1976.",
+        "temporal_scope": "1974",
+        "output": {
+          "format": "text",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-22",
+      "input": {
+        "original_ask": "Name the US president in 1976.",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "json",
+          "language": "en"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-23",
+      "input": {
+        "original_ask": "Name the US president in 1976.",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "fr"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-24",
+      "input": {
+        "original_ask": "Name the US president in 1976.",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        },
+        "supplied_context": {
+          "pronoun": "someone else"
+        }
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-25",
+      "input": {
+        "original_ask": "Name the US president in 1976.",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        },
+        "constraints": [
+          "Use two sources"
+        ]
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-26",
+      "input": {
+        "original_ask": "Name the US president in 1976.",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        },
+        "proposed_acceptance": [
+          "Independently verified"
+        ]
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-27",
+      "input": {
+        "original_ask": "Name the US president in 1976.",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        },
+        "deliverable": "Signed result"
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "cache-28",
+      "input": {
+        "original_ask": "Name the US president in 1976.",
+        "temporal_scope": "1976",
+        "output": {
+          "format": "text",
+          "language": "en"
+        },
+        "intent": "action"
+      },
+      "expected": "miss"
+    },
+    {
+      "id": "route-angular-28",
+      "input": {
+        "original_ask": "Build the app against its installed Angular version."
+      },
+      "hints": {
+        "domain": "angular"
+      },
+      "expected": "rag/v1"
+    },
+    {
+      "id": "route-cosmos-29",
+      "input": {
+        "original_ask": "Measure this query RU charge using the actual partition key."
+      },
+      "hints": {
+        "domain": "cosmos"
+      },
+      "expected": "rag/v1"
+    },
+    {
+      "id": "route-dotnet-30",
+      "input": {
+        "original_ask": "Validate the .NET API contract."
+      },
+      "hints": {
+        "domain": "dotnet"
+      },
+      "expected": "rag/v1"
+    },
+    {
+      "id": "route-integration-31",
+      "input": {
+        "original_ask": "Verify Angular, .NET and Cosmos integration."
+      },
+      "hints": {
+        "domain": "integration"
+      },
+      "expected": "rag/v1"
+    },
+    {
+      "id": "route-history-32",
+      "input": {
+        "original_ask": "Resolve disputed officeholder dates."
+      },
+      "hints": {
+        "domain": "history"
+      },
+      "expected": "rag/v1"
+    },
+    {
+      "id": "route-research-33",
+      "input": {
+        "original_ask": "Resolve contradictory current references."
+      },
+      "hints": {
+        "domain": "research"
+      },
+      "expected": "rag/v1"
+    },
+    {
+      "id": "route-general-34",
+      "input": {
+        "original_ask": "Prove P = NP."
+      },
+      "hints": {
+        "domain": "general"
+      },
+      "expected": "rag/v1"
+    },
+    {
+      "id": "route-general-35",
+      "input": {
+        "original_ask": "List twenty easy greetings."
+      },
+      "hints": {
+        "domain": "general"
+      },
+      "expected": "rag/v1"
+    }
+  ]
+}

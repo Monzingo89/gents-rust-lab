@@ -4,6 +4,13 @@ use gents_local_mcp::{default_authority, protocol, Phase, Registry, Scope};
 use std::{collections::BTreeMap, path::PathBuf};
 async fn run() -> Result<()> {
     let args = std::env::args().skip(1).collect::<Vec<_>>();
+    if args == ["--task-schemas"] {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&gents_local_mcp::task_engine::schemas::bundle())?
+        );
+        return Ok(());
+    }
     if args == ["--implementation-catalog"] {
         println!(
             "{}",

@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-19",
+  "goal_status": "active_incomplete",
+  "scope": "Existing owned MLX workers and owner task UI; not model qualification or native MCP async completion",
+  "source_sha256": {
+    "crates/harness/src/model_package.rs": "3d4a936b220d0b65d77a4122206617e7958658efc2c5d0ffe237f74f6db9f008",
+    "crates/harness/src/mlx_prompt.rs": "5fa33f54d0cb357343d907da74b0d6217a66318a01dd02042cf776d141341d40",
+    "crates/harness/src/local_runtime.rs": "46e15fe6885c73dd251f4acd7a66aa24e3e23084ace5583f77615cd1c41d6405",
+    "crates/harness/src/task_workflows.rs": "911941ffc2f3617630ca228de9131accd4eca66e1cf449a0683296e3ffde7059",
+    "crates/harness/src/task_answers.rs": "319b8d5a325dc1b608c8def4b45df5e07fec4477ab4bf3a92d38d43a8d491eb6",
+    "crates/harness/src/task_frontdoor.rs": "e4e2f6831b0a1250b59538500c2c889e865fbdb86433b04d069bbc1ba9a66797",
+    "crates/harness/src/provider.rs": "a01d895de6cac8479f6c78e899f17261f50b9cbbab358d8198199efcbf669413",
+    "crates/harness/src/main.rs": "769e4075e50ebf02ec4de3b0728e0b95e7035e3b90abad13c842fac9d71bab2c",
+    "mcp/src/task_engine/workflows.rs": "9f650125071f247cc7d96441964ce8d66b0de1f4042527f372ddcc19018979df",
+    "scripts/mlx_prompt_tokens.py": "393aa9a78f2933719b168c14d7c19d3f5066c41535cf3aca39c1302a62debf8f",
+    "scripts/task_mlx_live.py": "b326f5b1e34a12241373c1a799cc324ecc4d6026e94f6a42a33516f6cc3db3c8",
+    "web/app.js": "7787bc9d76cc54d6da36f5fb88dbf7b3a3b4d1c135c8ba62005ba60afa7dcfd3",
+    "web/assets/task-workbench.js": "b18e23598493f885ac54b981e7dcf9b255ed62c05d259f1837e914b8f4cc236d",
+    "scripts/task_workflows_browser.mjs": "0eb5e86361c5e4ba7308ab3689cad8486388098e0eee427c7482fb450eb74756",
+    "scripts/task_workflows_smoke.py": "87c3250ee8ed5b74810561f7dbb4aa5b407f6542e7a8444e6e6c22ed5879e062",
+    "scripts/check.sh": "d45ee43a9de8c2514f820a477c1c69c6078e4ccba6e09028db1f00c80099eefa"
+  },
+  "verification": {
+    "full_repository_check": {
+      "command": "CARGO_NET_OFFLINE=true bash scripts/check.sh",
+      "exit_code": 0,
+      "rust_passed": 649,
+      "rust_failed": 0,
+      "rust_ignored": 27,
+      "log_sha256": "09bacbd6138df4b79b04897f74cb741ff602767cd42aa387ce6c729ef834214e"
+    },
+    "browser": {
+      "commands": [
+        "python3 scripts/task_workflows_smoke.py --browser",
+        "python3 scripts/task_frontdoor_smoke.py --browser"
+      ],
+      "exit_codes": [
+        0,
+        0
+      ],
+      "worker": "mock only; actual HTTP/SQLite/Chrome, no page-route mocks",
+      "logs_sha256": {
+        "/tmp/gents-task-ui-browser-final.log": "96a0198029d49473216d38f72237c6cb68a01d98ceaea8aa4d81d794a7612836",
+        "/tmp/gents-task-ui-legacy-browser.log": "1c95a9ee006255ab4c0a1d16f505208bc62adb204feda752fb0157aaab43ac24"
+      },
+      "screenshots_sha256": {
+        "data/task-architecture-verification/task-workbench-desktop.png": "cf4417ee22855866962cd3d5018fe543ad7de5001f099f84a21ad893be845ab7",
+        "data/task-architecture-verification/task-workbench-mobile.png": "cdd936060467111e764977599ea83d8cceb26be8417fa83b735859f74f99310f"
+      }
+    }
+  },
+  "live_mlx": {
+    "report": "data/task-mlx-live/7f21aab5-2920-41d0-8cb1-8226e67ecc6c/report.json",
+    "report_sha256": "fa005f440b616e17c41930750a9e611881b7f39ee3096093d6f90819c73cd26b",
+    "harness_binary_sha256": "0a67dec6402eb92078cf17048540dc5794bb443814e044a44725de4bc625b090",
+    "model_path": "models/gemma-4-E4B-it",
+    "package_sha256": "bea43fdaa35b44cc0ef56cb550727657f135d30160b1e6f51050fbdcdd2fe9b1",
+    "pinned_weight_bytes": 15992595884,
+    "pinned_total_input_bytes": 16024794203,
+    "checks": {
+      "generated": true,
+      "exact_answer": true,
+      "one_generative_call": true,
+      "source_cited": true,
+      "offline_preflight": true,
+      "tokenizer_matches_server_usage": true
+    },
+    "measurements": {
+      "elapsed_micros": 37541279,
+      "embedding_calls": 0,
+      "generative_model_calls": 1,
+      "input_tokens": 1007,
+      "memory_bytes": 12266962944,
+      "output_tokens": 80,
+      "provider_cost_usd": 0,
+      "tool_calls": 0
+    },
+    "local_execution": {
+      "backend_pid": 29910,
+      "dispatched_at_ms": 1795077220301,
+      "finish_reason": "stop",
+      "port": 64242,
+      "prompt_preflight": {
+        "has_chat_template": true,
+        "model_context_limit": 131072,
+        "prompt_tokens": 1007,
+        "provider_version": "0.32.2",
+        "schema_version": 1,
+        "tokenization_scheme": "mlx_lm.server/0.32.2",
+        "weights_loaded": false
+      },
+      "received_at_ms": 1795077227979,
+      "resident_kib": 11979456,
+      "task_input_sha256": "8c7f07301bd4c2c302cf6638a5f80d8b4c68de51daf5c59a49e491cc9520e503"
+    },
+    "backend_observed_context_tokens": null,
+    "quality_scope": "One synthetic source-backed literal/protocol trial; no specialist or general-quality qualification.",
+    "rss_is_not_total_unified_memory": true,
+    "production_admission": false,
+    "adapter_loaded": false
+  },
+  "retained_initial_trial": {
+    "report": "data/task-mlx-live/a15cb1ae-89a2-4ada-a0a8-f5d77b8d7f57/report.json",
+    "status": "capacity refusal, zero generation/tool calls",
+    "cause": "trial exact byte budget was one MiB short after conservative rounding",
+    "correction": "pad trial capacity to whole MiB; scheduler preserved"
+  },
+  "provider_cost_usd": 0,
+  "downloads": 0,
+  "committed": false,
+  "pushed": false,
+  "deployed": false,
+  "remaining": [
+    "native MCP asynchronous inference/status/cancel",
+    "specialist runtime checks and independent support validation",
+    "production model/intake/routing qualification",
+    "broader backends and configured multi-host execution"
+  ]
+}

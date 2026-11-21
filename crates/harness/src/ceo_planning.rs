@@ -852,6 +852,7 @@ pub async fn turn(
                             )?,
                             crate::now_ms(),
                         );
+                    repo.refresh_dependencies(&policy.scope, root)?;
                     let base = repo.execute(&request, &policy, crate::now_ms())?;
                     tx.commit()?;
                     base

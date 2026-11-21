@@ -8,6 +8,17 @@ use std::path::{Component, PathBuf};
 
 pub trait Authority {
     fn open(&self, scope: &Scope) -> Result<Connection>;
+    /// Optional request-local SDK observation, computed by trusted host code
+    /// before taking a writer lock. Never accepted through tool arguments.
+    fn angular_sdk_seal(
+        &self,
+        _sdk: &crate::angular_check::runtime::HostSdk,
+    ) -> Result<Option<String>> {
+        Ok(None)
+    }
+    fn discover_models(&self) -> Result<Value> {
+        bail!("model discovery unavailable for this authority")
+    }
     /// Only called after open, current governance and job-state admission.
     fn workspace(&self, _scope: &Scope) -> Result<PathBuf> {
         bail!("authority has no local workspace adapter")
@@ -24,6 +35,11 @@ impl SqliteAuthority {
     }
 }
 impl Authority for SqliteAuthority {
+    fn discover_models(&self) -> Result<Value> {
+        Ok(
+            serde_json::json!({"artifacts":crate::task_engine::models::configured(&self.root)?,"provider_probes":"use owner discovery API for configured endpoints; this native tool is offline"}),
+        )
+    }
     fn workspace(&self, scope: &Scope) -> Result<PathBuf> {
         scope.validate()?;
         Ok(self

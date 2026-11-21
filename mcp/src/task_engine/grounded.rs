@@ -295,7 +295,7 @@ fn running_result(base: &TaskResult, job: &FrozenJob, key: &str) -> TaskResult {
     result.plan=Some(ExecutionPlan {schema_version:VERSION,plan_id:Uuid::new_v4(),task_id:job.request.task_id,revision:1,previous_plan:None,
         original_objective_sha256:crate::digest(job.request.original_ask.as_bytes()),template:"grounded_answer/v1".into(),coordination:Coordination::Single,scheduling:Scheduling::Sequential,strategy:Strategy::GroundedGeneration,
         nodes:vec![PlanNode{id:"grounded_answer".into(),dependencies:vec![],profile:"local_grounded_answer/v1".into(),provider_model:Some(job.model_identity.clone()),strategy:Strategy::GroundedGeneration,tools:vec![],validators:vec!["current_citation_bytes/v1".into()]}],
-        routing_justification:"One generator receives bounded retrieved candidates; it must report missing support instead of inventing evidence. No team or worker side effects.".into(),cache_decision:"verified_answer_miss".into()});
+        routing_justification:"One generator receives bounded retrieved candidates; it must report missing support instead of inventing evidence. No team or worker side effects.".into(),cache_decision:"verified_answer_miss".into(),evidence_required:true,resolved_models:std::collections::BTreeMap::from([("answer".into(),job.model_identity.clone())])});
     result
 }
 pub fn prompt(job: &FrozenJob) -> Value {
@@ -370,6 +370,7 @@ pub fn finish(
     now: u64,
 ) -> Result<TaskResult> {
     install(repo)?;
+    repo.require_dependencies(scope)?;
     let (job, state, prior) = load(repo, scope, id)?;
     ensure!(
         prior.is_none() && matches!(state.as_str(), "running" | "cancel_requested"),

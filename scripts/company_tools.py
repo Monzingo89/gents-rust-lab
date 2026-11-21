@@ -293,10 +293,10 @@ def tls_context():
 
 class PinnedHTTPS(http.client.HTTPSConnection):
     def __init__(self, *args, **kwargs):
-        self._context = kwargs.pop("context", None)
-        super().__init__(*args, **kwargs)
-        if self._context is not None:
-            self._context = self._context
+        # HTTPSConnection initializes _context itself; assigning it beforehand
+        # loses the caller's configured certificate store and mocked transport.
+        context = kwargs.pop("context", None)
+        super().__init__(*args, context=context, **kwargs)
 
     def connect(self):
         # Pin the validated address to prevent DNS rebinding between validation/connect.

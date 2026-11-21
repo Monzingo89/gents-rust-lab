@@ -1,4 +1,5 @@
 //! Local-only, process-bound MCP tools. Transport does not create authority.
+pub mod angular_check;
 pub mod artifact_bindings;
 pub mod audio;
 pub mod authority;
@@ -8,6 +9,7 @@ pub mod completion;
 pub mod component_api;
 pub mod contract_execution;
 pub mod contracts;
+pub mod cosmos_check;
 pub mod functions;
 pub mod governance;
 pub mod host_memory;
@@ -21,16 +23,20 @@ mod owner_inputs;
 pub fn frozen_input_path(intake: &serde_json::Value, path: &str) -> bool {
     owner_inputs::protected(intake, path)
 }
+pub mod dotnet_check;
 pub mod packet_budget;
 pub mod proposal_feedback;
 pub mod proposals;
 pub mod protocol;
 pub mod python_check;
 mod python_custody;
+mod registry_angular;
+mod registry_dotnet;
 mod runtime_bundle;
 pub mod rust_verification;
 pub mod safety;
 pub mod skills;
+mod strict_json;
 pub mod task_engine;
 pub mod transports;
 pub mod workspace;
@@ -50,7 +56,8 @@ pub enum Phase {
     Planner,
     Worker,
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct Scope {
     pub company: String,
     pub owner: String,
@@ -94,6 +101,10 @@ pub fn now_ms() -> u64 {
 pub struct RuntimeRequirements {
     pub installed_rustc: bool,
     pub installed_python: bool,
+    #[serde(skip_serializing_if = "is_false")]
+    pub installed_dotnet: bool,
+    #[serde(skip_serializing_if = "is_false")]
+    pub installed_angular: bool,
     pub call_timeout_seconds: u64,
 }
 impl Default for RuntimeRequirements {
@@ -101,6 +112,8 @@ impl Default for RuntimeRequirements {
         Self {
             installed_rustc: false,
             installed_python: false,
+            installed_dotnet: false,
+            installed_angular: false,
             call_timeout_seconds: 10,
         }
     }
@@ -110,9 +123,14 @@ impl RuntimeRequirements {
         Self {
             installed_rustc: true,
             installed_python: false,
+            installed_dotnet: false,
+            installed_angular: false,
             call_timeout_seconds: 110,
         }
     }
+}
+fn is_false(value: &bool) -> bool {
+    !value
 }
 /// Implementations receive neither network credentials nor an arbitrary shell.
 pub trait Tool: Send + Sync {
@@ -381,7 +399,14 @@ impl Registry {
                         continue;
                     }
                 }
-                list.push(json!({"name":tool.name(),"description":tool.description(),"inputSchema":schema,"annotations":{"readOnlyHint":tool.read_only(),"openWorldHint":false,"destructiveHint":!tool.read_only()}}));
+                let mut definition = json!({"name":tool.name(),"description":tool.description(),"inputSchema":schema,"annotations":{"readOnlyHint":tool.read_only(),"openWorldHint":false,"destructiveHint":!tool.read_only()}});
+                if let Some(output) = tool
+                    .result_schema(None)
+                    .filter(|_| functions::is_task_capability(tool.name()))
+                {
+                    definition["outputSchema"] = json!({"type":"object","additionalProperties":false,"required":["value","receipt"],"properties":{"value":output,"receipt":{"type":"object","required":["actor","phase","tool","arguments_sha256","result_sha256","policy_revision","provider_cost_usd","status"],"properties":{"actor":{"type":"string"},"phase":{"type":"string"},"tool":{"type":"string"},"arguments_sha256":{"type":"string"},"result_sha256":{"type":"string"},"policy_revision":{"type":"integer"},"provider_cost_usd":{"const":0},"status":{"const":"completed"}}}}});
+                }
+                list.push(definition);
             }
         }
         tx.commit()?;
@@ -394,6 +419,19 @@ impl Registry {
         name: &str,
         arguments: Value,
     ) -> Result<Value> {
+        if name == "angular_check" {
+            return self.call_angular(authority, scope, name, arguments);
+        }
+        if matches!(name, "dotnet_check" | "dotnet_api_check") {
+            return self.call_dotnet(authority, scope, name, arguments);
+        }
+        let sdk_authority = matches!(name, "get_task_status" | "cancel_task")
+            .then(|| crate::angular_check::ReceiptAuthority::for_scope(authority, scope));
+        let authority: &dyn authority::Authority = if let Some(adapter) = &sdk_authority {
+            adapter
+        } else {
+            authority
+        };
         let mut db = authority.open(scope)?;
         // Immediate transaction fences policy changes and native memory writes
         // across processes. A revoked tool cannot commit against an old epoch.

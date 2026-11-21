@@ -1273,8 +1273,10 @@ fn executive_action(
     EmbeddedContracts.validate(&action, &arguments).ok()?;
     // Scoped Rust observations are deduplicated later using current source,
     // tests, policy and verifier identity. The path-only prefilter is too broad.
-    let source_bound = matches!(action.as_str(), "rust_verify" | "python_check")
-        && catalog[&action]["source_bound_dispatch_guard"] == true
+    let source_bound = matches!(
+        action.as_str(),
+        "rust_verify" | "python_check" | "dotnet_check" | "dotnet_api_check" | "angular_check"
+    ) && catalog[&action]["source_bound_dispatch_guard"] == true
         || action == "files"
             && arguments["op"] == "read"
             && catalog[&action]["source_bound_read_paths"]
@@ -2804,6 +2806,23 @@ async fn execute(
                 &engineer.id,
             ));
         }
+        if job["intake"]["dotnet_check_contracts"]
+            .as_array()
+            .is_some_and(|v| !v.is_empty())
+        {
+            let authority = gents_local_mcp::default_authority(root.clone())?;
+            let scope = gents_local_mcp::Scope {
+                company: company.clone(),
+                owner: owner.clone(),
+                run: id,
+                actor: engineer.id.clone(),
+                phase: gents_local_mcp::Phase::Worker,
+                expected_revision: stage_epoch,
+            };
+            context["dotnet_builds"] = json!(gents_local_mcp::dotnet_check::observations(
+                &authority, &scope
+            )?);
+        }
         if let Some(revision) = stage_epoch {
             context["evidence_policy_revision"] = json!(revision);
         }
@@ -3135,7 +3154,10 @@ async fn execute(
             emit(app,id,&engineer.id,"operations","rust_write_precondition_bound",&json!({"path":args["path"],"expected_sha256":args["expected_sha256"],"model_supplied":false,"authority_granted":false,"scope":"host-added current-source hash precondition; authored content unchanged"})).await?;
         }
         let revision = capability_revision();
-        let verification_identity = if action == "python_check" {
+        let verification_identity = if matches!(
+            action.as_str(),
+            "python_check" | "dotnet_check" | "dotnet_api_check" | "angular_check"
+        ) {
             let authority = gents_local_mcp::default_authority(root.clone())?;
             let scope = gents_local_mcp::Scope {
                 company: company.clone(),
@@ -3145,7 +3167,16 @@ async fn execute(
                 phase: gents_local_mcp::Phase::Worker,
                 expected_revision: stage_epoch,
             };
-            match gents_local_mcp::python_check::request_identity(
+            let identity_fn = if action == "angular_check" {
+                gents_local_mcp::angular_check::request_identity
+            } else if action == "dotnet_api_check" {
+                gents_local_mcp::dotnet_check::api_request_identity
+            } else if action == "dotnet_check" {
+                gents_local_mcp::dotnet_check::request_identity
+            } else {
+                gents_local_mcp::python_check::request_identity
+            };
+            match identity_fn(
                 &authority,
                 &scope,
                 args["contract_id"].as_str().unwrap_or(""),
@@ -3158,7 +3189,7 @@ async fn execute(
                     state.plan_queue.clear();
                     state.review_intent = None;
                     repair(app,id,&company,&mut state,task,json!({"error":error.to_string(),
-                        "executed":false,"instruction":"Python diagnostics require a fresh owner-frozen contract, installed interpreter, current grants and exact suite. Repair candidate source when missing; do not change frozen tests or permissions."}),cancel).await?;
+                        "executed":false,"instruction":"Checks require a current owner-frozen contract, installed hash-frozen runtime, current grants and exact frozen inputs. Repair candidate source when missing; do not change frozen inputs or permissions."}),cancel).await?;
                     continue;
                 }
             }
@@ -3195,7 +3226,7 @@ async fn execute(
                 phase: gents_local_mcp::Phase::Worker,
                 expected_revision: stage_epoch,
             };
-            // Owner-frozen Rust/Python source reads use dependency-aware accounting.
+            // Owner-frozen Rust/Python/.NET source reads use dependency-aware accounting.
             // Include pagination arguments so separate pages are not duplicates.
             gents_local_mcp::rust_verification::request_identity(
                 &authority,
@@ -3205,6 +3236,22 @@ async fn execute(
             .ok()
             .or_else(|| {
                 gents_local_mcp::python_check::source_read_identity(
+                    &authority,
+                    &scope,
+                    args["path"].as_str().unwrap_or(""),
+                )
+                .ok()
+            })
+            .or_else(|| {
+                gents_local_mcp::dotnet_check::source_read_identity(
+                    &authority,
+                    &scope,
+                    args["path"].as_str().unwrap_or(""),
+                )
+                .ok()
+            })
+            .or_else(|| {
+                gents_local_mcp::angular_check::source_read_identity(
                     &authority,
                     &scope,
                     args["path"].as_str().unwrap_or(""),
@@ -3361,6 +3408,34 @@ async fn execute(
                 .cloned()
                 .unwrap_or(Value::Null);
             review["python_result_limit"] = json!("Copied-source execution diagnostics only. Python may spoof zero exit. No automatic independent acceptance, promotion or company completion.");
+        }
+        if matches!(action.as_str(), "dotnet_check" | "dotnet_api_check") {
+            review["frozen_dotnet_build"] = job["intake"]["dotnet_check_contracts"]
+                .as_array()
+                .and_then(|contracts| {
+                    contracts.iter().find(|contract| {
+                        contract["actor"] == engineer.id && contract["id"] == args["contract_id"]
+                    })
+                })
+                .cloned()
+                .unwrap_or(Value::Null);
+            review["dotnet_result_limit"] = if action == "dotnet_api_check" {
+                json!("Compilation and owner-frozen finite host HTTP checks against the copied application through an inherited loopback socket. Only those cases are checked; no general API correctness, independent acceptance or promotion.")
+            } else {
+                json!("Compilation of explicit captured inputs only; no candidate runtime, API correctness, independent acceptance or promotion.")
+            };
+        }
+        if action == "angular_check" {
+            review["frozen_angular_check"] = job["intake"]["angular_check_contracts"]
+                .as_array()
+                .and_then(|contracts| {
+                    contracts
+                        .iter()
+                        .find(|c| c["actor"] == engineer.id && c["id"] == args["contract_id"])
+                })
+                .cloned()
+                .unwrap_or(Value::Null);
+            review["angular_result_limit"]=json!("Copied application build and finite host DOM checks in the required outer OS sandbox. Only the frozen cases are checked; no general correctness, independent acceptance, qualification or promotion.");
         }
         crate::rust_review::attach_verification(
             &job["intake"],

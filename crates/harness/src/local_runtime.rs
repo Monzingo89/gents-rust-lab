@@ -125,6 +125,31 @@ impl LocalRuntime {
             stop(&mut state).await;
             state.context_tokens = context_tokens;
         }
+        let mut model_input = input.to_owned();
+        let task_contract = system.starts_with("LOCAL_TASK_INTAKE:")
+            || system.starts_with("LOCAL_TASK_STAGE:")
+            || system.starts_with("LOCAL_GROUNDED_ANSWER:");
+        let mlx_kwargs = if task_contract {
+            json!({"enable_thinking":false})
+        } else {
+            json!({})
+        };
+        if model.provider == "mlx" && task_contract {
+            let mut packet: Value = serde_json::from_str(input)?;
+            let schema = if system.starts_with("LOCAL_TASK_INTAKE:") {
+                task_intake_schema(&packet)?
+            } else if system.starts_with("LOCAL_TASK_STAGE:") {
+                gents_local_mcp::task_engine::workflows::bound_reply_schema_for_tools(
+                    &serde_json::from_value::<Vec<String>>(packet["allowed_tools"].clone())?,
+                    packet["evidence_required"].as_bool().unwrap_or(true),
+                )
+            } else {
+                gents_local_mcp::task_engine::grounded::reply_schema()
+            };
+            packet["required_output_schema"] = schema;
+            packet["output_contract_note"]=json!("Return only JSON matching required_output_schema. This schema describes output, not tools or permissions.");
+            model_input = serde_json::to_string(&packet)?;
+        }
         let path = self.resolve_model(
             model.path.as_deref().context("local model path missing")?,
             &model.provider,
@@ -158,8 +183,24 @@ impl LocalRuntime {
             stop(&mut state).await;
             state.session = session.to_string();
         }
+        let prompt_preflight =
+            if model.provider == "mlx" && (task_contract || model.context_tokens.is_some()) {
+                let preflight = crate::mlx_prompt::count(
+                    &self.root,
+                    &path,
+                    &crate::context::messages(system, &model_input),
+                    &mlx_kwargs,
+                    cancel,
+                )
+                .await?;
+                preflight.allowance(model.context_tokens, generation.total_generation_tokens)?;
+                Some(preflight)
+            } else {
+                None
+            };
         let mut last_error = None;
-        for level in state.recovery_level..3 {
+        let recovery_attempts = if model.provider == "mlx" { 1 } else { 3 };
+        for level in state.recovery_level..recovery_attempts {
             state.recovery_level = level;
             match self.ensure_loaded(&mut state, &path, cancel).await {
                 Ok(()) => {
@@ -176,9 +217,14 @@ impl LocalRuntime {
             }
         }
         if let Some(error) = last_error {
+            if model.provider == "mlx" {
+                bail!(
+                    "Owned MLX startup failed; no unsupported GPU/CPU fallback claimed: {error:#}"
+                );
+            }
             bail!("GPU, reduced GPU offload, and CPU load attempts exhausted: {error:#}");
         }
-        let mut portable_input = input.to_owned();
+        let mut portable_input = model_input;
         if model.provider == "local" {
             // Count the selected model's actual chat template and tokenizer;
             // reserve output space before dispatching expensive inference.
@@ -225,8 +271,26 @@ impl LocalRuntime {
             // MLX maps this owned alias to BOTH the local base and its CLI adapter.
             // Sending only the base path would silently omit the configured adapter.
             body["model"] = json!("default_model");
+            body["chat_template_kwargs"] = mlx_kwargs;
         }
         if let Some(mut schema) = schema_for(system).filter(|_| model.provider != "mlx") {
+            if system.starts_with("LOCAL_TASK_INTAKE:") {
+                let input: Value = serde_json::from_str(&portable_input)?;
+                let profiles: Vec<String> =
+                    serde_json::from_value(input["available_profiles"].clone())?;
+                anyhow::ensure!(
+                    !profiles.is_empty() && profiles.len() <= 32,
+                    "intake profile catalog outside bound"
+                );
+                schema = gents_local_mcp::task_engine::intake::schema(&profiles);
+            }
+            if system.starts_with("LOCAL_TASK_STAGE:") {
+                let input: Value = serde_json::from_str(&portable_input)?;
+                schema = gents_local_mcp::task_engine::workflows::bound_reply_schema_for_tools(
+                    &serde_json::from_value::<Vec<String>>(input["allowed_tools"].clone())?,
+                    input["evidence_required"].as_bool().unwrap_or(true),
+                );
+            }
             if system.starts_with("FACTORY_WORK_V2:") {
                 schema = crate::coordination::evidence::schema(&crate::context::task_input(
                     &portable_input,
@@ -334,6 +398,11 @@ impl LocalRuntime {
             }
         };
         let received_at_ms = crate::now_ms();
+        if let Some(preflight) = &prompt_preflight {
+            if value["usage"]["prompt_tokens"].as_u64() != Some(preflight.prompt_tokens as u64) {
+                return Err(diagnostic.observe(FailureStage::FinalContent).into());
+            }
+        }
         let (text, reasoning_observed) =
             crate::local_generation::final_content(&value, generation.enabled())
                 .map_err(|_| diagnostic.observe(FailureStage::FinalContent))?;
@@ -368,6 +437,7 @@ impl LocalRuntime {
                 generation_budget: (model.provider == "local").then_some(generation.clone()),
                 separated_reasoning_observed: (model.provider == "local")
                     .then_some(reasoning_observed),
+                prompt_preflight,
             }),
             usage: Usage {
                 input: usage["prompt_tokens"].as_u64(),
@@ -819,6 +889,16 @@ fn bind_company_review_schema(schema: &mut Value, input: &str) -> Result<()> {
 }
 
 fn schema_for(system: &str) -> Option<Value> {
+    if system.starts_with("LOCAL_TASK_INTAKE:") {
+        return Some(gents_local_mcp::task_engine::intake::schema(
+            &gents_local_mcp::task_engine::routing::profiles()
+                .into_keys()
+                .collect::<Vec<_>>(),
+        ));
+    }
+    if system.starts_with("LOCAL_TASK_STAGE:") {
+        return Some(gents_local_mcp::task_engine::workflows::reply_schema());
+    }
     if system.starts_with("LOCAL_GROUNDED_ANSWER:") {
         return Some(gents_local_mcp::task_engine::grounded::reply_schema());
     }
@@ -1667,4 +1747,13 @@ fn focused_candidate_uses_the_same_strict_source_output_schema() {
     assert_eq!(full, focused);
     assert_eq!(focused["additionalProperties"], false);
     assert!(focused["properties"].get("prompt_profile").is_none());
+}
+
+fn task_intake_schema(packet: &Value) -> Result<Value> {
+    let profiles: Vec<String> = serde_json::from_value(packet["available_profiles"].clone())?;
+    anyhow::ensure!(
+        !profiles.is_empty() && profiles.len() <= 32,
+        "invalid intake profile catalog"
+    );
+    Ok(gents_local_mcp::task_engine::intake::schema(&profiles))
 }

@@ -106,6 +106,7 @@ impl CapabilityRepository for EmbeddedCapabilityRepository {
         ];
         Ok(catalog
             .into_iter()
+            .filter(|(id,_)|!crate::functions::is_task_capability(id))
             .map(|(id, contract)| {
                 let read_only = read_only_ids.contains(&id.as_str());
                 json!({
@@ -209,10 +210,33 @@ pub fn capabilities_for_phase(phase: &str) -> Result<Vec<Value>> {
         |role| EmbeddedCapabilityRepository.for_role(role),
     )
 }
+/// Angular execution is unavailable without a frozen owner contract. Keep its
+/// schema out of unrelated legacy prompts; the native catalog and backend
+/// authorization remain independent and unchanged.
+pub fn scope_sdk_capabilities(capabilities: &mut Vec<Value>, intake: &Value) {
+    let angular = intake["angular_check_contracts"]
+        .as_array()
+        .is_some_and(|c| !c.is_empty());
+    capabilities.retain(|c| c["id"] != "angular_check" || angular);
+}
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn unrelated_prompts_do_not_advertise_unavailable_angular_execution() {
+        let mut capabilities = capabilities_for_phase("worker").unwrap();
+        assert!(capabilities.iter().any(|c| c["id"] == "angular_check"));
+        let mut scoped = capabilities.clone();
+        scope_sdk_capabilities(
+            &mut scoped,
+            &json!({"angular_check_contracts":[{"actor":"Author"}]}),
+        );
+        assert_eq!(scoped.len(), capabilities.len());
+        scope_sdk_capabilities(&mut capabilities, &json!({}));
+        assert!(!capabilities.iter().any(|c| c["id"] == "angular_check"));
+        assert!(capabilities.iter().any(|c| c["id"] == "files"));
+    }
 
     #[test]
     fn department_skills_are_assigned_without_expanding_old_job_context() {
@@ -275,7 +299,13 @@ mod tests {
                 "../../config/company-tools.json"
             ))
             .unwrap()
-            .len()
+            .keys()
+            .filter(|id| !crate::functions::is_task_capability(id))
+            .count()
         );
+        assert!(capabilities_for_phase("worker")
+            .unwrap()
+            .iter()
+            .all(|c| !crate::functions::is_task_capability(c["id"].as_str().unwrap())));
     }
 }

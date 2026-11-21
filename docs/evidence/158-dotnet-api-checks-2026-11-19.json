@@ -1,0 +1,310 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-19",
+  "goal_status": "active_incomplete",
+  "scope": "Separately authorized finite host HTTP checks of copied .NET Web SDK applications, with native task receipts and shared compilation facets; no Angular/Cosmos integration or specialist qualification",
+  "git": {
+    "root": "/Users/rmonzingo/repo-applications/gents-rust-lab",
+    "branch": "codex/feature/public-research-view",
+    "head": "23b7d823956586a3a4d760767d7eb5b7e18d63a3",
+    "remote": "https://github.com/Monzingo89/gents-rust-lab.git",
+    "commit_push_deploy_performed": false
+  },
+  "source_sha256": {
+    "mcp/Cargo.toml": "433a9712c3c5de3ab625016584a08d816ff4e57d4cc82a4acb95eeba48d7998e",
+    "Cargo.lock": "b244cae45599ef2e300bc5353620579ddad88051d000eb4af1b717954cc533ff",
+    "mcp/src/dotnet_check.rs": "7c0f961fe507c99fe3c6853369863d8780a52de67a630670169515c0d114f0e7",
+    "mcp/src/dotnet_check/api.rs": "ef23f694ff39309666c3306e4e0d2c765fe67f7cc1581b5d730c6c7d19f452b3",
+    "mcp/src/dotnet_check/sandbox.rs": "42679a7f4cf583f7f76f68d92df3e528bcd8e4b082cc3152a5ff8351de184ecd",
+    "mcp/src/strict_json.rs": "c47740c32c422c2d6fd22995cbd82f869748bb1c080c95162766508fb1bc1bc8",
+    "mcp/src/task_engine/project_metadata.rs": "c33e175f136951ed751c02f5c998813991efc3881c19d5d4dd142fb46a9e36e7",
+    "mcp/src/registry_dotnet.rs": "61d3af2ea37e07b59039d4092e994bbf638da930c6195108cc1bb535cbc4bedc",
+    "mcp/src/functions/dotnet_check.rs": "2f95ab74df04ada9703962c1584744bc6c15253a936a1f3b2dd3985d14eee1f8",
+    "mcp/src/functions/mod.rs": "5186535c756b051c5f4665a1fbd55c63b6f51387e466abd2dc3302d4df087b50",
+    "mcp/src/lib.rs": "4ac7d9534420951a1565c144d64678a9fcfeff8709dc0e65702f93a6eb5c36df",
+    "mcp/src/task_engine/validators.rs": "26649aa11e89d96dee89c165431c7fe38aff15d3b1987d88b747e1c137c75ffe",
+    "mcp/src/task_engine/routing.rs": "bde603cc0b93b82b7e6899bc238eb937bb9c2a2559532a48d32ae518069a0f67",
+    "mcp/src/task_engine/native.rs": "2064cbfb1086d4f371fa84520b4d4bb920c874be564436ffa66276ffb4733cef",
+    "crates/harness/src/provider.rs": "1ada3ce101be9933385de3d8b96b68bed434c292f9fd83dc42d2924c655d93df",
+    "crates/harness/src/task_workflows.rs": "0d052ff89aceac360f3221168d610eecdfbedee14dd3f719f9a2f35a715481a5",
+    "crates/harness/src/company.rs": "0843684fbbd4788251a102b5a29467cca70f5212085fd624653381de3620d522",
+    "crates/harness/src/autonomy.rs": "14a95faa06c8f1b1f6e9213e0f11ab485d32bd1c4a302c5db41d12d6c2819a70",
+    "crates/harness/src/recovery_scope.rs": "a719cae298abc2c0780fcaf8d309aa41d708024589c7ab67650c2d4c9e4c5038",
+    "mcp/tests/dotnet_check.rs": "ca89bd2474fda4c1e53ec1cbe67b8ef40d684292f05d5f70cca67526ed633016",
+    "mcp/tests/dotnet_api_check.rs": "17f90acc69ca7743f4b7514724aeafad9fe860a08ecbdf9a3e3163cdcb027fa1",
+    "mcp/tests/task_validators.rs": "ccfc7418c79f49086e282e58beea6cade92f4f29f4ea7552b8b329a7f3b8a7c2",
+    "mcp/tests/adaptive_tasks.rs": "539993a9c7fc6691fad1f67fa6d87bdc754aba10a2ff91cde0da1d9daf7c5873",
+    "scripts/task_validation_smoke.py": "ed3730fd33f994b63539a01f40b58cfbe79108978432ca1e8351ba7f57fc0352",
+    "scripts/check.sh": "215d7a498b839a015c17ecb8d4fd6f90f19bb2edcf1832f0be3b3520034df07f",
+    "config/company-tools.json": "2df7fd6f329511579420d76fb5a9a48358ececa758908b7db9f915f8b39b0170",
+    "config/company-tool-inputs.json": "7cc53d3b803c6fb3b21198321adebbbbbde4708e198947b2faf438c48e47183a",
+    "config/schemas/task-engine-v1.json": "b8eac02fad589826fc26fd54e25a778be3378c42b1ffdbbf4d8b80b471d988a9",
+    "docs/158-frozen-dotnet-api-checks.md": "f2b227a33e6c59972e6313e9b916a55a13b2cd2bc6c3945bc00ac20bebe908f5",
+    "docs/157-executable-task-validators.md": "698731154590265e8d1606acb902e88f420c728e09837816440a318474921921",
+    "docs/151-task-engine-completion-audit.md": "501700e5916c3d552b43f4596f3b7e3fc91f697c8ee93b0fcb487df0cae3d94c",
+    "mcp/README.md": "12198e1710bc6e61ecee2557e930f4267cd9e2d67274444fb84926cc39fc8254"
+  },
+  "retained_initial_full_check_failure": {
+    "exit_code": 1,
+    "log": {
+      "path": "data/task-api-live/2026-11-19-native-check/gents-api-full-check-initial-failure.log",
+      "sha256": "e33e846619f5237af6249c0e62ba217001c452ee66280e8d6a58826ce40b442e"
+    },
+    "boundary": "Autonomy ambiguous-action restart smoke stalled after optional transcript compaction; mock worker ignored the retained successful-operation index.",
+    "repair": "Mock operator now checks successful host observations from the retained index. Production completion, permissions, budgets and compaction rules are unchanged.",
+    "focused_regression_log": {
+      "path": "data/task-api-live/2026-11-19-native-check/gents-api-mock-compaction-regression.log",
+      "sha256": "334af933557483248812c6381ebe0dced84cbfaa5d526a3265ec752ad9099f7d"
+    },
+    "focused_autonomy_log": {
+      "path": "data/task-api-live/2026-11-19-native-check/gents-api-autonomy-focused.log",
+      "sha256": "f168c75a56bacf82b33b189219164043a75a95fddc5686a9163f695eaf3ee8f1"
+    }
+  },
+  "full_repository_check": {
+    "command": "CARGO_NET_OFFLINE=true bash scripts/check.sh",
+    "exit_code": 0,
+    "archived_log": {
+      "path": "data/task-api-live/2026-11-19-native-check/gents-api-full-check-complete.log",
+      "sha256": "b4d1e28467a93d4ce2d54487c1c2aa7f0c47e1daf0a59b5ad977adec2c388460"
+    },
+    "rust_passed": 677,
+    "rust_failed": 0,
+    "rust_ignored": 29,
+    "scope": "Strict format/Clippy, Rust tests/build, Python/Node/HTTP/native stdio+SSE fixtures, web build/site checks; SDK application component fixture separately opt-in"
+  },
+  "timestamp_diagnostic_fix": {
+    "scope": "Host API observation time uses Unix seconds; exact milliseconds remain in canonical audits. Candidate-data privacy checks and general card detection are unchanged.",
+    "retained_rejection_logs": [
+      {
+        "path": "data/task-api-live/2026-11-19-native-check/gents-api-task-stdio-timestamp-failure.log",
+        "sha256": "bd26523854a9a33159e9c949757449e6a6d641dbe2781ff7183b49a27873f1eb"
+      },
+      {
+        "path": "data/task-api-live/2026-11-19-native-check/gents-api-task-sse-timestamp-failure.log",
+        "sha256": "79e6ed0f9cbfce6442df734defd3357b9340c36cdae0416824d605bb07901557"
+      },
+      {
+        "path": "data/task-api-live/2026-11-19-native-check/gents-api-task-mixed-timestamp-failure.log",
+        "sha256": "7867022709851ff120e08eabaa80d8d56cdce1135daac42e2aa23f76429e2d18"
+      }
+    ]
+  },
+  "final_portability_check": {
+    "command": "cargo clippy --workspace --all-targets --locked -- -D warnings; cargo build --workspace --locked",
+    "exit_code": 0,
+    "log": {
+      "path": "data/task-api-live/2026-11-19-native-check/gents-api-portability-lint-final.log",
+      "sha256": "aa680c97aa32f14361df4c40e5cdbfc0160fd53f21d05846a74713a0dcecdc37"
+    },
+    "scope": "Final cfg/import changes are inert on the tested macOS target; SDK and task fixtures were rebuilt and rerun against their current implementation digests. No Linux target was installed or cross-compilation performed."
+  },
+  "live_component_check": {
+    "command": "GENTS_DOTNET=/opt/homebrew/bin/dotnet GENTS_API_TEST_REPORT=<local-report> cargo test --offline --workspace --test dotnet_api_check -- --include-ignored --nocapture",
+    "exit_code": 0,
+    "report": {
+      "path": "data/task-api-live/2026-11-19-native-check/native-http-final.json",
+      "sha256": "ad3ed6c21c2fbfbca916f5702c025abeeef6d5f7431838e31ce49f4e1b349107"
+    },
+    "checks": {
+      "actual_sse_http": true,
+      "actual_stdio_http": true,
+      "compile_success_does_not_pass_bad_api": true,
+      "current_api_observation_and_source_invalidation": true,
+      "extra_execution_grant_required": true,
+      "runtime_denies_host_io_writes_binds_outbound_subprocesses_and_procargs": true,
+      "unresponsive_api_deadline_stops_after_one_request": true,
+      "zero_exit_stdout_cannot_spoof_http": true
+    },
+    "canonical_results_verified": 5,
+    "actual_statuses": [
+      "api_passed",
+      "api_passed",
+      "api_failed",
+      "api_failed",
+      "api_failed"
+    ]
+  },
+  "live_task_checks": [
+    {
+      "report": "data/task-api-live/2026-11-19-native-check/task-api-stdio-final.json",
+      "report_sha256": "8698ce980a06b43b9cdd4bd2ca34613fd3918e68ab4078abcf60685950202393",
+      "frozen_approval_verified": true,
+      "source_identities_verified": 4,
+      "rejected_source_identity_verified": true,
+      "canonical_results_verified": 3,
+      "task_facets_verified": 6,
+      "statuses": [
+        "generated",
+        "blocked",
+        "generated",
+        "blocked"
+      ],
+      "tool_attempts": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "transport": "actual native MCP stdio, HTTP owner admission and SQLite",
+      "checks": {
+        "failed_native_api_is_not_automatically_recompiled": true,
+        "actual_sdk_build": true,
+        "three_stage_one_validation": true,
+        "shared_tool_budget": true,
+        "source_change_invalidated": true,
+        "completed_build_not_replayed_or_cached": true,
+        "canonical_native_receipt_required": true,
+        "wrong_actor_denied": true,
+        "inflight_source_change_stopped_sdk": true,
+        "actual_application_http": true,
+        "compile_success_separate_from_api_failure": true,
+        "compile_and_api_share_one_native_invocation": true
+      },
+      "native_binary_sha256": "458e6c38cd3c6e454a85747874b4ecd6b2eaed19518b0672e6833d0c237fc2e5",
+      "harness_binary_sha256": "d5dd517425559caedb1729d697edafd961adaddab5638dc967df50ed70b2a0e5",
+      "scope": "mock only; zero model inference and no specialist qualification"
+    },
+    {
+      "report": "data/task-api-live/2026-11-19-native-check/task-api-sse-final.json",
+      "report_sha256": "ec91b712fa4b37673022000db274f823f93fd65c8899dbded87c6b13dd7593e1",
+      "frozen_approval_verified": true,
+      "source_identities_verified": 4,
+      "rejected_source_identity_verified": true,
+      "canonical_results_verified": 3,
+      "task_facets_verified": 6,
+      "statuses": [
+        "generated",
+        "blocked",
+        "generated",
+        "blocked"
+      ],
+      "tool_attempts": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "transport": "actual native MCP sse, HTTP owner admission and SQLite",
+      "checks": {
+        "failed_native_api_is_not_automatically_recompiled": true,
+        "actual_sdk_build": true,
+        "three_stage_one_validation": true,
+        "shared_tool_budget": true,
+        "source_change_invalidated": true,
+        "completed_build_not_replayed_or_cached": true,
+        "canonical_native_receipt_required": true,
+        "wrong_actor_denied": true,
+        "inflight_source_change_stopped_sdk": true,
+        "actual_application_http": true,
+        "compile_success_separate_from_api_failure": true,
+        "compile_and_api_share_one_native_invocation": true
+      },
+      "native_binary_sha256": "458e6c38cd3c6e454a85747874b4ecd6b2eaed19518b0672e6833d0c237fc2e5",
+      "harness_binary_sha256": "d5dd517425559caedb1729d697edafd961adaddab5638dc967df50ed70b2a0e5",
+      "scope": "mock only; zero model inference and no specialist qualification"
+    },
+    {
+      "report": "data/task-api-live/2026-11-19-native-check/task-api-mixed-final.json",
+      "report_sha256": "c8708b54507fd95903db672429048feff035126e3f1c7e41e332dfbcdc1cfb29",
+      "frozen_approval_verified": true,
+      "source_identities_verified": 8,
+      "rejected_source_identity_verified": true,
+      "canonical_results_verified": 7,
+      "task_facets_verified": 10,
+      "statuses": [
+        "generated",
+        "blocked",
+        "generated",
+        "blocked"
+      ],
+      "tool_attempts": [
+        2,
+        2,
+        2,
+        2
+      ],
+      "transport": "actual native MCP stdio, HTTP owner admission and SQLite",
+      "checks": {
+        "failed_native_api_is_not_automatically_recompiled": true,
+        "actual_sdk_build": true,
+        "shared_tool_budget": true,
+        "source_change_invalidated": true,
+        "completed_build_not_replayed_or_cached": true,
+        "canonical_native_receipt_required": true,
+        "wrong_actor_denied": true,
+        "inflight_source_change_stopped_sdk": true,
+        "three_stage_one_validation_per_contract": true,
+        "compile_facet_reuse_is_contract_scoped": true,
+        "compile_only_contract_is_not_dropped": true,
+        "actual_application_http": true,
+        "compile_success_separate_from_api_failure": true,
+        "compile_and_api_share_one_native_invocation": true
+      },
+      "native_binary_sha256": "458e6c38cd3c6e454a85747874b4ecd6b2eaed19518b0672e6833d0c237fc2e5",
+      "harness_binary_sha256": "d5dd517425559caedb1729d697edafd961adaddab5638dc967df50ed70b2a0e5",
+      "scope": "mock only; zero model inference and no specialist qualification"
+    }
+  ],
+  "independent_receipt_check": {
+    "script": {
+      "path": "data/task-api-live/2026-11-19-native-check/verify-receipts.py",
+      "sha256": "18332d1a16a4cc8afe2815c37f827b7fd7f687dd543f773bc9fa04209dc5a8a1"
+    },
+    "report": {
+      "path": "data/task-api-live/2026-11-19-native-check/independent-receipt-check.json",
+      "sha256": "aac0e98c581908ffcf85716ab22c1ba7d34c46b43404af59d5ddf572b5008303"
+    },
+    "implementation_sha256": "747bf1ee7d27440dbf05807dae69856428f90006f0caa4fba21c52e64dfa0e5e",
+    "source_identities_verified": 16,
+    "canonical_results_verified": 13,
+    "task_facets_verified": 22,
+    "api_digest_encoding": "Rust declared struct-field order; nested JSON Value maps sorted, independently recomputed",
+    "tested_binaries": [
+      {
+        "path": "data/task-api-live/2026-11-19-native-check/gents-local-mcp-workspace-tested",
+        "sha256": "458e6c38cd3c6e454a85747874b4ecd6b2eaed19518b0672e6833d0c237fc2e5"
+      },
+      {
+        "path": "data/task-api-live/2026-11-19-native-check/gents-harness-tested",
+        "sha256": "d5dd517425559caedb1729d697edafd961adaddab5638dc967df50ed70b2a0e5"
+      }
+    ]
+  },
+  "retained_boundary_findings": [
+    {
+      "log": {
+        "path": "data/task-api-live/2026-11-19-native-check/gents-api-live-restricted3.log",
+        "sha256": "a0968b7b5a4c886a4ab696f291d34002d2f42900b4decda80a4aac24bc5b9bc0"
+      },
+      "finding": "Runtime failed with Unsupported OS page size; required hw.pagesize_compat was added specifically, without restoring broad sysctl access."
+    },
+    {
+      "log": {
+        "path": "data/task-api-live/2026-11-19-native-check/gents-api-live-procargs.log",
+        "sha256": "5eb96724cfa869c9e29bbeef279b23264a83a5834390af6f5052027c8e7ddd13"
+      },
+      "finding": "Deny-default plus a sysctl allowlist still allowed numeric cross-process argument buffer access on this host; no buffer contents were logged. Explicit process inspection denial plus self-only allowance and process-argument sysctl denial now pass the actual boundary fixture."
+    },
+    {
+      "log": {
+        "path": "data/task-api-live/2026-11-19-native-check/gents-api-live-boundaries.log",
+        "sha256": "d530116b5446efe4ce6c888b34334511754fec4b1c99d8b26f9c445bbb359a51"
+      },
+      "finding": "A generated diagnostic hit the native privacy gate before persistence. The gate remained enabled; the final installed-SDK fixture passed it."
+    }
+  ],
+  "limitations": [
+    "SDK/runtime library closure is not fully content-addressed; executable and exact SDK selection are recorded.",
+    "Finite exact status/JSON cases are not general API correctness or independent acceptance.",
+    "RSS and scratch limits are sampled; very short runtimes can have no sample.",
+    "Application isolation is implemented and measured for this installed macOS sandbox and SDK; other platforms fail closed.",
+    "No Angular/Cosmos cross-domain integration or new independent model qualification is established.",
+    "The original 15-section brief remains active and incomplete."
+  ],
+  "provider_cost_usd": 0,
+  "model_inference_calls": 0,
+  "model_downloads": 0,
+  "qualified": false,
+  "promoted": false
+}

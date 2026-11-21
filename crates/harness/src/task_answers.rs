@@ -27,6 +27,8 @@ pub struct Settings {
     pub model: Model,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub model_sha256: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub adapter_sha256: Option<String>,
     pub final_tokens: u32,
     pub deadline_seconds: u64,
     pub draft_ttl_seconds: u64,
@@ -35,7 +37,7 @@ pub struct Settings {
 impl Settings {
     pub fn validate(&self) -> Result<()> {
         self.model.validate()?;
-        if self.model.provider == "local" {
+        if matches!(self.model.provider.as_str(), "local" | "mlx") {
             ensure!(
                 self.model_sha256
                     .as_ref()
@@ -46,7 +48,23 @@ impl Settings {
                 "native grounded model requires an owner-frozen SHA-256"
             );
         }
-        ensure!(matches!(self.model.provider.as_str(),"local"|"mock"),"grounded answers require owned native local inference; mock is a protocol fixture only");
+        ensure!(
+            matches!(self.model.provider.as_str(), "local" | "mlx" | "mock"),
+            "grounded answers require owned local inference; mock is a protocol fixture only"
+        );
+        ensure!(
+            self.model.adapter.is_some() == self.adapter_sha256.is_some(),
+            "adapter path and SHA-256 must be supplied together"
+        );
+        if let Some(hash) = &self.adapter_sha256 {
+            ensure!(
+                hash.len() == 64
+                    && hash
+                        .bytes()
+                        .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)),
+                "immutable adapter SHA-256 required"
+            );
+        }
         ensure!(
             (64..=2048).contains(&self.final_tokens)
                 && (1..=300).contains(&self.deadline_seconds)
@@ -86,14 +104,57 @@ fn scoped(
     tenant: &str,
     subject: &str,
     runtime: &str,
+    root: &Path,
 ) -> Result<AccessScope> {
     let mut scope = task_frontdoor::owner_scope(repo, tenant, subject, runtime)?;
+    repo.refresh_dependencies(&scope, root)?;
     scope.profile_revision = "local-grounded-answer/v1".into();
     Ok(scope)
 }
 impl Service {
-    async fn verify_pin(&self, root: &Path, settings: &Settings) -> Result<()> {
+    pub(super) async fn verify_pin(
+        &self,
+        root: &Path,
+        settings: &Settings,
+        company: &str,
+    ) -> Result<()> {
         if settings.model.provider == "mock" {
+            return Ok(());
+        }
+        if settings.model.provider == "mlx" {
+            let relative = settings.model.path.as_deref().context("MLX path missing")?;
+            ensure!(
+                relative.starts_with("models/") && crate::model_package::safe_relative(relative),
+                "confined MLX package required"
+            );
+            self.verify_package(
+                root,
+                relative,
+                crate::model_package::Kind::Model,
+                settings
+                    .model_sha256
+                    .as_deref()
+                    .context("MLX model pin missing")?,
+            )
+            .await?;
+            if let Some(adapter) = &settings.model.adapter {
+                crate::company::identifier(company)?;
+                ensure!(
+                    crate::model_package::safe_relative(adapter)
+                        && adapter.starts_with(&format!("data/companies/{company}/training/runs/")),
+                    "adapter outside this company's training root"
+                );
+                self.verify_package(
+                    root,
+                    adapter,
+                    crate::model_package::Kind::Adapter,
+                    settings
+                        .adapter_sha256
+                        .as_deref()
+                        .context("adapter pin missing")?,
+                )
+                .await?;
+            }
             return Ok(());
         }
         let relative = settings
@@ -153,6 +214,32 @@ impl Service {
         pins.insert(key, fingerprint()?);
         Ok(())
     }
+    async fn verify_package(
+        &self,
+        root: &Path,
+        relative: &str,
+        kind: crate::model_package::Kind,
+        expected: &str,
+    ) -> Result<()> {
+        let before = crate::model_package::snapshot(root, relative, kind)?;
+        let key = format!("package/v1/{kind:?}/{relative}/{expected}");
+        let mut pins = self.pins.lock().await;
+        if pins.get(&key) == Some(&before.fingerprint) {
+            return Ok(());
+        }
+        let (root, relative, expected) =
+            (root.to_path_buf(), relative.to_owned(), expected.to_owned());
+        let verified = tokio::task::spawn_blocking(move || {
+            crate::model_package::verify(&root, &relative, kind, &expected)
+        })
+        .await??;
+        ensure!(
+            verified.fingerprint == before.fingerprint,
+            "package changed during pin admission"
+        );
+        pins.insert(key, verified.fingerprint);
+        Ok(())
+    }
     #[allow(clippy::too_many_arguments)]
     pub async fn start(
         &self,
@@ -168,7 +255,7 @@ impl Service {
             return Ok(base);
         };
         settings.validate()?;
-        self.verify_pin(&root, &settings).await?;
+        self.verify_pin(&root, &settings, &tenant).await?;
         let runtime = gents_local_mcp::digest(&serde_json::to_vec(&app.config)?);
         // Hold only admission, never inference, under this lock. Status cannot
         // misidentify a just-claimed local job before its active handle exists.
@@ -190,7 +277,7 @@ impl Service {
             }
             let repo=Repository::new(&tx)?;
             let now=crate::now_ms();
-            let mut policy=ExecutionPolicy::read_only(scoped(&repo,&tenant2,&subject2,&runtime2)?,now);
+            let mut policy=ExecutionPolicy::read_only(scoped(&repo,&tenant2,&subject2,&runtime2,&root2)?,now);
             policy.max_model_calls=1;policy.max_tokens=settings2.final_tokens+settings2.model.local_reasoning_tokens.unwrap_or(0);
             policy.deadline_ms=now.saturating_add(settings2.deadline_seconds*1000);policy.cache_ttl_ms=settings2.draft_ttl_seconds*1000;
             let admitted=grounded::admit(&repo,&request,&base,&policy,&settings2.identity()?,now,allow_new)?;
@@ -224,7 +311,7 @@ impl Service {
             let mut db = company::connect(root, tenant, subject, false)?;
             let tx = db.transaction_with_behavior(TransactionBehavior::Immediate)?;
             let repo = Repository::new(&tx)?;
-            let scope = scoped(&repo, tenant, subject, runtime)?;
+            let scope = scoped(&repo, tenant, subject, runtime, root)?;
             let result = repo
                 .status(&scope, task, crate::now_ms())?
                 .context("task unavailable to this scope")?;
@@ -255,7 +342,7 @@ impl Service {
             let mut db = company::connect(root, tenant, subject, false)?;
             let tx = db.transaction_with_behavior(TransactionBehavior::Immediate)?;
             let repo = Repository::new(&tx)?;
-            let scope = scoped(&repo, tenant, subject, runtime)?;
+            let scope = scoped(&repo, tenant, subject, runtime, root)?;
             let (id, stop) = grounded::cancel(&repo, &scope, task, crate::now_ms())?;
             tx.commit()?;
             (id, stop)
@@ -306,6 +393,9 @@ async fn run(
         0,
     );
     let call = async {
+        app.task_answers
+            .verify_pin(&root, &settings, &tenant)
+            .await?;
         if settings.model.provider == "mock" {
             app.gateway
                 .complete(
@@ -365,7 +455,11 @@ async fn run(
         }
         Err(error) => json!({"inference_failure":crate::local_generation::planning_failure(error)}),
     };
-    let pin_current = app.task_answers.verify_pin(&root, &settings).await.is_ok();
+    let pin_current = app
+        .task_answers
+        .verify_pin(&root, &settings, &tenant)
+        .await
+        .is_ok();
     let (job_id, root2, tenant2, subject2) = (
         admitted.job_id,
         root.clone(),
@@ -375,7 +469,7 @@ async fn run(
     let finished=tokio::task::spawn_blocking(move ||->Result<()> {
         let mut db=company::connect(&root2,&tenant2,&subject2,false)?;
         let tx=db.transaction_with_behavior(TransactionBehavior::Immediate)?;
-        let repo=Repository::new(&tx)?;let scope=scoped(&repo,&tenant2,&subject2,&runtime)?;
+        let repo=Repository::new(&tx)?;let scope=scoped(&repo,&tenant2,&subject2,&runtime,&root2)?;
         let wire=if pin_current {reply.as_ref().map(|reply|reply.text.as_str()).map_err(|_|anyhow::anyhow!("provider invocation failed; inspect original call evidence"))} else {Err(anyhow::anyhow!("model pin changed"))};
         let result=grounded::finish(&repo,&scope,job_id,wire,measurements,crate::now_ms())?;
         tx.execute("INSERT INTO audit(run_id,kind,body,created) VALUES(?1,'grounded_call_finished',?2,?3)",params![job_id.to_string(),json!({"task_id":result.task_id,"status":result.status,"verification_state":result.verification_state,"call_evidence":call_evidence,"model_pin_current":pin_current,"provider_invocations":1,"provider_fees_usd":0,"scope":"Generated draft, no worker execution, no verified answer-cache promotion"}).to_string(),crate::now_ms() as i64])?;

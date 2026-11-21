@@ -141,6 +141,7 @@ pub(super) fn receipt(packet: &Value, content: Value) -> Reply {
             observed_context_tokens: None,
             generation_budget: None,
             separated_reasoning_observed: None,
+            prompt_preflight: None,
         }),
     }
 }

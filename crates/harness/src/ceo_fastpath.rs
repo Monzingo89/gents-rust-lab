@@ -83,6 +83,7 @@ pub fn try_answer(
     }
     let repo = Repository::new(&tx)?;
     let scope = crate::task_frontdoor::owner_scope(&repo, company, owner, runtime_revision)?;
+    repo.refresh_dependencies(&scope, root)?;
     let task_input = input
         .get("task_input")
         .cloned()
@@ -145,6 +146,7 @@ pub fn refresh_answer(root: &Path, company: &str, owner: &str, body: &mut Value)
     let tx = db.transaction_with_behavior(TransactionBehavior::Immediate)?;
     let repo = Repository::new(&tx)?;
     let scope = crate::task_frontdoor::owner_scope(&repo, company, owner, "status-read/v1")?;
+    repo.refresh_dependencies(&scope, root)?;
     let result = repo
         .status(&scope, id, crate::now_ms())?
         .context("saved task result unavailable")?;

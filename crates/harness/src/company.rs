@@ -264,6 +264,15 @@ pub fn operation(root: &Path, company: &str, owner: &str, input: &Value) -> Resu
                     &mut frozen_intake,
                 )?;
                 for stage in &stages {
+                    if stage.tools.iter().any(|tool| tool == "dotnet_api_check") {
+                        anyhow::ensure!(frozen_intake["dotnet_check_contracts"].as_array().is_some_and(|contracts|contracts.iter().any(|contract|contract["actor"]==stage.actor && contract["api"].is_object())),"CEO-selected API execution requires an owner-frozen API contract for its assigned actor");
+                    }
+                    if stage.tools.iter().any(|tool| tool == "angular_check") {
+                        anyhow::ensure!(frozen_intake["angular_check_contracts"].as_array().is_some_and(|contracts|contracts.iter().any(|c|c["actor"]==stage.actor)),"CEO-selected Angular execution requires owner-frozen Angular contract for its assigned actor");
+                    }
+                    if stage.tools.iter().any(|tool| tool == "dotnet_check") {
+                        anyhow::ensure!(frozen_intake["dotnet_check_contracts"].as_array().is_some_and(|checks|checks.iter().any(|check|check["actor"]==stage.actor)),"CEO-selected dotnet_check requires owner-frozen build contracts for its assigned actor before intake");
+                    }
                     if stage.tools.iter().any(|tool| tool == "python_check") {
                         anyhow::ensure!(frozen_intake["python_check_contracts"].as_array().is_some_and(|checks|checks.iter().any(|check|check["actor"]==stage.actor)),"CEO-selected python_check requires owner-frozen diagnostic contracts for its assigned actor before intake");
                     }
@@ -703,7 +712,10 @@ pub fn operation(root: &Path, company: &str, owner: &str, input: &Value) -> Resu
             let expected = input["expected_revision"]
                 .as_u64()
                 .context("expected_revision required")?;
-            let tx = db.transaction()?;
+            // Acquire the writer before reading the source epoch/intake. A
+            // deferred WAL read snapshot cannot safely upgrade after a native
+            // queue/checkpoint commits on another connection.
+            let tx = db.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
             let encoded: Option<String> = tx
                 .query_row("SELECT intake FROM jobs WHERE run_id=?1", [run], |r| {
                     r.get(0)

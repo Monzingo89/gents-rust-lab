@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-11-19T07:58:43.827553+00:00",
+  "full_goal_status": "active",
+  "branch": "codex/feature/public-research-view",
+  "checkpoint": "confined workspace observations and static project declarations",
+  "implemented": [
+    "Finite search/read/list tool schemas narrowed to actual host/profile grants",
+    "Company-private default root and explicit project-root configuration; app/reserved/other-company roots rejected",
+    "Descriptor-relative native reads, privacy gate, full-file hashes, bounded UTF-8 pages and explicit listing truncation",
+    "Task-local captured evidence independent of shared corpus and dependency roots",
+    "Source/root/scope/TTL checks before subsequent dispatch, delivery, status and same-input job reuse",
+    "Typed declared Angular/TypeScript, lockfile, conditional MSBuild and Cosmos source observations; no runtime/build/query claim",
+    "Typed malformed/unsupported metadata, duplicate JSON-key rejection and bounded DTD-free XML parsing",
+    "Separate one-second negative reuse from bounded job/history retention with non-replaying additive migration",
+    "Scoped audit retention cleans only read-workflow kinds, preserving native approvals/uncertain effects",
+    "All structured request annotations use the existing data gate before persistence"
+  ],
+  "verification": {
+    "full_repository_script": {
+      "command": "CARGO_NET_OFFLINE=true bash scripts/check.sh",
+      "exit_code": 0,
+      "path": "/tmp/gents-workspace-tools-full-check.log",
+      "sha256": "b887378f74b097239c4d45eb9f050e0a9ce2d56dfa2c847a99a66742ecad22a0",
+      "passed": 638,
+      "failed": 0,
+      "ignored": 27,
+      "scope_note": "Completed before final metadata/retention/annotation guards. Current workspace, Clippy/build and later HTTP checks cover the follow-up changes; unchanged Python/Node/site stages passed. No visual browser or deployment claim."
+    },
+    "current_workspace": {
+      "command": "cargo test --workspace --locked --offline",
+      "exit_code": 0,
+      "path": "/tmp/gents-workspace-tools-final-workspace.log",
+      "sha256": "426d649dff0b9e100054ee7cd9fe7fdcc6cbc3b528f11772f34ed6e056c1e123",
+      "passed": 642,
+      "failed": 0,
+      "ignored": 27
+    },
+    "focused_before_annotation_guard": {
+      "exit_code": 0,
+      "path": "/tmp/gents-workspace-tools-final-tests.log",
+      "sha256": "7cf7cd913760b2098ab7224fd98107c90254dbe24fc33c3d46454c6af9e0ab9c",
+      "passed": 61,
+      "failed": 0,
+      "ignored": 0
+    },
+    "settings_and_migration": {
+      "exit_code": 0,
+      "path": "/tmp/gents-workspace-tools-settings.log",
+      "sha256": "7331276cb0981b11a902f41321860873c316e4150a4ff3b52974b3fff4660bbe",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0
+    },
+    "strict_clippy": {
+      "exit_code": 0,
+      "path": "/tmp/gents-workspace-tools-clippy.log",
+      "sha256": "6e167d894223724abd7e1f10075240a345099c2b8d5b71e89aaf782d836be7d6"
+    },
+    "build": {
+      "exit_code": 0,
+      "path": "/tmp/gents-workspace-tools-build.log",
+      "sha256": "9b294d289dd40609a787f8852d047177f447e0dd91d979a0957a6e5d11fe60da"
+    },
+    "http": {
+      "workspace": {
+        "exit_code": 0,
+        "path": "/tmp/gents-workspace-tools-http.log",
+        "sha256": "c66bca928d2f4a22280bc4eb94d0c00a8f564a4138a42dc71a6377cc9cf95d78"
+      },
+      "workspace_denied": {
+        "exit_code": 0,
+        "path": "/tmp/gents-workspace-tools-denied.log",
+        "sha256": "6ae2f43c6d7b360f083fff71645de90eeecef530139ba1026df03fc5f6a09f38"
+      },
+      "adaptive": {
+        "exit_code": 0,
+        "path": "/tmp/gents-workspace-tools-adaptive-http.log",
+        "sha256": "3b4a371617fae4626da076c7c930086573c1efce9b67e8cf5479cdeeb9d53bfc"
+      },
+      "nine_workflows_and_retained_negative_history": {
+        "exit_code": 0,
+        "path": "/tmp/gents-workspace-tools-nine-http.log",
+        "sha256": "b26b26c432a2b9a4e1beb756260f006ca15a5e20477023e65e195c02daaa0952"
+      }
+    }
+  },
+  "bounded_live_trial": {
+    "report": "data/task-workspace-live/9e1ea1b6-5723-4ae7-9ee6-b10e7714cb9e/report.json",
+    "report_sha256": "019b87d6cb861c740aabbd66ccd95d93c0f8afb0cd63f72d64d825aa3cbee556",
+    "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+    "tested_binary_sha256": "db272533029e91c678d8f6e6f0e313dd90329f1c97f6697a954f0dc1c06591c7",
+    "passed": true,
+    "checks": {
+      "generated": true,
+      "exact_source_literal": true,
+      "one_tool_call": true,
+      "two_generative_calls": true,
+      "source_hash_matches": true,
+      "independent_build_not_claimed": true
+    },
+    "measurements": {
+      "elapsed_micros": 14226463,
+      "embedding_calls": 0,
+      "generative_model_calls": 2,
+      "input_tokens": 1867,
+      "memory_bytes": 3930570752,
+      "output_tokens": 731,
+      "provider_cost_usd": 0,
+      "tool_calls": 1
+    },
+    "elapsed_seconds": 14.551056832999166,
+    "exact_tool_request": [
+      {
+        "arguments": {
+          "limit_bytes": 1024,
+          "offset_bytes": 0,
+          "path": "frontend/package.json"
+        },
+        "name": "workspace_read"
+      }
+    ],
+    "tool_elapsed_micros": [
+      5603
+    ],
+    "scope_note": "Recorded binary tested before later result-check/retention/metadata guards. Actual one-file tool use and exact randomized source literal, not installed Angular, build/query execution, expert qualification or optimal routing."
+  },
+  "new_dependency": {
+    "name": "quick-xml",
+    "version": "0.42.0",
+    "source": "existing local Cargo cache; added and built offline; installed API inspected"
+  },
+  "model_downloads": 0,
+  "weights_modified": false,
+  "provider_fees_usd": 0,
+  "production_admissions": [],
+  "remaining": [
+    "Production-quality independent intake/routing qualification",
+    "Native MCP asynchronous worker execution with current actor grants and shared parent budgets",
+    "Broader existing inference/embedding provider integration",
+    "Real Angular/.NET/Cosmos runtime validators and cross-domain integration checks",
+    "Task UI integration and broader quality/resource evaluation",
+    "Routing-decision cache and richer evidence-support validation"
+  ],
+  "audit": "docs/151-task-engine-completion-audit.md",
+  "documentation": "docs/152-workspace-task-evidence.md",
+  "code_sha256": {
+    "Cargo.lock": "9320d3473ebd821cb159eb3a195238a05457c4c2c057dd78c17f7e1caa53b2d7",
+    "mcp/Cargo.toml": "572eff2bb5ed5f049884d124210a3934425be909317e943b3fd98a697fa0f81f",
+    "mcp/src/task_engine/read_tools.rs": "3ed0449e4728bfc9d0c3315a7de7b94b6ea5697a47af88d91ca1f42174da3b3e",
+    "mcp/src/task_engine/workspace_evidence.rs": "697658fc95530ccb71cfbdbc01dcd03526d85202abe767f6eb062b31a9409e3e",
+    "mcp/src/task_engine/project_metadata.rs": "62ecc3eb0cb17c74dabc70463b6f2ec5c24da40269d57aff86f085bde7466e68",
+    "mcp/src/task_engine/repository.rs": "a71c08811f358a6d4d639bf0674420fc16bf4ca0376b42dcbfa0f96a190d6f19",
+    "mcp/src/task_engine/contracts.rs": "867d327d333e3b1914e96b6fcdb46c68cc5a72658bc250d7647c689de69ce444",
+    "mcp/src/task_engine/workflows.rs": "b3f847e2710d76d7a98b5df628d0c219f1948ef3152c28ab7928beec89824854",
+    "mcp/src/task_engine/routing.rs": "711091e3fb333b1951a76fb7a33ccbb18d25ef31becd466c7e67ba2c26988bd8",
+    "mcp/src/task_engine/adaptive.rs": "53b1ecec722c323d19cf70fc41753becf8a90f6f146ad062494313cd2db7211b",
+    "mcp/src/task_engine/schemas.rs": "3c575463f9fb540ef1c16d1967e72b5e7bf902f4e99bd93e06d12a08dfee233f",
+    "crates/harness/src/task_workflows.rs": "a4fed117c13928426f91cf9fc370d703abb7f4d0b37ec699d4d32c0dd8831bc4",
+    "crates/harness/src/task_frontdoor.rs": "b28bab188c5fcd4c5eb41da22cf3452929a11780a32261ab49e4bd830b517e32",
+    "crates/harness/src/local_runtime.rs": "39c40e6010b09c144d9d73c3aaac58620d0025a41564d5ad168c20f2f33f15c3",
+    "crates/harness/src/provider.rs": "1b6faab3f1b24120db6c60d18233f9fa883a7dbdecf3f9e35c086bf5a28c05a6",
+    "mcp/tests/workspace_tasks.rs": "b61dfc7f67b5856212342247a59ae5af0cbb39a182482dd7a9cea51452659222",
+    "mcp/tests/intake_replans.rs": "b89bb1f0220ea0031a6428c9bdfa6b22ff32b1044224a4a9ae665f1274f97ea0",
+    "scripts/task_workflows_smoke.py": "932836fb87ff6e3b9224189c1216e022c903ef12f07bf6b799c03d63c3551034",
+    "scripts/task_workspace_live.py": "fd467e164c4dab5f6a08346ac56358c216379c2913a25ae5edb0e54f0ced5edd",
+    "scripts/check.sh": "6587f1eccc637f4d62adca7a1010088997f95c6b0016ba2d152bf6aa4c2c43ef",
+    "config/schemas/task-engine-v1.json": "4e0f748fcaa297d6700036a6e6b7b1b847f6fddade008c39c13a7b5ffa332c91"
+  }
+}

@@ -1,0 +1,348 @@
+{
+  "schema_version": 1,
+  "milestone": "integrated_cache_first_task_core",
+  "full_goal_status": "active",
+  "observed_at_utc": "2026-11-19T05:35:23.661773+00:00",
+  "source_head": "23b7d823956586a3a4d760767d7eb5b7e18d63a3",
+  "branch": "codex/feature/public-research-view",
+  "input_brief_sha256": "d4ca125900b75307dc3c4471fd9eb013c43b0779e2eaf2ee60f4c3c6496d47d9",
+  "implemented": [
+    "versioned Serde contracts and generated schemas",
+    "scoped exact answers and reviewed CPU-feature semantic reuse",
+    "incremental lexical retrieval and source/file dependency invalidation",
+    "nine finite registered workflow executors",
+    "shared global reservations, deadlines, cancellation and coalescence",
+    "lightweight built-in/custom profiles and resolved model identities",
+    "actor-private granted native MCP task tools and async owner API",
+    "metadata inventory and disabled research manifest/promotion gates"
+  ],
+  "remaining_required": [
+    "evaluated schema-constrained model intake and automatic complex routing",
+    "budget-preserving replanning/escalation with retained evidence",
+    "broader configured provider and local embedding adapters",
+    "generic approved native tools and specialist validator integration",
+    "async native MCP worker execution beyond deterministic methods",
+    "broader model-quality and routing/retrieval acceptance evidence"
+  ],
+  "checks": {
+    "cargo_fmt_check": "passed",
+    "cargo_clippy_all_targets_deny_warnings": "passed",
+    "cargo_build_workspace": "passed",
+    "full_workspace_before_last_two_cache_hardenings": {
+      "passed": 613,
+      "ignored": 27
+    },
+    "focused_current_core_tests": {
+      "passed": 37,
+      "failed": 0
+    },
+    "http_mock_workflows": {
+      "transport": "real HTTP and SQLite",
+      "provider": "mock, zero generative calls",
+      "workflows": [
+        {
+          "template": "direct/v1",
+          "nodes": 1,
+          "status": "generated"
+        },
+        {
+          "template": "rag/v1",
+          "nodes": 1,
+          "status": "generated"
+        },
+        {
+          "template": "tool_loop/v1",
+          "nodes": 1,
+          "status": "generated"
+        },
+        {
+          "template": "pipeline/v1",
+          "nodes": 3,
+          "status": "generated"
+        },
+        {
+          "template": "hub/v1",
+          "nodes": 4,
+          "status": "generated"
+        },
+        {
+          "template": "hierarchy/v1",
+          "nodes": 5,
+          "status": "generated"
+        },
+        {
+          "template": "peer/v1",
+          "nodes": 5,
+          "status": "generated"
+        },
+        {
+          "template": "critique/v1",
+          "nodes": 3,
+          "status": "generated"
+        },
+        {
+          "template": "explore/v1",
+          "nodes": 4,
+          "status": "generated"
+        }
+      ],
+      "duplicate_job_coalesced": true,
+      "subscriber_cancel_isolated": true,
+      "source_correction_invalidated": true,
+      "provider_cost_usd": 0
+    },
+    "heldout_cases": 36,
+    "heldout_false_cache_hits": 0,
+    "heldout_fixture_sha256": "0b72c7f031b57303f6597a81252928aeb3a79319d2f2971b18adcfe9d7728d59",
+    "repository_check_stages": "Passed across resumed segments after fixture import and TLS-context fixes. No uninterrupted scripts/check.sh success is claimed.",
+    "actual_browser_visual_test": "not run; no visual UI changes"
+  },
+  "inventory": {
+    "observed_at_ms": 1795062676135,
+    "top_level_weight_artifacts": 17,
+    "metadata_identity_groups": 16,
+    "all_nested_artifacts": 24,
+    "ollama_manifests": [
+      {
+        "id": "registry.ollama.ai/library/llama3.2/latest",
+        "provider": "ollama",
+        "layers": [
+          {
+            "digest": "sha256:dde5aa3fc5ffc17176b5e8bdc82f587b24b2678c6c66101bf7da77af9f7ccdff",
+            "disk_bytes": 2019377376,
+            "downloaded": true
+          }
+        ],
+        "serveable": "unknown_daemon_not_probed",
+        "loaded": "unknown",
+        "aliases_may_share_weight_digest": true
+      },
+      {
+        "id": "registry.ollama.ai/robertjmonzingo/zingo/latest",
+        "provider": "ollama",
+        "layers": [
+          {
+            "digest": "sha256:dde5aa3fc5ffc17176b5e8bdc82f587b24b2678c6c66101bf7da77af9f7ccdff",
+            "disk_bytes": 2019377376,
+            "downloaded": true
+          }
+        ],
+        "serveable": "unknown_daemon_not_probed",
+        "loaded": "unknown",
+        "aliases_may_share_weight_digest": true
+      }
+    ],
+    "endpoint_probes": [
+      {
+        "endpoint": "http://127.0.0.1:11434",
+        "reachable": false,
+        "error_type": "URLError",
+        "files_missing": false,
+        "inference_attempted": false
+      }
+    ],
+    "runtimes": {
+      "ollama": {
+        "path": "/usr/local/bin/ollama",
+        "version_output": "Warning: could not connect to a running Ollama instance\nWarning: client version is 0.35.1"
+      },
+      "llama-server": {
+        "path": "/opt/homebrew/bin/llama-server",
+        "version_output": "version: 0.7.0 (build 11669, commit 620d2225c)\nbuilt with AppleClang 21.0.0.21000334 for Darwin arm64"
+      }
+    },
+    "distinct_serveable_worker_count": "not established"
+  },
+  "live_trials": [
+    {
+      "report": "data/task-engine-live/09762241-bd75-4e01-9090-3038d65848be/report.json",
+      "model_path": "models/qwen2.5-1.5b-instruct/qwen2.5-1.5b-instruct-q4_k_m.gguf",
+      "model_sha256": "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+      "status": "generated",
+      "answer": "Jimmy Carter",
+      "exact_name_acceptance": false,
+      "verification_state": "citations_checked_answer_unverified",
+      "measurements": {
+        "elapsed_micros": 4102255,
+        "embedding_calls": 0,
+        "generative_model_calls": 1,
+        "input_tokens": 569,
+        "memory_bytes": 1610858496,
+        "output_tokens": 116,
+        "provider_cost_usd": 0,
+        "tool_calls": 0
+      },
+      "production_profile_admission": false
+    },
+    {
+      "report": "data/task-engine-live/15c43dc9-8287-4110-8f55-0b1afbf9603c/report.json",
+      "model_path": "models/qwen3-4b-instruct/Qwen3-4B-Q4_K_M.gguf",
+      "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+      "status": "generated",
+      "answer": "Gerald Ford",
+      "exact_name_acceptance": true,
+      "verification_state": "citations_checked_answer_unverified",
+      "measurements": {
+        "elapsed_micros": 8252714,
+        "embedding_calls": 0,
+        "generative_model_calls": 1,
+        "input_tokens": 595,
+        "memory_bytes": 3926376448,
+        "output_tokens": 241,
+        "provider_cost_usd": 0,
+        "tool_calls": 0
+      },
+      "production_profile_admission": false
+    },
+    {
+      "report": "data/task-engine-live/2ebdf6f4-006f-4bab-8eb4-bba6398881fb/report.json",
+      "model_path": "models/qwen3-4b-instruct/Qwen3-4B-Q4_K_M.gguf",
+      "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+      "status": "generated",
+      "answer": "The US president in 1976 was Jimmy Carter. Gerald Ford held the presidency from August 9, 1974, to January 20, 1977, following his loss to Carter in the 1976 election.",
+      "exact_name_acceptance": false,
+      "verification_state": "citations_checked_answer_unverified",
+      "measurements": {
+        "elapsed_micros": 7762572,
+        "embedding_calls": 0,
+        "generative_model_calls": 1,
+        "input_tokens": 585,
+        "memory_bytes": 3928719360,
+        "output_tokens": 144,
+        "provider_cost_usd": 0,
+        "tool_calls": 0
+      },
+      "production_profile_admission": false
+    },
+    {
+      "report": "data/task-engine-live/81fe0c82-b59c-4003-8a71-a5e97793a8f4/report.json",
+      "model_path": "models/qwen3-4b-instruct/Qwen3-4B-Q4_K_M.gguf",
+      "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+      "status": "generated",
+      "answer": "Gerald Ford",
+      "exact_name_acceptance": true,
+      "verification_state": "citations_checked_answer_unverified",
+      "measurements": {
+        "elapsed_micros": 8288189,
+        "embedding_calls": 0,
+        "generative_model_calls": 1,
+        "input_tokens": 589,
+        "memory_bytes": 3925901312,
+        "output_tokens": 270,
+        "provider_cost_usd": 0,
+        "tool_calls": 0
+      },
+      "production_profile_admission": false
+    },
+    {
+      "report": "data/task-engine-live/b9294f9a-f4c3-436c-8eb7-107984ca4bad/report.json",
+      "model_path": "models/qwen2.5-0.5b-instruct/qwen2.5-0.5b-instruct-q4_k_m.gguf",
+      "model_sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+      "status": "blocked",
+      "answer": null,
+      "exact_name_acceptance": false,
+      "verification_state": "citations_checked_answer_unverified",
+      "measurements": {
+        "elapsed_micros": 1903849,
+        "embedding_calls": 0,
+        "generative_model_calls": 1,
+        "input_tokens": 568,
+        "memory_bytes": 835338240,
+        "output_tokens": 121,
+        "provider_cost_usd": 0,
+        "tool_calls": 0
+      },
+      "production_profile_admission": false
+    },
+    {
+      "report": "data/task-engine-live/c309d560-dcef-4ffb-8f36-825d2452fc6f/report.json",
+      "model_path": "models/qwen3-4b-instruct/Qwen3-4B-Q4_K_M.gguf",
+      "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+      "status": "generated",
+      "answer": "Jimmy Carter",
+      "exact_name_acceptance": false,
+      "verification_state": "citations_checked_answer_unverified",
+      "measurements": {
+        "elapsed_micros": 7058600,
+        "embedding_calls": 0,
+        "generative_model_calls": 1,
+        "input_tokens": 590,
+        "memory_bytes": 3929473024,
+        "output_tokens": 92,
+        "provider_cost_usd": 0,
+        "tool_calls": 0
+      },
+      "production_profile_admission": false
+    },
+    {
+      "report": "data/task-engine-live/d55be491-c24a-4429-a116-d0ea31493c4a/report.json",
+      "model_path": "models/qwen2.5-0.5b-instruct/qwen2.5-0.5b-instruct-q4_k_m.gguf",
+      "model_sha256": "74a4da8c9fdbcd15bd1f6d01d621410d31c6fc00986f5eb687824e7b93d7a9db",
+      "status": "blocked",
+      "answer": null,
+      "exact_name_acceptance": false,
+      "verification_state": "citations_checked_answer_unverified",
+      "measurements": {
+        "elapsed_micros": 2497385,
+        "embedding_calls": 0,
+        "generative_model_calls": null,
+        "input_tokens": 0,
+        "memory_bytes": null,
+        "output_tokens": 0,
+        "provider_cost_usd": 0,
+        "tool_calls": 0
+      },
+      "production_profile_admission": false
+    }
+  ],
+  "provider_fees_usd": 0,
+  "model_downloads": 0,
+  "weights_modified": false,
+  "source_sha256": {
+    "Cargo.lock": "816fe2042b81f562ff3a33708ed696a9f0b6b8ad30fd665ab343426b9efb3de5",
+    "config/company-tools.json": "8bc9e1d0db84b03849613b09c0a7dd0d481d59f0dc26c8043a79c92ff2263157",
+    "config/schemas/task-engine-v1.json": "44c4306ef1aff9f3d9da0093af381711b7fb87d7c92c29cbd2742572caf8944d",
+    "crates/harness/src/ceo_fastpath.rs": "a25ebf11b05f2a5e2cc75f7345355b4b138ffce5061a58461656a3006f37f19d",
+    "crates/harness/src/ceo_planning.rs": "43818667e12fe70cff8d5f5d091077557a920b315a7549c97c1d0b153dce1433",
+    "crates/harness/src/local_runtime.rs": "cce73422694961abea6027d43ffc6ccefb4220e4315e92ea21d6d028ff74554f",
+    "crates/harness/src/main.rs": "004937ed60473a16545d4dfe82b7e1fe4209695eea439cdbb8a6acca67dd5bed",
+    "crates/harness/src/provider.rs": "b85c6ebc6617462f29f136e0ebfc5fe37fa8394fe6ed5a39880ddc27faf59bc5",
+    "crates/harness/src/task_answers.rs": "9d68e3d3c41f59915cae1f4a4f0d39405553aa8081a5df094fe6a9a09e5a9da0",
+    "crates/harness/src/task_frontdoor.rs": "4c5d46b63561e27d71b6fcddebc33e19af3a8262389f10e0f3245a0c6e5fe69e",
+    "crates/harness/src/task_workflows.rs": "8bfe85ef4474477a8769674e359c7a845ed1a019da4bb2af9760f58a37cf3e31",
+    "docs/150-adaptive-local-task-engine.md": "9ae2b278ae9b4a966d46a34df22eb74c0c364d8a9e91a4a1654190d0f781765d",
+    "mcp/Cargo.toml": "674de17673d05d0d8dbb612cfd22ade8c8f2db20cbc01746252ea2999c4867f6",
+    "mcp/README.md": "c281d61c66d5af57fc21f12ccdf27a17ad2172de7a9113a90266fd84fafdf0ec",
+    "mcp/src/authority.rs": "cd914e75dcccfc15f0080d9d099b4565240bf8085d158ec5d01832e6920b2433",
+    "mcp/src/functions/mod.rs": "405d9f228867806ede771765b271f030e7210a5556b4a3b209bff0af2546096a",
+    "mcp/src/functions/tasks.rs": "2488e87ef8514651c1b8413fb96c5be6e6b13b3c3001995113593d5922a0e22c",
+    "mcp/src/main.rs": "6be2b6c2158b5729ad9d25d9c362b35cc485466ae302fc16e2d4199591d4ac21",
+    "mcp/src/skills.rs": "542430aeea5b9e9dd3db91c82563eea55b4a39d04060ecd4959a7e048dfcd0b3",
+    "mcp/src/task_engine/contracts.rs": "6f96b3c097b7b88afb650031e7af25e38d70f0aea1bdf4852531289ae8f281dd",
+    "mcp/src/task_engine/grounded.rs": "bd6e7133023f0acc002670d4ad66aea1f332f25382e9dc3abfabb780319ca67d",
+    "mcp/src/task_engine/mod.rs": "0647414802d6106eef8cc3807d79e60584c390508112f1f43a346ecda13c8127",
+    "mcp/src/task_engine/models.rs": "4d658692b6c7c18c552413dfb72705c014d1c356f9086219eb191d32df1d3e68",
+    "mcp/src/task_engine/optimization.rs": "28e447ed8044613c619ee28e068e83d0432785d0df7aedaf7a5a7f6fc2128b8f",
+    "mcp/src/task_engine/repository.rs": "c5b4f98a9fe17c516cbed5c5e5c06ab3e84a6a54f3e8f35ea415581e3da0f88f",
+    "mcp/src/task_engine/resources.rs": "9a3ae3b33084d0d0900e72ab408bdd26eac75462a713c395ba2a79cf1e98ba9d",
+    "mcp/src/task_engine/routing.rs": "00efa3abafdb5ab4334d577f48de88fa460a2fd68895728a8e5a9eecdb9bd63f",
+    "mcp/src/task_engine/schemas.rs": "d3910f9550cf7580855ee999e909a46083c2e80e64876b03dcda04a92f881fc8",
+    "mcp/src/task_engine/semantic.rs": "f40fe3fbf301e4d966847e5bdc8f5edd6a8b0166f9f2a2efde47bf688177d327",
+    "mcp/src/task_engine/workflows.rs": "956fe2c4c93d4cde95d613eaf2505872576bd52ebe080301157907eae853b00f",
+    "mcp/tests/adaptive_tasks.rs": "fb1d0b998629c35c793629f0fc812e7ce43724fa56548dd8d454942b0ba8f23a",
+    "mcp/tests/fixtures/task-heldout-v1.json": "0b72c7f031b57303f6597a81252928aeb3a79319d2f2971b18adcfe9d7728d59",
+    "mcp/tests/grounded_tasks.rs": "255aa4a768bc0e93629b6b6b206084890b836604f8c4f313286374e6e6945f0b",
+    "mcp/tests/task_engine.rs": "101214bf0e686244d0a4913c5336c777745363282bebb0440ba64de451b97cb4",
+    "mcp/tests/task_mcp.rs": "65235603c508b6dd842a24ca66402bceefb199650fe4d625462849188b3637e2",
+    "scripts/check.sh": "2fe569c7946cab42348076811eeeea591c1b3d2fba8aa7b3adc5804475723447",
+    "scripts/company_tools.py": "c93d996a3ffcc9da846a86bdecc7c2fafb2ecd8428f43b1299726b8f31741128",
+    "scripts/intent_retention_smoke.py": "f79e3ca671c17c9341cebee122d785ad6ec305f5daa41fac07eced040b2967f5",
+    "scripts/qa_recovery_smoke.py": "7378860a6254a60a5310a43f767f23d5540b7f4aa615915df279d45e7872fb9f",
+    "scripts/review_protocol_smoke.py": "081bfbe81a7c70154af77edcc9a941db52392d84c2cfddbac63e6ffec34b7d19",
+    "scripts/rust_proposal_feedback_smoke.py": "cb0784689aa18ed8d5ef6c0901bc067570cc85700e6f0773b538bc733a57167c",
+    "scripts/task_engine_live.py": "144e30e0bdc6a61460e389d916d7c5388d7e7d6ac5630f54f9aead9cb026435d",
+    "scripts/task_model_discovery.py": "af551bc6ef3dc0431299a16488b5606d7af1a65854be5137b3d1d68d20a40ac2",
+    "scripts/task_workflows_smoke.py": "88c0ed6727829d79e516a533e35ee74043f4ea0fcf32fae4e88364b843411491",
+    "scripts/test_task_model_discovery.py": "d0c8db7d7949f19d9fc1136b8ae50c34828139ca9330bcfa6651bbcc82eed92d"
+  }
+}

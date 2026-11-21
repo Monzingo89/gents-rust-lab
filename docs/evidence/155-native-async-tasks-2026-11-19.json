@@ -1,0 +1,251 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-19",
+  "goal_status": "active_incomplete",
+  "scope": "Native asynchronous task lifecycle through existing MCP stdio/owned SSE and shared harness engine; not specialist or production model qualification",
+  "source_sha256": {
+    "crates/harness/src/task_native.rs": "faca0482f3b1cba1b9cd9ef5cc1ee8968c91a61c93bb8e7a1680c0a5c8d90fc6",
+    "crates/harness/src/task_workflows.rs": "af5710615115ab8b2409ce5ecbdc6e3a80201807524eb6bd31d09bf975fd281e",
+    "crates/harness/src/company.rs": "14c67fc97d2fb1bf786a2150f888fe670f55f449fcf377f69d0e200035859e90",
+    "crates/harness/src/main.rs": "9c04714784e5aa46f6a27794126c05167e1ed90912dbf7ca9bf6dfd72000ec18",
+    "mcp/src/task_engine/native.rs": "d8c73606ff96e8927db51ac2faf7dc59c0bacb4fc6063a2101098bbfd85291d9",
+    "mcp/src/task_engine/repository.rs": "58b1f2b7638788a586dec5e797938daf6bda7b78a67be27abae1c892b91c8ffc",
+    "mcp/src/task_engine/schemas.rs": "269de8dffb269dc96eba6f545002bba56344fad4fa50abfc6fd07d4a97d8f65f",
+    "mcp/src/task_engine/routing.rs": "c039e0532156d627392e4e0f1402569208fd8bc73aac80d19088eb2c77470058",
+    "mcp/src/functions/tasks.rs": "290cf8a16a04b501b25876710e669072b16c171704c8842b1f3d50f791885654",
+    "mcp/src/functions/mod.rs": "42cdc6f39124e65659311310166773b6430ebe5bec70828b100d3d17d8fc711f",
+    "mcp/src/protocol.rs": "55368355455d6777cdd2b95d8d373019dcf940e43bff155bad1c4218007c6e52",
+    "mcp/src/lib.rs": "90ed30e69c4ac5d54966ce8178d86bd2d8cc610f6677ef333d0cafd36521281b",
+    "mcp/tests/native_task_queue.rs": "80e9e69e91fe23da0a9be861022cdc90944578be9c6b4410d0a8f261662476ea",
+    "scripts/task_native_smoke.py": "e5982e947524937097970d3dba6e686ead0d9d6e1702206992d60ae7c92698f2",
+    "scripts/task_mlx_live.py": "6643febe27d05262a2c9487b3d9abc377ae06f7394fe60efc9fe78fc47fb1047",
+    "scripts/check.sh": "337fe0d3d10c91673079dd7e51a3396974a85afe1439aabe68dd9ac0fb5d8379",
+    "config/company-tools.json": "b0068c9133d8d8b17bf60febae16813d7264fc3155fa29af2afaf3cbf4a67396"
+  },
+  "full_repository_check": {
+    "command": "CARGO_NET_OFFLINE=true bash scripts/check.sh",
+    "exit_code": 0,
+    "log_sha256": "b725a02a697f38baac12d33e4885e2d02686a88ed9ce9926226255971d214a70",
+    "rust_passed": 662,
+    "rust_failed": 0,
+    "rust_ignored": 27,
+    "protocol_reports": [
+      {
+        "transport": "actual native MCP stdio, HTTP owner governance and SQLite",
+        "worker": "mock only; no model weights loaded",
+        "templates": [
+          {
+            "template": "direct/v1",
+            "nodes": 1
+          },
+          {
+            "template": "rag/v1",
+            "nodes": 1
+          },
+          {
+            "template": "tool_loop/v1",
+            "nodes": 1
+          },
+          {
+            "template": "pipeline/v1",
+            "nodes": 3
+          },
+          {
+            "template": "hub/v1",
+            "nodes": 4
+          },
+          {
+            "template": "hierarchy/v1",
+            "nodes": 5
+          },
+          {
+            "template": "peer/v1",
+            "nodes": 5
+          },
+          {
+            "template": "critique/v1",
+            "nodes": 3
+          },
+          {
+            "template": "explore/v1",
+            "nodes": 4
+          }
+        ],
+        "exact_repeat_zero_generation": true,
+        "actor_private": true,
+        "coalesced_subscriber_cancellation": true,
+        "revocation_invalidated": true,
+        "concurrent_owner_update_stale_rejected": true,
+        "restart_did_not_replay": true,
+        "parent_budget_enforced": true,
+        "parent_budget_reservations": 32,
+        "dispatch_reservations_not_inference_proof": 32,
+        "other_company_not_enabled": true,
+        "provider_cost_usd": 0
+      },
+      {
+        "transport": "actual native MCP stdio and SQLite",
+        "worker": "mock only",
+        "analysis_only": true,
+        "clarification_blocks_worker": true,
+        "structured_intake_bypass": true,
+        "parent_reserved_calls": 3,
+        "provider_cost_usd": 0
+      },
+      {
+        "transport": "actual native MCP sse, HTTP owner governance and SQLite",
+        "worker": "mock only; no model weights loaded",
+        "templates": [
+          {
+            "template": "direct/v1",
+            "nodes": 1
+          },
+          {
+            "template": "rag/v1",
+            "nodes": 1
+          },
+          {
+            "template": "tool_loop/v1",
+            "nodes": 1
+          },
+          {
+            "template": "pipeline/v1",
+            "nodes": 3
+          },
+          {
+            "template": "hub/v1",
+            "nodes": 4
+          },
+          {
+            "template": "hierarchy/v1",
+            "nodes": 5
+          },
+          {
+            "template": "peer/v1",
+            "nodes": 5
+          },
+          {
+            "template": "critique/v1",
+            "nodes": 3
+          },
+          {
+            "template": "explore/v1",
+            "nodes": 4
+          }
+        ],
+        "exact_repeat_zero_generation": true,
+        "actor_private": true,
+        "coalesced_subscriber_cancellation": true,
+        "revocation_invalidated": true,
+        "concurrent_owner_update_stale_rejected": true,
+        "restart_did_not_replay": true,
+        "parent_budget_enforced": true,
+        "parent_budget_reservations": 32,
+        "dispatch_reservations_not_inference_proof": 32,
+        "other_company_not_enabled": true,
+        "provider_cost_usd": 0
+      },
+      {
+        "transport": "actual native MCP sse and SQLite",
+        "worker": "mock only",
+        "analysis_only": true,
+        "clarification_blocks_worker": true,
+        "structured_intake_bypass": true,
+        "parent_reserved_calls": 3,
+        "provider_cost_usd": 0
+      }
+    ]
+  },
+  "retained_initial_check_failure": {
+    "log_sha256": "bcaef58a1b9f50fcd7d970c5371fbdf5a5f4d4bad5f2e62259f4f20d059b4957",
+    "exit_code": 1,
+    "boundary": "HTTP 400 at owner governance installation during native SSE fixture",
+    "original_response_body_retained": false,
+    "root_cause_note": "Original status alone does not prove a SQLite code. Deferred read-to-write upgrade window removed with BEGIN IMMEDIATE; regressions require one concurrent owner save and one explicit stale revision rejection.",
+    "current_regression_passed_both_transports": true
+  },
+  "live_native": {
+    "report": "data/task-mlx-live/937e42f2-a3d8-47d9-94db-a8b6ca312fc8/report.json",
+    "report_sha256": "718ce9b49c81d0395e5ac4debeaeaee306be8da8e482b00f225babedace5e207",
+    "transport": "native MCP stdio",
+    "binary_sha256_during_trial": "a703419519d17fb59aea95e8f14f8a12726cc0c2a37fd0c903ac4225ec3fe963",
+    "package_sha256": "bea43fdaa35b44cc0ef56cb550727657f135d30160b1e6f51050fbdcdd2fe9b1",
+    "checks": {
+      "generated": true,
+      "exact_answer": true,
+      "one_generative_call": true,
+      "source_cited": true,
+      "offline_preflight": true,
+      "tokenizer_matches_server_usage": true,
+      "unchanged_harness_binary": true,
+      "native_parent_allowance_charged": true,
+      "native_admission_recorded": true,
+      "actor_private_scope": true
+    },
+    "measurements": {
+      "elapsed_micros": 38914557,
+      "embedding_calls": 0,
+      "generative_model_calls": 1,
+      "input_tokens": 1007,
+      "memory_bytes": 13923762176,
+      "output_tokens": 58,
+      "provider_cost_usd": 0,
+      "tool_calls": 0
+    },
+    "native_proof": {
+      "parent_run": "30a369d0-123c-4291-adc2-be4216c8f4c9",
+      "parent_reserved_calls": 1,
+      "native_admissions": 1,
+      "scope_subject": "local-developer:30a369d0-123c-4291-adc2-be4216c8f4c9:Worker"
+    },
+    "local_execution": {
+      "backend_pid": 49427,
+      "dispatched_at_ms": 1795080152580,
+      "finish_reason": "stop",
+      "port": 52717,
+      "prompt_preflight": {
+        "has_chat_template": true,
+        "model_context_limit": 131072,
+        "prompt_tokens": 1007,
+        "provider_version": "0.32.2",
+        "schema_version": 1,
+        "tokenization_scheme": "mlx_lm.server/0.32.2",
+        "weights_loaded": false
+      },
+      "received_at_ms": 1795080157847,
+      "resident_kib": 13597424,
+      "task_input_sha256": "e71d406e746f80b7e24813609599cee6d009fdf2c31c0088d17c6a73a40592bb"
+    },
+    "verification_state": "citations_checked_answer_unverified",
+    "production_admission": false,
+    "rss_not_total_unified_memory": true,
+    "quality_scope": "One synthetic source-backed literal/protocol trial; no specialist or general-quality qualification."
+  },
+  "earlier_native_trial": {
+    "report": "data/task-mlx-live/511733bc-c680-427f-98b1-4c09817f9d84/report.json",
+    "passed": true
+  },
+  "primary_protocol_reference": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools",
+  "separate_sdk_discovery": {
+    "dotnet_sdks": [
+      "9.0.318",
+      "10.0.300",
+      "10.0.401"
+    ],
+    "angular_cli_on_path": false,
+    "checked_angular_npm_cache_query_empty": true,
+    "dotnet_minimal_sandbox_probe": "data/task-specialist-probes/a8913c56-0a57-4233-8807-86f9f54da1b5/report.json",
+    "probe_result": "Runtime initialization failed with missing ICU data under minimal allowlist; no build/qualification claimed"
+  },
+  "provider_cost_usd": 0,
+  "model_downloads": 0,
+  "committed": false,
+  "pushed": false,
+  "deployed": false,
+  "remaining": [
+    "native specialist runtime validators and real cross-domain checks",
+    "independent production model/intake/routing qualification",
+    "broader providers, local embedding adapters and configured multi-host execution",
+    "broader independent evidence-support/factual acceptance"
+  ]
+}

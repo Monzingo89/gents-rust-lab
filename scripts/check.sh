@@ -30,6 +30,17 @@ python3 scripts/experiment_evaluation_smoke.py
 python3 scripts/experiment_evaluation_smoke.py --continuation
 python3 scripts/experiment_evaluation_smoke.py --research
 python3 scripts/task_frontdoor_smoke.py
+python3 scripts/task_workflows_smoke.py
+python3 scripts/task_workflows_smoke.py --adaptive
+python3 scripts/task_workflows_smoke.py --workspace
+python3 scripts/task_workflows_smoke.py --workspace-denied
+python3 scripts/task_native_smoke.py
+python3 scripts/task_native_smoke.py --adaptive
+python3 scripts/task_native_smoke.py --sse
+python3 scripts/task_native_smoke.py --adaptive --sse
+python3 scripts/task_validation_smoke.py
+python3 scripts/task_validation_smoke.py --sse
+python3 -m unittest discover -s scripts -p 'test_task_model_discovery.py'
 python3 scripts/intent_retention_smoke.py
 python3 scripts/qa_recovery_smoke.py
 python3 scripts/frozen_artifact_gate_smoke.py
@@ -108,6 +119,10 @@ node --check scripts/fixtures/mcp-workflow-catalog.mjs
 node --check scripts/mcp-workflow-check.mjs
 node --check scripts/fixtures/mcp-reconciliation.mjs
 node --check web/app.js
+node --check web/assets/task-workbench.js
+node --check scripts/task_workflows_browser.mjs
+node --check mcp/src/angular_check/browser.mjs
+node --check mcp/src/angular_check/browser_profile.mjs
 npm run build
 npm run test:site
 

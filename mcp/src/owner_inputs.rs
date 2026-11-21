@@ -27,11 +27,25 @@ fn paths(intake: &Value) -> Vec<&str> {
         .filter_map(|check| check["frozen_inputs"].as_object())
         .flat_map(|inputs| inputs.keys().map(String::as_str))
         .for_each(|path| paths.push(path));
+    intake["dotnet_check_contracts"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|check| check["frozen_inputs"].as_object())
+        .flat_map(|inputs| inputs.keys().map(String::as_str))
+        .for_each(|path| paths.push(path));
     intake["ceo_source_files"]
         .as_array()
         .into_iter()
         .flatten()
         .filter_map(|file| file["path"].as_str())
+        .for_each(|path| paths.push(path));
+    intake["angular_check_contracts"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|check| check["frozen_inputs"].as_object())
+        .flat_map(|inputs| inputs.keys().map(String::as_str))
         .for_each(|path| paths.push(path));
     let registry = crate::Registry::new();
     intake["ceo_source_inputs"]
@@ -77,4 +91,24 @@ pub(crate) fn write_protected(
         }
     }
     Ok(false)
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn angular_owner_controls_are_protected_through_hardlink_aliases() {
+        let root =
+            std::env::temp_dir().join(format!("gents-angular-owner-{}", uuid::Uuid::new_v4()));
+        std::fs::create_dir(&root).unwrap();
+        let root = root.canonicalize().unwrap();
+        std::fs::write(root.join("angular.json"), "{}").unwrap();
+        std::fs::write(root.join("main.ts"), "source").unwrap();
+        let intake = serde_json::json!({"angular_check_contracts":[{"frozen_inputs":{"angular.json":"frozen"}}]});
+        assert!(super::write_protected(&root, &intake, "angular.json").unwrap());
+        assert!(!super::write_protected(&root, &intake, "main.ts").unwrap());
+        std::fs::hard_link(root.join("angular.json"), root.join("alias.json")).unwrap();
+        assert!(super::write_protected(&root, &intake, "angular.json").unwrap());
+        assert!(super::write_protected(&root, &intake, "alias.json").is_err());
+        std::fs::remove_dir_all(root).unwrap();
+    }
 }

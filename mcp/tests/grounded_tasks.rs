@@ -19,6 +19,7 @@ fn scope() -> AccessScope {
 }
 fn source() -> KnowledgeSource {
     KnowledgeSource {
+        dependencies: Default::default(),
         source_id: "source".into(),
         revision: "v1".into(),
         title: "Synthetic widget manual".into(),

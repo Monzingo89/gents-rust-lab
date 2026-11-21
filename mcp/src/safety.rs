@@ -50,13 +50,47 @@ fn luhn(value: &str) -> bool {
 }
 
 fn looks_like_email(token: &str) -> bool {
-    let token = token.trim_matches(|character: char| {
-        character.is_ascii_punctuation() && !matches!(character, '@' | '.' | '-' | '_')
-    });
-    let Some((local, domain)) = token.split_once('@') else {
-        return false;
-    };
-    !local.is_empty() && domain.contains('.') && !domain.starts_with('.') && !domain.ends_with('.')
+    // Inspect address-shaped spans around every @. Treating an entire URL as
+    // an address falsely classified public npm /@scope/package-1.2.3.tgz
+    // references; checking only the first @ also missed later real addresses.
+    token.match_indices('@').any(|(index, _)| {
+        let local = token[..index]
+            .chars()
+            .rev()
+            .take_while(|c| {
+                c.is_alphanumeric()
+                    || matches!(
+                        c,
+                        '.' | '_'
+                            | '-'
+                            | '+'
+                            | '%'
+                            | '!'
+                            | '#'
+                            | '$'
+                            | '&'
+                            | '\''
+                            | '*'
+                            | '='
+                            | '?'
+                            | '^'
+                            | '`'
+                            | '{'
+                            | '|'
+                            | '}'
+                            | '~'
+                    )
+            })
+            .collect::<String>();
+        let domain = token[index + 1..]
+            .chars()
+            .take_while(|c| c.is_alphanumeric() || matches!(c, '.' | '-'))
+            .collect::<String>();
+        !local.is_empty()
+            && domain.contains('.')
+            && !domain.starts_with('.')
+            && !domain.trim_end_matches('.').is_empty()
+    })
 }
 
 fn looks_like_ssn(token: &str) -> bool {
@@ -197,5 +231,21 @@ mod tests {
         );
         assert_eq!(assess("4111 1111 1111 1111").level, "payment_card");
         assert!(require_persistable("4111 1111 1111 1111").is_err());
+    }
+    #[test]
+    fn public_scoped_package_urls_are_not_addresses_but_embedded_addresses_still_are() {
+        assert!(require_persistable(
+            r#"{"resolved":"https://registry.npmjs.org/@angular/core/-/core-21.2.26.tgz"}"#
+        )
+        .is_ok());
+        for address in [
+            r#"{"contact":"jane@example.com"}"#,
+            "@scope/package;jane@example.com",
+            "https://jane@example.com/path",
+            "first+last@example.com",
+            "Patient diagnosis: jane@example.com.",
+        ] {
+            assert!(require_persistable(address).is_err(), "{address}");
+        }
     }
 }

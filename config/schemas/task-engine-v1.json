@@ -1,0 +1,2015 @@
+{
+  "ExecutionPlan": {
+    "$defs": {
+      "Coordination": {
+        "enum": [
+          "single",
+          "assembly_line",
+          "hub_and_spoke",
+          "hierarchy",
+          "peer_collaboration"
+        ],
+        "type": "string"
+      },
+      "PlanNode": {
+        "additionalProperties": false,
+        "properties": {
+          "dependencies": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "string"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "provider_model": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "strategy": {
+            "$ref": "#/$defs/Strategy"
+          },
+          "tools": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "validators": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "dependencies",
+          "profile",
+          "strategy",
+          "tools",
+          "validators"
+        ],
+        "type": "object"
+      },
+      "Scheduling": {
+        "enum": [
+          "sequential",
+          "parallel",
+          "mixed"
+        ],
+        "type": "string"
+      },
+      "Strategy": {
+        "enum": [
+          "exact_lookup",
+          "source_extraction",
+          "direct",
+          "grounded_generation",
+          "tool_loop",
+          "critique_revision",
+          "candidate_exploration"
+        ],
+        "type": "string"
+      }
+    },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "cache_decision": {
+        "type": "string"
+      },
+      "coordination": {
+        "$ref": "#/$defs/Coordination"
+      },
+      "evidence_required": {
+        "default": false,
+        "type": "boolean"
+      },
+      "nodes": {
+        "items": {
+          "$ref": "#/$defs/PlanNode"
+        },
+        "type": "array"
+      },
+      "original_objective_sha256": {
+        "type": "string"
+      },
+      "plan_id": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "previous_plan": {
+        "format": "uuid",
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "resolved_models": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "default": {},
+        "type": "object"
+      },
+      "revision": {
+        "format": "uint32",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "routing_justification": {
+        "type": "string"
+      },
+      "scheduling": {
+        "$ref": "#/$defs/Scheduling"
+      },
+      "schema_version": {
+        "format": "uint32",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "strategy": {
+        "$ref": "#/$defs/Strategy"
+      },
+      "task_id": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "template": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "schema_version",
+      "plan_id",
+      "task_id",
+      "revision",
+      "original_objective_sha256",
+      "template",
+      "coordination",
+      "scheduling",
+      "strategy",
+      "nodes",
+      "routing_justification",
+      "cache_decision"
+    ],
+    "title": "ExecutionPlan",
+    "type": "object"
+  },
+  "ExecutionPolicy": {
+    "$defs": {
+      "AccessScope": {
+        "description": "Constructed by the authenticated host. Never deserialize this from a model.",
+        "properties": {
+          "allowed_sources": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "conversation_sha256": {
+            "type": "string"
+          },
+          "effective_access_sha256": {
+            "type": "string"
+          },
+          "policy_revision": {
+            "type": "string"
+          },
+          "profile_revision": {
+            "type": "string"
+          },
+          "runtime_revision": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "tenant": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tenant",
+          "subject",
+          "effective_access_sha256",
+          "policy_revision",
+          "profile_revision",
+          "runtime_revision",
+          "conversation_sha256",
+          "allowed_sources"
+        ],
+        "type": "object"
+      }
+    },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "properties": {
+      "allowed_provider_endpoints": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "uniqueItems": true
+      },
+      "cache_ttl_ms": {
+        "format": "uint64",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "deadline_ms": {
+        "format": "uint64",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "evidence_required": {
+        "type": "boolean"
+      },
+      "local_inference_required": {
+        "type": "boolean"
+      },
+      "max_cache_entries": {
+        "format": "uint",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "max_concurrency": {
+        "format": "uint32",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "max_depth": {
+        "format": "uint32",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "max_evidence_bytes": {
+        "format": "uint",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "max_fan_out": {
+        "format": "uint32",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "max_model_calls": {
+        "format": "uint32",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "max_retries": {
+        "format": "uint32",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "max_tokens": {
+        "format": "uint32",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "network_allowed": {
+        "type": "boolean"
+      },
+      "permitted_tools": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "uniqueItems": true
+      },
+      "permitted_validators": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array",
+        "uniqueItems": true
+      },
+      "retention_ms": {
+        "format": "uint64",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "schema_version": {
+        "format": "uint32",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "scope": {
+        "$ref": "#/$defs/AccessScope"
+      },
+      "workspace_roots": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      }
+    },
+    "required": [
+      "schema_version",
+      "scope",
+      "local_inference_required",
+      "max_model_calls",
+      "max_tokens",
+      "deadline_ms",
+      "max_retries",
+      "max_fan_out",
+      "max_depth",
+      "max_concurrency",
+      "cache_ttl_ms",
+      "max_cache_entries",
+      "max_evidence_bytes",
+      "permitted_tools",
+      "permitted_validators",
+      "workspace_roots",
+      "network_allowed",
+      "allowed_provider_endpoints",
+      "retention_ms",
+      "evidence_required"
+    ],
+    "title": "ExecutionPolicy",
+    "type": "object"
+  },
+  "Hints": {
+    "additionalProperties": false,
+    "properties": {
+      "domain": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "essential_questions": {
+        "default": [],
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "evidence_required": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "subtasks": {
+        "default": [],
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "template": {
+        "description": "Caller preference is only a proposal. No endpoint, code or grant fields.",
+        "type": [
+          "string",
+          "null"
+        ]
+      }
+    },
+    "title": "Hints",
+    "type": "object"
+  },
+  "IntakeProposal": {
+    "$defs": {
+      "AtomicSubtask": {
+        "additionalProperties": false,
+        "properties": {
+          "dependencies": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "string"
+          },
+          "objective": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "objective",
+          "dependencies"
+        ],
+        "type": "object"
+      },
+      "WorkShape": {
+        "enum": [
+          "atomic",
+          "tool_investigation",
+          "dependent_stages",
+          "independent_work",
+          "delegation",
+          "peer_review",
+          "critique",
+          "compare_candidates"
+        ],
+        "type": "string"
+      }
+    },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "ambiguity": {
+        "type": "string"
+      },
+      "assumptions": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "decomposition_useful": {
+        "type": "boolean"
+      },
+      "difficulty": {
+        "type": "string"
+      },
+      "domain": {
+        "type": "string"
+      },
+      "environment_requirements": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "essential_questions": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "evidence_required": {
+        "type": "boolean"
+      },
+      "relevant_literals": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "routing_justification": {
+        "type": "string"
+      },
+      "subtasks": {
+        "items": {
+          "$ref": "#/$defs/AtomicSubtask"
+        },
+        "type": "array"
+      },
+      "task_type": {
+        "type": "string"
+      },
+      "work_shape": {
+        "$ref": "#/$defs/WorkShape"
+      }
+    },
+    "required": [
+      "domain",
+      "task_type",
+      "ambiguity",
+      "difficulty",
+      "evidence_required",
+      "decomposition_useful",
+      "work_shape",
+      "subtasks",
+      "relevant_literals",
+      "environment_requirements",
+      "assumptions",
+      "essential_questions",
+      "routing_justification"
+    ],
+    "title": "Proposal",
+    "type": "object"
+  },
+  "KnowledgeSource": {
+    "additionalProperties": false,
+    "properties": {
+      "dependencies": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "description": "Host-validated repository/workspace relative path -> full SHA-256.",
+        "type": "object"
+      },
+      "domain": {
+        "type": "string"
+      },
+      "language": {
+        "type": "string"
+      },
+      "lookups": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "context_independent": {
+              "type": "boolean"
+            },
+            "end_byte": {
+              "format": "uint",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "exact_ask": {
+              "type": "string"
+            },
+            "start_byte": {
+              "format": "uint",
+              "minimum": 0,
+              "type": "integer"
+            },
+            "temporal_scope": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "exact_ask",
+            "temporal_scope",
+            "context_independent",
+            "start_byte",
+            "end_byte"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "observed_at_ms": {
+        "format": "uint64",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "revision": {
+        "type": "string"
+      },
+      "source_id": {
+        "type": "string"
+      },
+      "text": {
+        "type": "string"
+      },
+      "title": {
+        "type": "string"
+      },
+      "valid_until_ms": {
+        "format": "uint64",
+        "minimum": 0,
+        "type": "integer"
+      }
+    },
+    "required": [
+      "source_id",
+      "revision",
+      "title",
+      "domain",
+      "language",
+      "text",
+      "observed_at_ms",
+      "valid_until_ms",
+      "lookups"
+    ],
+    "title": "KnowledgeSource",
+    "type": "object"
+  },
+  "ProjectMetadata": {
+    "$defs": {
+      "AcceptanceCheck": {
+        "additionalProperties": false,
+        "properties": {
+          "detail": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/$defs/CheckStatus"
+          }
+        },
+        "required": [
+          "name",
+          "status",
+          "detail"
+        ],
+        "type": "object"
+      },
+      "CheckStatus": {
+        "enum": [
+          "passed",
+          "failed",
+          "not_run",
+          "unsupported"
+        ],
+        "type": "string"
+      },
+      "Observation": {
+        "additionalProperties": false,
+        "properties": {
+          "applicability": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "value": true
+        },
+        "required": [
+          "name",
+          "value",
+          "applicability"
+        ],
+        "type": "object"
+      }
+    },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "content_sha256": {
+        "type": "string"
+      },
+      "kind": {
+        "type": "string"
+      },
+      "observations": {
+        "items": {
+          "$ref": "#/$defs/Observation"
+        },
+        "type": "array"
+      },
+      "runtime_checks": {
+        "items": {
+          "$ref": "#/$defs/AcceptanceCheck"
+        },
+        "type": "array"
+      },
+      "schema_version": {
+        "format": "uint32",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "source_id": {
+        "type": "string"
+      },
+      "state": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "schema_version",
+      "source_id",
+      "content_sha256",
+      "kind",
+      "state",
+      "observations",
+      "runtime_checks"
+    ],
+    "title": "Metadata",
+    "type": "object"
+  },
+  "StageReply": {
+    "oneOf": [
+      {
+        "additionalProperties": false,
+        "properties": {
+          "answer": {
+            "maxLength": 4096,
+            "minLength": 1,
+            "type": "string"
+          },
+          "citations": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "passage": {
+                  "maximum": 7,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "quote": {
+                  "maxLength": 1024,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "passage",
+                "quote"
+              ],
+              "type": "object"
+            },
+            "maxItems": 8,
+            "type": "array"
+          },
+          "missing_evidence": {
+            "items": {
+              "maxLength": 400,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 0,
+            "type": "array"
+          },
+          "status": {
+            "const": "answer"
+          },
+          "tool": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "status",
+          "answer",
+          "citations",
+          "missing_evidence",
+          "tool"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "properties": {
+          "answer": {
+            "const": "",
+            "type": "string"
+          },
+          "citations": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "passage": {
+                  "maximum": 7,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "quote": {
+                  "maxLength": 1024,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "passage",
+                "quote"
+              ],
+              "type": "object"
+            },
+            "maxItems": 0,
+            "type": "array"
+          },
+          "missing_evidence": {
+            "items": {
+              "maxLength": 400,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 4,
+            "minItems": 1,
+            "type": "array"
+          },
+          "status": {
+            "const": "insufficient"
+          },
+          "tool": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "status",
+          "answer",
+          "citations",
+          "missing_evidence",
+          "tool"
+        ],
+        "type": "object"
+      },
+      {
+        "additionalProperties": false,
+        "properties": {
+          "answer": {
+            "const": "",
+            "type": "string"
+          },
+          "citations": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "passage": {
+                  "maximum": 7,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "quote": {
+                  "maxLength": 1024,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "passage",
+                "quote"
+              ],
+              "type": "object"
+            },
+            "maxItems": 0,
+            "type": "array"
+          },
+          "missing_evidence": {
+            "items": {
+              "maxLength": 400,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 0,
+            "type": "array"
+          },
+          "status": {
+            "const": "tool"
+          },
+          "tool": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "arguments": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "query": {
+                        "maxLength": 1000,
+                        "minLength": 1,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "query"
+                    ],
+                    "type": "object"
+                  },
+                  "name": {
+                    "const": "search_knowledge"
+                  }
+                },
+                "required": [
+                  "name",
+                  "arguments"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "arguments": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "limit_bytes": {
+                        "maximum": 8192,
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "offset_bytes": {
+                        "maximum": 16777216,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "path": {
+                        "maxLength": 1000,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "path",
+                      "offset_bytes",
+                      "limit_bytes"
+                    ],
+                    "type": "object"
+                  },
+                  "name": {
+                    "const": "workspace_read"
+                  }
+                },
+                "required": [
+                  "name",
+                  "arguments"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "arguments": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "path": {
+                        "maxLength": 1000,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "path"
+                    ],
+                    "type": "object"
+                  },
+                  "name": {
+                    "const": "workspace_list"
+                  }
+                },
+                "required": [
+                  "name",
+                  "arguments"
+                ],
+                "type": "object"
+              }
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "answer",
+          "citations",
+          "missing_evidence",
+          "tool"
+        ],
+        "type": "object"
+      }
+    ]
+  },
+  "TaskAnalysis": {
+    "$defs": {
+      "PlanNode": {
+        "additionalProperties": false,
+        "properties": {
+          "dependencies": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "string"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "provider_model": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "strategy": {
+            "$ref": "#/$defs/Strategy"
+          },
+          "tools": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "validators": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "dependencies",
+          "profile",
+          "strategy",
+          "tools",
+          "validators"
+        ],
+        "type": "object"
+      },
+      "Strategy": {
+        "enum": [
+          "exact_lookup",
+          "source_extraction",
+          "direct",
+          "grounded_generation",
+          "tool_loop",
+          "critique_revision",
+          "candidate_exploration"
+        ],
+        "type": "string"
+      }
+    },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "ambiguity": {
+        "type": "string"
+      },
+      "atomic_subtasks": {
+        "default": [],
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "candidate_capabilities": {
+        "default": [],
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "decomposition_useful": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "difficulty_estimate": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "domain": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "evidence_required": {
+        "type": "boolean"
+      },
+      "evidence_sufficient": {
+        "type": "boolean"
+      },
+      "freshness_scope": {
+        "type": "string"
+      },
+      "observed_dates_or_ranges": {
+        "default": [],
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "retrieval_suitable": {
+        "type": "boolean"
+      },
+      "routing_justification": {
+        "type": "string"
+      },
+      "schema_version": {
+        "format": "uint32",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "subtasks": {
+        "items": {
+          "$ref": "#/$defs/PlanNode"
+        },
+        "type": "array"
+      },
+      "task_id": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "task_type": {
+        "type": "string"
+      },
+      "tool_environment_requirements": {
+        "default": [],
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      }
+    },
+    "required": [
+      "schema_version",
+      "task_id",
+      "task_type",
+      "ambiguity",
+      "evidence_required",
+      "freshness_scope",
+      "retrieval_suitable",
+      "evidence_sufficient",
+      "subtasks",
+      "routing_justification"
+    ],
+    "title": "TaskAnalysis",
+    "type": "object"
+  },
+  "TaskInput": {
+    "additionalProperties": false,
+    "properties": {
+      "constraints": {
+        "default": [],
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "deliverable": {
+        "default": "",
+        "type": "string"
+      },
+      "extraction": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "end_byte": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "source_id": {
+                "type": "string"
+              },
+              "start_byte": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "source_id",
+              "start_byte",
+              "end_byte"
+            ],
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null
+      },
+      "intent": {
+        "enum": [
+          "answer",
+          "action"
+        ],
+        "type": "string"
+      },
+      "original_ask": {
+        "type": "string"
+      },
+      "output": {
+        "additionalProperties": false,
+        "properties": {
+          "format": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "format",
+          "language"
+        ],
+        "type": "object"
+      },
+      "proposed_acceptance": {
+        "default": [],
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "supplied_context": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "default": {},
+        "type": "object"
+      },
+      "temporal_scope": {
+        "default": "",
+        "type": "string"
+      }
+    },
+    "required": [
+      "original_ask"
+    ],
+    "title": "TaskInput",
+    "type": "object"
+  },
+  "TaskRequest": {
+    "$defs": {
+      "Extraction": {
+        "additionalProperties": false,
+        "properties": {
+          "end_byte": {
+            "format": "uint",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "source_id": {
+            "type": "string"
+          },
+          "start_byte": {
+            "format": "uint",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "source_id",
+          "start_byte",
+          "end_byte"
+        ],
+        "type": "object"
+      },
+      "Intent": {
+        "enum": [
+          "answer",
+          "action"
+        ],
+        "type": "string"
+      },
+      "OutputSpec": {
+        "additionalProperties": false,
+        "properties": {
+          "format": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "format",
+          "language"
+        ],
+        "type": "object"
+      },
+      "TaskInput": {
+        "additionalProperties": false,
+        "properties": {
+          "constraints": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "deliverable": {
+            "default": "",
+            "type": "string"
+          },
+          "extraction": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Extraction"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "intent": {
+            "$ref": "#/$defs/Intent",
+            "default": "answer"
+          },
+          "original_ask": {
+            "type": "string"
+          },
+          "output": {
+            "$ref": "#/$defs/OutputSpec",
+            "default": {
+              "format": "text",
+              "language": "unspecified"
+            }
+          },
+          "proposed_acceptance": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "supplied_context": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "default": {},
+            "type": "object"
+          },
+          "temporal_scope": {
+            "default": "",
+            "type": "string"
+          }
+        },
+        "required": [
+          "original_ask"
+        ],
+        "type": "object"
+      }
+    },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "assumptions": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "clarification_questions": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "confirmed_facts": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "input": {
+        "$ref": "#/$defs/TaskInput"
+      },
+      "objective": {
+        "type": "string"
+      },
+      "original_ask": {
+        "type": "string"
+      },
+      "schema_version": {
+        "format": "uint32",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "task_id": {
+        "format": "uuid",
+        "type": "string"
+      }
+    },
+    "required": [
+      "schema_version",
+      "task_id",
+      "original_ask",
+      "objective",
+      "input",
+      "assumptions",
+      "confirmed_facts",
+      "clarification_questions"
+    ],
+    "title": "TaskRequest",
+    "type": "object"
+  },
+  "TaskResult": {
+    "$defs": {
+      "AcceptanceCheck": {
+        "additionalProperties": false,
+        "properties": {
+          "detail": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/$defs/CheckStatus"
+          }
+        },
+        "required": [
+          "name",
+          "status",
+          "detail"
+        ],
+        "type": "object"
+      },
+      "CacheProvenance": {
+        "additionalProperties": false,
+        "properties": {
+          "created_at_ms": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "decision": {
+            "type": "string"
+          },
+          "expires_at_ms": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "key": {
+            "type": "string"
+          },
+          "origin_task_id": {
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "work_avoided": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "decision",
+          "key",
+          "work_avoided"
+        ],
+        "type": "object"
+      },
+      "CheckStatus": {
+        "enum": [
+          "passed",
+          "failed",
+          "not_run",
+          "unsupported"
+        ],
+        "type": "string"
+      },
+      "Coordination": {
+        "enum": [
+          "single",
+          "assembly_line",
+          "hub_and_spoke",
+          "hierarchy",
+          "peer_collaboration"
+        ],
+        "type": "string"
+      },
+      "Evidence": {
+        "additionalProperties": false,
+        "properties": {
+          "content_sha256": {
+            "type": "string"
+          },
+          "end_byte": {
+            "format": "uint",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "observed_at_ms": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "quote": {
+            "type": "string"
+          },
+          "source_id": {
+            "type": "string"
+          },
+          "source_revision": {
+            "type": "string"
+          },
+          "start_byte": {
+            "format": "uint",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "valid_until_ms": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "source_id",
+          "source_revision",
+          "content_sha256",
+          "title",
+          "start_byte",
+          "end_byte",
+          "quote",
+          "observed_at_ms",
+          "valid_until_ms"
+        ],
+        "type": "object"
+      },
+      "ExecutionPlan": {
+        "additionalProperties": false,
+        "properties": {
+          "cache_decision": {
+            "type": "string"
+          },
+          "coordination": {
+            "$ref": "#/$defs/Coordination"
+          },
+          "evidence_required": {
+            "default": false,
+            "type": "boolean"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/$defs/PlanNode"
+            },
+            "type": "array"
+          },
+          "original_objective_sha256": {
+            "type": "string"
+          },
+          "plan_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "previous_plan": {
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resolved_models": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "default": {},
+            "type": "object"
+          },
+          "revision": {
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "routing_justification": {
+            "type": "string"
+          },
+          "scheduling": {
+            "$ref": "#/$defs/Scheduling"
+          },
+          "schema_version": {
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "strategy": {
+            "$ref": "#/$defs/Strategy"
+          },
+          "task_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "template": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema_version",
+          "plan_id",
+          "task_id",
+          "revision",
+          "original_objective_sha256",
+          "template",
+          "coordination",
+          "scheduling",
+          "strategy",
+          "nodes",
+          "routing_justification",
+          "cache_decision"
+        ],
+        "type": "object"
+      },
+      "Measurements": {
+        "additionalProperties": false,
+        "properties": {
+          "elapsed_micros": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "embedding_calls": {
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "generative_model_calls": {
+            "format": "uint32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "input_tokens": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "memory_bytes": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "output_tokens": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "provider_cost_usd": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "tool_calls": {
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "embedding_calls",
+          "tool_calls"
+        ],
+        "type": "object"
+      },
+      "NativeReceipt": {
+        "additionalProperties": false,
+        "properties": {
+          "api_contract_sha256": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "arguments_sha256": {
+            "type": "string"
+          },
+          "artifact_sha256": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "contract_id": {
+            "type": "string"
+          },
+          "elapsed_micros": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "input_snapshot_sha256": {
+            "type": "string"
+          },
+          "outcome": {
+            "$ref": "#/$defs/CheckStatus"
+          },
+          "policy_revision": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "result_sha256": {
+            "type": "string"
+          },
+          "sampled_process_group_rss_bytes": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "schema_version": {
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "source_identity": {
+            "type": "string"
+          },
+          "tool": {
+            "type": "string"
+          },
+          "validator": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "schema_version",
+          "validator",
+          "tool",
+          "contract_id",
+          "source_identity",
+          "policy_revision",
+          "arguments_sha256",
+          "result_sha256",
+          "input_snapshot_sha256",
+          "outcome",
+          "elapsed_micros"
+        ],
+        "type": "object"
+      },
+      "PlanNode": {
+        "additionalProperties": false,
+        "properties": {
+          "dependencies": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "string"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "provider_model": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "strategy": {
+            "$ref": "#/$defs/Strategy"
+          },
+          "tools": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "validators": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "dependencies",
+          "profile",
+          "strategy",
+          "tools",
+          "validators"
+        ],
+        "type": "object"
+      },
+      "Scheduling": {
+        "enum": [
+          "sequential",
+          "parallel",
+          "mixed"
+        ],
+        "type": "string"
+      },
+      "Strategy": {
+        "enum": [
+          "exact_lookup",
+          "source_extraction",
+          "direct",
+          "grounded_generation",
+          "tool_loop",
+          "critique_revision",
+          "candidate_exploration"
+        ],
+        "type": "string"
+      },
+      "TaskAnalysis": {
+        "additionalProperties": false,
+        "properties": {
+          "ambiguity": {
+            "type": "string"
+          },
+          "atomic_subtasks": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "candidate_capabilities": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "decomposition_useful": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "difficulty_estimate": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "domain": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "evidence_required": {
+            "type": "boolean"
+          },
+          "evidence_sufficient": {
+            "type": "boolean"
+          },
+          "freshness_scope": {
+            "type": "string"
+          },
+          "observed_dates_or_ranges": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "retrieval_suitable": {
+            "type": "boolean"
+          },
+          "routing_justification": {
+            "type": "string"
+          },
+          "schema_version": {
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "subtasks": {
+            "items": {
+              "$ref": "#/$defs/PlanNode"
+            },
+            "type": "array"
+          },
+          "task_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "task_type": {
+            "type": "string"
+          },
+          "tool_environment_requirements": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "schema_version",
+          "task_id",
+          "task_type",
+          "ambiguity",
+          "evidence_required",
+          "freshness_scope",
+          "retrieval_suitable",
+          "evidence_sufficient",
+          "subtasks",
+          "routing_justification"
+        ],
+        "type": "object"
+      }
+    },
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "acceptance_checks": {
+        "items": {
+          "$ref": "#/$defs/AcceptanceCheck"
+        },
+        "type": "array"
+      },
+      "actual_path": {
+        "type": "string"
+      },
+      "analysis": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/TaskAnalysis"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "answer": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "artifacts": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "assumptions": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "blockers": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "cache": {
+        "$ref": "#/$defs/CacheProvenance"
+      },
+      "clarification_questions": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "evidence": {
+        "items": {
+          "$ref": "#/$defs/Evidence"
+        },
+        "type": "array"
+      },
+      "measurements": {
+        "$ref": "#/$defs/Measurements"
+      },
+      "plan": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/ExecutionPlan"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "schema_version": {
+        "format": "uint32",
+        "minimum": 0,
+        "type": "integer"
+      },
+      "status": {
+        "type": "string"
+      },
+      "task_id": {
+        "format": "uuid",
+        "type": "string"
+      },
+      "validation_receipts": {
+        "items": {
+          "$ref": "#/$defs/NativeReceipt"
+        },
+        "type": "array"
+      },
+      "verification_state": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "schema_version",
+      "task_id",
+      "status",
+      "artifacts",
+      "evidence",
+      "blockers",
+      "acceptance_checks",
+      "actual_path",
+      "verification_state",
+      "cache",
+      "measurements"
+    ],
+    "title": "TaskResult",
+    "type": "object"
+  }
+}

@@ -887,6 +887,44 @@
     ],
     "additionalProperties": false
   },
+  "dotnet_api_check": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "contract_id"
+    ],
+    "properties": {
+      "contract_id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      },
+      "expected_source_identity": {
+        "type": "string",
+        "minLength": 64,
+        "maxLength": 64
+      }
+    }
+  },
+  "dotnet_check": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "contract_id"
+    ],
+    "properties": {
+      "contract_id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      },
+      "expected_source_identity": {
+        "type": "string",
+        "minLength": 64,
+        "maxLength": 64
+      }
+    }
+  },
   "python_check": {
     "type": "object",
     "additionalProperties": false,
@@ -1026,6 +1064,25 @@
         "type": "string",
         "minLength": 1,
         "maxLength": 240
+      }
+    }
+  },
+  "angular_check": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "contract_id"
+    ],
+    "properties": {
+      "contract_id": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 80
+      },
+      "expected_source_identity": {
+        "type": "string",
+        "minLength": 64,
+        "maxLength": 64
       }
     }
   }

@@ -97,6 +97,39 @@ pub async fn invoke(
     if requirements.installed_python {
         command.env("GENTS_PYTHON", crate::python_check::interpreter_path()?);
     }
+    if requirements.installed_dotnet {
+        command.env("GENTS_DOTNET", crate::dotnet_check::executable_path()?);
+    } else if matches!(name, "get_task_status" | "cancel_task")
+        && std::env::var_os("GENTS_DOTNET").is_some()
+    {
+        // Optional host runtime custody for revalidating stored SDK receipts.
+        // Ordinary task status does not require installing/configuring .NET.
+        if let Ok(path) = crate::dotnet_check::executable_path() {
+            command.env("GENTS_DOTNET", path);
+        }
+    }
+    if requirements.installed_angular
+        || (matches!(name, "get_task_status" | "cancel_task")
+            && std::env::var_os("GENTS_NODE").is_some())
+    {
+        match crate::angular_check::runtime::HostSdk::configured() {
+            Ok(sdk) => {
+                if let Some(home) = std::env::var_os("HOME") {
+                    command.env("HOME", home);
+                }
+                for (name, path) in [
+                    ("GENTS_NODE", sdk.node),
+                    ("GENTS_ANGULAR_MODULES", sdk.angular),
+                    ("GENTS_PLAYWRIGHT_DRIVER", sdk.driver),
+                    ("GENTS_ANGULAR_BROWSER", sdk.browser),
+                ] {
+                    command.env(name, path);
+                }
+            }
+            Err(error) if requirements.installed_angular => return Err(error),
+            Err(_) => {}
+        }
+    }
     let call_timeout = Duration::from_secs(requirements.call_timeout_seconds);
     let mut child = command.spawn()?;
     if transport == "sse" {

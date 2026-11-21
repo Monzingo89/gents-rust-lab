@@ -1,0 +1,337 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-19",
+  "goal_status": "active_incomplete",
+  "scope": "Real installed Angular build and finite browser SDK executor in process; not a registered MCP Angular tool or canonical task validator; no specialist qualification",
+  "git": {
+    "root": "/Users/rmonzingo/repo-applications/gents-rust-lab",
+    "branch": "codex/feature/public-research-view",
+    "head": "23b7d823956586a3a4d760767d7eb5b7e18d63a3",
+    "origin": "https://github.com/Monzingo89/gents-rust-lab.git",
+    "published": false
+  },
+  "source_sha256": {
+    "mcp/src/angular_check.rs": "793749bfd159e4dc9fafe7bdccab9e66c9b6b0136c06a8981bf9148ca5b7856f",
+    "mcp/src/angular_check/runtime.rs": "1f95a8426cfb337994db8e90b214eb781a766a646e1cd6e27a6a1e5cadf0df42",
+    "mcp/src/angular_check/browser.mjs": "01c14f23a930417a039146dc035ba95a0e3c71788cd16270cde0d30cf0e7bbed",
+    "mcp/src/angular_check/browser_profile.mjs": "241683151af1d0d145d7005481388c94816cb8fef6ceeb6382c712bf76dd194e",
+    "mcp/src/completion.rs": "9b4e7aabf34b37f0451ed832292b57e0dbe7b2be0f42ea06553f402595ee64a4",
+    "mcp/src/owner_inputs.rs": "c03ab468819e548b1c757bef46d937794cf480f055ed5d1f75feae8140353c15",
+    "mcp/src/lib.rs": "d44c035862744886dd7d03a0860177b0bdc8d5d76b5661131c95e3e93a205da9",
+    "mcp/src/safety.rs": "19649d3c8f44e4f6cc709b8962363fb884b45b6b219322b723444b7ac91354b7",
+    "mcp/src/strict_json.rs": "6f33d28e7586f49d5fb21b1a399c86496e727380f9a4603c7bb1064b805e77e4",
+    "mcp/src/dotnet_check.rs": "e5f6c749b4670bd39cd1416706f0bc1aab969886793d60cd420a14bd07d3e029",
+    "mcp/src/dotnet_check/sandbox.rs": "a7dd706681f73b51f5335ca4fc8f66b07758b8ff78467790c0c34c19f3af5373",
+    "mcp/tests/angular_check.rs": "283c57aafd32f41dede14dbb68dc838ca3097b26ae28b81e9613d1a5069095cf",
+    "scripts/prepare_task_angular_sdk.py": "0f61391f06ad861a000204af5b59db5c2c67c2626508488756e0d9138809351d",
+    "scripts/task_angular_boundary_smoke.py": "93235398a74fc718c43f31859d8692635f4e6bc446c11f101cb68b09cdc09e16",
+    "scripts/check.sh": "46ac0007a65cf837566db44802d2b5fadc5af8c06c1e9a5f8b230880ddf34078",
+    "mcp/README.md": "dfcd52a9a75c623f76d9ae3a6878feb38c605064dcf91024f84715f517239b9f",
+    "docs/151-task-engine-completion-audit.md": "24c75546fbabb7b9ea217b4c81fd9da8d80c92047bd24367e5ded79bbe326afd",
+    "docs/159-pinned-angular-sdk-executor.md": "c9856735d39f1aa61dae4c4f152d6408e0333ce3eb515584a0dfac5bd74e5403"
+  },
+  "full_repository_check": {
+    "command": "bash scripts/check.sh",
+    "exit_code": 0,
+    "rust_passed": 682,
+    "rust_ignored": 31,
+    "log": "/tmp/gents-angular-full-check-verified.log",
+    "log_sha256": "3164ee32075daed20b0057796a4ab12b933494c1294ea9c34e793d2fcf7e3ca2",
+    "scope": "fmt, strict workspace Clippy, Rust tests/build, Python/Node/HTTP/native stdio/SSE regressions, web build and ten-page site checks; installed Angular/.NET cases additionally invoked separately"
+  },
+  "final_portability_check": {
+    "commands": [
+      "cargo fmt --all -- --check",
+      "cargo clippy --workspace --all-targets --locked -- -D warnings"
+    ],
+    "exit_code": 0,
+    "log_sha256": "724c8bb8fa385b48452f1115f876e067be135efb7b4e95b863e9cc147df345c6"
+  },
+  "installed_sdk": {
+    "pins": {
+      "angular_cli_version": "21.2.26",
+      "browser_tree_sha256": "3fc9e653c9bf58781357ca0d6a979514281fe1ddf39aa523a39c9d7c9002af43",
+      "driver_tree_sha256": "4b0bb7fcc57379da72b03308fbb86c7addc67169893b291510707c2af4e3289d",
+      "node_sha256": "798d7f9c0d38051608d11ba87a12fbb01e92bfa457cd77ec612b5bad2a73a05e",
+      "node_version": "v24.21.0",
+      "sdk_tree_sha256": "0d165777d09736f1a49c0b6a1a2a66be13e25427d8834b80bfc7b064cf515cd1"
+    },
+    "typescript": "5.9.3",
+    "playwright_core": "1.64.1",
+    "headless_shell_metadata": {
+      "name": "chromium-headless-shell",
+      "revision": "1248",
+      "installByDefault": true,
+      "browserVersion": "156.0.8078.4",
+      "title": "Chrome Headless Shell"
+    },
+    "setup_report_sha256": "ebd9a945c4e09abcb458c3f1562326a8073c705007d99e85259e0e6a4f173909",
+    "lifecycle_scripts_run": false,
+    "runtime_downloads": false,
+    "development_sdk_downloads": "public npm Angular development dependencies and official Playwright headless-shell/FFmpeg; outside workspace"
+  },
+  "live_cases": {
+    "pass": {
+      "status": "browser_passed",
+      "source_identity": "33bd7c7042b752c34e4b2a683b42e5cbb961f59f4b6e383f6d024014a3ca4f17",
+      "inputs_sha256": {
+        "angular.json": "509d35a1785d100069da58ab0856d3d9ec1c4d9abe59c2b5799445e1254726ac",
+        "package-lock.json": "8b25cece9d5b9f806c373ed6a9c3f75bc70410176059f02d083d7c618b792932",
+        "package.json": "ea429c54cbc1b96c5cf85d683655fd6af2b7254083b12413fd33fa3bcde7e3b6",
+        "src/index.html": "61e82bc1321acc1a561a135da14cc4981de7e1b7a6f290450ef09d39e5f67b45",
+        "src/main.ts": "01d3a16e86032dfd25da45d4d0ce2d03df06254ed1d85cbda17830ba38d863d8",
+        "tsconfig.app.json": "e971565d7e7755c7480e91209afeece556989efd749f0c2e19cca62f56b642da",
+        "tsconfig.json": "9ab400bdfe12744d0a01e814457ef5a85ae5b70ae7761f79a4f530324b654600"
+      },
+      "artifact_sha256": "3bf3c17af38ca0374e3e64d9ebadadab6bf6f781ec9f093e9d093ccb300b9b70",
+      "compile": {
+        "elapsed_ms": 1183,
+        "exit_code": 0,
+        "limit": null,
+        "passed": true,
+        "resource_samples": 9,
+        "sampled_process_group_rss_bytes": 565149696,
+        "sampled_scratch_bytes": 6857551
+      },
+      "browser": {
+        "blocked_requests": 0,
+        "chromium_inner_sandbox": false,
+        "outer_seatbelt": true,
+        "passed": true,
+        "phase": {
+          "elapsed_ms": 403,
+          "exit_code": 0,
+          "limit": null,
+          "passed": true,
+          "resource_samples": 3,
+          "sampled_process_group_rss_bytes": 335282176,
+          "sampled_scratch_bytes": 9886291
+        },
+        "reason": "completed",
+        "started": true,
+        "steps": [
+          {
+            "actual_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+            "expected_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+            "id": "initial",
+            "status": "passed"
+          },
+          {
+            "actual_sha256": null,
+            "expected_sha256": null,
+            "id": "increment",
+            "status": "passed"
+          },
+          {
+            "actual_sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+            "expected_sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+            "id": "changed",
+            "status": "passed"
+          }
+        ]
+      },
+      "elapsed_ms": 4252,
+      "snapshot_unchanged": true
+    },
+    "compile_failure": {
+      "status": "check_failed",
+      "source_identity": "7ddd98fe1fa0a62d944e738085fad7317501c60a5f06a14a39f83565caf06e95",
+      "inputs_sha256": {
+        "angular.json": "509d35a1785d100069da58ab0856d3d9ec1c4d9abe59c2b5799445e1254726ac",
+        "package-lock.json": "8b25cece9d5b9f806c373ed6a9c3f75bc70410176059f02d083d7c618b792932",
+        "package.json": "ea429c54cbc1b96c5cf85d683655fd6af2b7254083b12413fd33fa3bcde7e3b6",
+        "src/index.html": "61e82bc1321acc1a561a135da14cc4981de7e1b7a6f290450ef09d39e5f67b45",
+        "src/main.ts": "e6ee2e57fa859872db78f0bb30abeb147b459c7aac92454f3d30e5036a6779ad",
+        "tsconfig.app.json": "e971565d7e7755c7480e91209afeece556989efd749f0c2e19cca62f56b642da",
+        "tsconfig.json": "9ab400bdfe12744d0a01e814457ef5a85ae5b70ae7761f79a4f530324b654600"
+      },
+      "artifact_sha256": null,
+      "compile": {
+        "elapsed_ms": 1148,
+        "exit_code": 1,
+        "limit": null,
+        "passed": false,
+        "resource_samples": 9,
+        "sampled_process_group_rss_bytes": 549601280,
+        "sampled_scratch_bytes": 6119330
+      },
+      "browser": null,
+      "elapsed_ms": 3715,
+      "snapshot_unchanged": true
+    },
+    "wrong_ui_and_self_report": {
+      "status": "check_failed",
+      "source_identity": "2ceeaec3ebaed6e7094f53c0375d467bf7fa536c85a130750eedd86e19a3f8f5",
+      "inputs_sha256": {
+        "angular.json": "509d35a1785d100069da58ab0856d3d9ec1c4d9abe59c2b5799445e1254726ac",
+        "package-lock.json": "8b25cece9d5b9f806c373ed6a9c3f75bc70410176059f02d083d7c618b792932",
+        "package.json": "ea429c54cbc1b96c5cf85d683655fd6af2b7254083b12413fd33fa3bcde7e3b6",
+        "src/index.html": "61e82bc1321acc1a561a135da14cc4981de7e1b7a6f290450ef09d39e5f67b45",
+        "src/main.ts": "1e5af0cda419a0695b1fa9dcf91d693661f6f1baf5478613a10dc7b2118e651b",
+        "tsconfig.app.json": "e971565d7e7755c7480e91209afeece556989efd749f0c2e19cca62f56b642da",
+        "tsconfig.json": "9ab400bdfe12744d0a01e814457ef5a85ae5b70ae7761f79a4f530324b654600"
+      },
+      "artifact_sha256": "fdb69e26b33b748d9a207a1c1c061fcad35d63e2849c6d2a8568f5c47c74041c",
+      "compile": {
+        "elapsed_ms": 1138,
+        "exit_code": 0,
+        "limit": null,
+        "passed": true,
+        "resource_samples": 9,
+        "sampled_process_group_rss_bytes": 592265216,
+        "sampled_scratch_bytes": 7747978
+      },
+      "browser": {
+        "blocked_requests": 0,
+        "chromium_inner_sandbox": false,
+        "outer_seatbelt": true,
+        "passed": false,
+        "phase": {
+          "elapsed_ms": 1376,
+          "exit_code": 0,
+          "limit": null,
+          "passed": true,
+          "resource_samples": 10,
+          "sampled_process_group_rss_bytes": 464994304,
+          "sampled_scratch_bytes": 9886508
+        },
+        "reason": "step_failed",
+        "started": true,
+        "steps": [
+          {
+            "actual_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+            "expected_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+            "id": "initial",
+            "status": "passed"
+          },
+          {
+            "actual_sha256": null,
+            "expected_sha256": null,
+            "id": "increment",
+            "status": "passed"
+          },
+          {
+            "actual_sha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+            "expected_sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+            "id": "changed",
+            "status": "failed"
+          }
+        ]
+      },
+      "elapsed_ms": 5176,
+      "snapshot_unchanged": true
+    }
+  },
+  "raw_dom_privacy_rejected_before_report": true,
+  "native_compiler_boundaries": {
+    "checks": {
+      "frozen_write_denied": true,
+      "loopback_connect_denied": true,
+      "outside_read_denied": true,
+      "outside_write_denied": true,
+      "scratch_write_allowed": true,
+      "sdk_write_denied": true,
+      "shell_exec_denied": true
+    },
+    "model_calls": 0,
+    "phase": {
+      "elapsed_ms": 42,
+      "exit_code": 0,
+      "limit": null,
+      "passed": true,
+      "resource_samples": 0,
+      "sampled_process_group_rss_bytes": null,
+      "sampled_scratch_bytes": null
+    },
+    "provider_cost_usd": 0,
+    "scope": "actual compiler profile, installed Node, finite host-held loopback and de-identified fixtures"
+  },
+  "native_browser_boundaries": {
+    "schema_version": 1,
+    "scope": "Native OS probes against actual checked-in browser profile, independent of Playwright routing/CSP; all fixtures de-identified",
+    "profile_source_sha256": "241683151af1d0d145d7005481388c94816cb8fef6ceeb6382c712bf76dd194e",
+    "profile_sha256": "248242939a12852faab5cdd7e170a035f37fb1c15d4a8715ed8d64c273fc16f9",
+    "checks": {
+      "outside_read_denied": true,
+      "outside_write_denied": true,
+      "oracle_read_denied": true,
+      "profile_write_allowed": true,
+      "asset_port_allowed": true,
+      "unrelated_loopback_denied": true,
+      "external_connect_denied": true,
+      "new_tcp_bind_denied": true,
+      "parent_argv_denied": true,
+      "shell_exec_denied": true
+    },
+    "provider_cost_usd": 0,
+    "model_calls": 0
+  },
+  "independent_source_identity_check": {
+    "scope": "Independent Python recomputation of all three source snapshot identities and exact DOM hashes; not canonical MCP receipts",
+    "implementation_sha256": "63cc93af7605996b5ef5066529ceb3d54f346b5b4e8778d91884c3a248c6bead",
+    "checks": {
+      "pass_current_source_identity": true,
+      "compile_failure_current_source_identity": true,
+      "wrong_ui_and_self_report_current_source_identity": true,
+      "exact_dom_hashes": true,
+      "raw_dom_privacy_rejected_before_report": true
+    }
+  },
+  "dotnet_shared_watchdog_regression": {
+    "command": "GENTS_DOTNET=/opt/homebrew/bin/dotnet cargo test --offline -p gents-local-mcp --test dotnet_api_check -- --include-ignored --nocapture",
+    "exit_code": 0,
+    "passed": 2,
+    "scope": "Actual installed SDK and host HTTP cases, plus deterministic contract test; no new task-level API trial or quality admission claimed"
+  },
+  "retained_findings": [
+    "Full Chrome failed application registration under restrictive profile; separate headless shell used.",
+    "Headless shell required macOS temporary-directory service and public ICU/timezone reads.",
+    "Chromium inner sandbox initialization failed under outer Seatbelt; fixed --no-sandbox is used only inside the required outer OS profile.",
+    "SDK module resolution needed read access to its separately pinned parent package manifest/lock, not other SDK parent contents.",
+    "Temporary cache rename/removal races must contribute zero to a sampled scratch observation; other observation errors still fail closed.",
+    "Public scoped npm URLs triggered the prior whole-token email heuristic; address-shaped spans retain actual address rejection without a package allowlist.",
+    "Initial owner-input alias fixture used noncanonical /var and then expected hardlinks to be admitted. The fixture now asserts canonical-root handling and the existing single-link fail-closed rule. Production workspace guards were unchanged."
+  ],
+  "workspace_resource_recovery": {
+    "scope": "Terminated only read-only IDE ripgrep workers with current kernel cwd equal to this repository, exact executable and parent identity rechecked",
+    "observed_ide_workers": 3073,
+    "stopped": 3073,
+    "source_files_modified": false,
+    "sdk_directory_moved_outside_workspace": true
+  },
+  "local_report_sha256": {
+    "data/task-angular-live/2026-11-19/runtime-cases.json": "003ae9bc8e7f2a165b99ff819c197089c3f6cca50ab9368162fc0501847d9332",
+    "data/task-angular-live/2026-11-19/compiler-boundaries.json": "c4f706cc226f5b262d79892027666e2415b2f4d053b7738cee94bcc9fc448515",
+    "data/task-angular-live/2026-11-19/browser-boundaries.json": "f2492c49883cb71170b1e205986fadb97d931310c52194a6fcdd4014730f3b66",
+    "data/task-angular-live/2026-11-19/verification.json": "27d9330b71050805eab696686e343c580241bd6b08e50229cecad841c8e21ba5",
+    "data/task-angular-live/2026-11-19/build-probe.json": "a032eec83990ad2c2adb5b96ae123084175ff253572042099a742d282c49f090",
+    "data/task-angular-live/2026-11-19/browser-probe.json": "dbda6a72751b4f13572ed03b0fb78594d4fe39d690c1e4f1c5eb72a47a88526f",
+    "data/task-angular-live/2026-11-19/workspace-search-cleanup.json": "b24b886cc0db63e195a1473d072e2cd916200676bdb36134492d7e7c9357693d"
+  },
+  "retained_log_sha256": {
+    "/tmp/gents-angular-full-check-verified.log": "3164ee32075daed20b0057796a4ab12b933494c1294ea9c34e793d2fcf7e3ca2",
+    "/tmp/gents-angular-final-portability.log": "724c8bb8fa385b48452f1115f876e067be135efb7b4e95b863e9cc147df345c6",
+    "/tmp/gents-angular-runtime-live-current.log": "fe7e551a0303b8baacc25213b873569962e206a5e66ea2d98e0b659a24611977",
+    "/tmp/gents-angular-compiler-boundary-final.log": "90cbe287366d8945f7be42692989e815ca92c6416aab850f0ca2e2eccfcf4adc",
+    "/tmp/gents-angular-boundary.log": "0e32eada7c578f864acf459efa603dc867be66886615cd35a7cc91a7d75d879d",
+    "/tmp/gents-angular-dotnet-regression.log": "d8ff5ad65b611dfe8593b25caab8622b1559f99839d0264363716f84c9e1931c",
+    "/tmp/gents-angular-full-check.log": "207439cebaa760bfe516b20380d524e69b86e43fcb1894234d2e764abc9e10f2",
+    "/tmp/gents-angular-owner-alias.log": "62002e48ecbe983523e8c5bf629e3f21f94424d10b20183a6a0507bd752c027e",
+    "/tmp/gents-angular-runtime-live-final2.log": "72f278d5b17947ff249ded68c3b79eeed19ff38f8b74f14ae762d97c9653e447",
+    "/tmp/gents-angular-runtime-live-final3.log": "6290e22340863b2920cb6550821903d1aef625ae92184534abdf0429eb8fc62c"
+  },
+  "limitations": [
+    "Native Angular MCP registration, current canonical task receipts, actor/policy/run binding and parent task budget integration remain unfinished; angular_build remains unsupported.",
+    "Only the narrow standard application fixture layout and finite literal DOM cases are implemented; no general Angular correctness or expert quality is established.",
+    "Outer Seatbelt replaces Chromium inner process-specific profiles; tested on this installed macOS/headless runtime only.",
+    "System/Homebrew dynamic-library closure is not fully pinned. Resource measurements and enforcement are sampled; very short phases can have no sample.",
+    "Process cleanup uses the watchdog-owned process group; abrupt server death cannot guarantee scratch-directory deletion.",
+    "Cosmos execution/RU evidence, cross-domain integration, broader provider work and fresh independent model qualification remain open.",
+    "The original fifteen-section brief remains the scope; no completion, production profile admission, source publication or deployment is claimed."
+  ],
+  "model_inference_calls": 0,
+  "provider_cost_usd": 0,
+  "model_downloads": 0,
+  "qualified": false,
+  "promoted": false
+}

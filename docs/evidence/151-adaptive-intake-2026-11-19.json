@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-11-19T06:28:49.022312+00:00",
+  "full_goal_status": "active",
+  "checkpoint": "quarantined intake and shared-budget adaptive execution",
+  "branch": "codex/feature/public-research-view",
+  "implemented": [
+    "Schema-constrained quarantined model analysis with exact input/literal/dependency guards",
+    "Optional async owner analysis-only mode and validated structured-request bypass",
+    "One shared budget for intake, repairs, all stages, tools and concrete bounded replans",
+    "Configured compatible fallback for insufficient evidence, invalid output, provider, context and capacity failures",
+    "Durable plan revision/intake/model dispatch-return audit; dispatch reservation is not proof of native inference",
+    "Scoped current-source/config checks before every plan/model dispatch and final delivery",
+    "Canonical original plan IDs retained across compatible coalesced subscribers",
+    "Bounded plan-history cleanup and cache inspection/invalidation coverage",
+    "Caller-supplied essential clarification preserved through structured bypass"
+  ],
+  "verification": {
+    "prior_workspace": {
+      "log": "/tmp/gents-adaptive-intake-workspace.log",
+      "suites": 34,
+      "passed": 624,
+      "failed": 0,
+      "ignored": 27
+    },
+    "latest_focused": {
+      "log": "/tmp/gents-adaptive-intake-final-tests.log",
+      "suites": 5,
+      "passed": 49,
+      "failed": 0,
+      "ignored": 0,
+      "exit_code": 0
+    },
+    "strict_clippy": {
+      "command": "cargo clippy --workspace --all-targets --locked --offline -- -D warnings",
+      "log": "/tmp/gents-adaptive-intake-clippy.log",
+      "status": "passed_current_source",
+      "exit_code": 0,
+      "log_sha256": "23adb5d9248af88c4cd8100cf61e6fa02a1b4a7f42f946d0e67d0c7133f2a502"
+    },
+    "build": {
+      "log": "/tmp/gents-adaptive-intake-build.log",
+      "status": "passed; executable rebuilt after final routing guard and full repository script completed"
+    },
+    "http": {
+      "adaptive_log": "/tmp/gents-adaptive-intake-http.log",
+      "nine_workflow_log": "/tmp/gents-adaptive-workflow-http.log",
+      "status": "passed; mock provider only, no model competence claim"
+    },
+    "full_repository_check": {
+      "command": "CARGO_NET_OFFLINE=true bash scripts/check.sh",
+      "log": "/tmp/gents-adaptive-full-check.log",
+      "status": "passed",
+      "exit_code": 0,
+      "log_sha256": "8bb7fabcaeb18a44e47132ad935bbb82ab3be42f41ced574e4538976ab207a14",
+      "rust_workspace": {
+        "passed": 625,
+        "failed": 0,
+        "ignored": 27
+      },
+      "scope_note": "Workspace phase preceded the final structured-question preservation guard. Latest focused 49 tests, current strict Clippy, script build, HTTP integration and remaining script stages followed that guard. No visual browser test or production model qualification is inferred."
+    }
+  },
+  "live_trials": [
+    {
+      "report": "data/task-intake-live/5ff77a3c-f8cb-4cec-986e-2f1256fce0e5/report.json",
+      "report_sha256": "d2a46c8d43374a174e43c2f12ad6e387e8bc0d03ae2bab5b609ec9cf482038dc",
+      "role": "heldout",
+      "model_path": "models/qwen3-4b-instruct/Qwen3-4B-Q4_K_M.gguf",
+      "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+      "harness_binary_sha256": null,
+      "cases": 32,
+      "passed": 5,
+      "per_check": {
+        "schema": 25,
+        "domain": 23,
+        "template": 16,
+        "evidence_required": 19,
+        "clarification": 16,
+        "no_worker_answer": 32,
+        "mode": 25
+      },
+      "generative_model_calls": 50,
+      "all_call_metrics_available": true,
+      "median_seconds": 11.277682104000633,
+      "max_memory_bytes": 4173758464,
+      "provider_cost_usd": 0,
+      "production_admission": false,
+      "elapsed_seconds": 343.9841285830007
+    },
+    {
+      "report": "data/task-intake-live/117175e4-1106-4b9f-921a-9c3af22cc784/report.json",
+      "report_sha256": "8293ba180fd0c76991d175e4b51cf9349f67a12472c3794a617136f3c09c6b57",
+      "role": "calibration",
+      "model_path": "models/qwen3-4b-instruct/Qwen3-4B-Q4_K_M.gguf",
+      "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+      "harness_binary_sha256": "8460146d5e3cc0cb527b1324370c4a6f7f4b191aa038b23aefcf5ad509764597",
+      "cases": 4,
+      "passed": 3,
+      "per_check": {
+        "schema": 4,
+        "domain": 4,
+        "template": 3,
+        "evidence_required": 4,
+        "clarification": 4,
+        "no_worker_answer": 4,
+        "mode": 4
+      },
+      "generative_model_calls": 4,
+      "all_call_metrics_available": true,
+      "median_seconds": 8.392884437498651,
+      "max_memory_bytes": 4000104448,
+      "provider_cost_usd": 0,
+      "production_admission": false,
+      "elapsed_seconds": 37.732224208000844
+    },
+    {
+      "report": "data/task-intake-live/abc41b91-72e6-4117-a077-03c86614004b/report.json",
+      "report_sha256": "5e1db6184381970c671189e61401108230c979f065635116195390a6209bcae5",
+      "role": "calibration",
+      "model_path": "models/qwen3-4b-instruct/Qwen3-4B-Q4_K_M.gguf",
+      "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+      "harness_binary_sha256": "d55315a9d9c881a5da988747a2dc0f99a9e9779d4e1f0c232cce71659bcdd603",
+      "cases": 32,
+      "passed": 17,
+      "per_check": {
+        "schema": 32,
+        "domain": 31,
+        "template": 20,
+        "evidence_required": 29,
+        "clarification": 31,
+        "no_worker_answer": 32,
+        "mode": 32
+      },
+      "generative_model_calls": 33,
+      "all_call_metrics_available": true,
+      "median_seconds": 7.337127187498481,
+      "max_memory_bytes": 4145758208,
+      "provider_cost_usd": 0,
+      "production_admission": false,
+      "elapsed_seconds": 241.12808783299988
+    },
+    {
+      "report": "data/task-intake-live/90d51d00-ead9-49b2-adc6-665003039822/report.json",
+      "report_sha256": "77c70aae8c45cc471a51bb3c9edc8626b0a496963b33bbaa3f0c95862ec60ae1",
+      "role": "calibration",
+      "model_path": "models/qwen2.5-7b-instruct/Qwen2.5-7B-Instruct-Q4_K_M.gguf",
+      "model_sha256": "65b8fcd92af6b4fefa935c625d1ac27ea29dcb6ee14589c55a8f115ceaaa1423",
+      "harness_binary_sha256": "65590fa0288c22d9f83462b5df5f1cf42b60db7e600b67f52e0a25e8bcd40140",
+      "cases": 4,
+      "passed": 3,
+      "per_check": {
+        "schema": 4,
+        "domain": 4,
+        "template": 3,
+        "evidence_required": 3,
+        "clarification": 4,
+        "no_worker_answer": 4,
+        "mode": 4
+      },
+      "generative_model_calls": 4,
+      "all_call_metrics_available": true,
+      "median_seconds": 3.954508729499139,
+      "max_memory_bytes": 5390286848,
+      "provider_cost_usd": 0,
+      "production_admission": false,
+      "elapsed_seconds": 24.3836442920001
+    }
+  ],
+  "provider_fees_usd": 0,
+  "downloads": 0,
+  "weights_modified": false,
+  "production_model_admissions": [],
+  "limitations": [
+    "Held-out baseline failed and calibration is not independent qualification",
+    "No production-quality model routing claim",
+    "No new actual specialist build/query acceptance",
+    "Broader provider/embedding adapter integration remains",
+    "Native MCP asynchronous generation remains",
+    "Task UI integration remains",
+    "Intake/routing cache and broader evidence support validation remain"
+  ],
+  "audit": "docs/151-task-engine-completion-audit.md",
+  "code_sha256": {
+    "mcp/src/task_engine/adaptive.rs": "9cccb96cdd8b35a6c6728ba0c6d1c5884ba27395f85d684ee7ca64afb4aeaf33",
+    "mcp/src/task_engine/intake.rs": "378a79aeaee0cd4806844bc730f0d9b92145c3864b448f640bb4700462ecdcd5",
+    "mcp/src/task_engine/contracts.rs": "e1fe80761733f5f2be4a0c5d4a93d832c90a79b73903319d06a76849ce5a6641",
+    "mcp/src/task_engine/resources.rs": "f9f2ecf711fb140d52da88e6b966c39c23346759c7bf1a10a2959f99d15985c7",
+    "mcp/src/task_engine/workflows.rs": "765bfa8b07cb2474f7a98fa06bfe83ca421c3e0ee04c2cda2a0941132740fd07",
+    "mcp/src/task_engine/routing.rs": "84f833f3b7b642bd212f8d0dd64fc85b441e1c81bf5e8eb0db28432da4f3ae6f",
+    "mcp/src/task_engine/repository.rs": "5d659a8133b0c28acad2d053a09dc23b380c6f36c823c3ac1d5bedc7b47144fc",
+    "crates/harness/src/task_workflows.rs": "6121075137f620f4a37c61c514bec8984d846f9b903e5dd3a9751657251e59f0",
+    "crates/harness/src/task_frontdoor.rs": "a65ca9ef98e51230998657a9922448aa8e83fc283351977cab1ddc9aceb7ba3b",
+    "crates/harness/src/local_runtime.rs": "df6ec4011fa6cf95d6fef710c6917768db23e136129f5a9e25315cf3366659f2",
+    "mcp/tests/intake_replans.rs": "be92f743b6043095f33864f4da9bba85396f4d5ca5493d11703db878f8a30719",
+    "mcp/tests/fixtures/intake-heldout-v1.json": "608c178c8c895bc76a1075faf466f74b972e0bc1cea3e6b90f3b9a4192041486",
+    "scripts/task_intake_live.py": "e5504ad0cf586adc33a2abb86ce99213ed14d040c99581a16cdcfa7fb03fbcad",
+    "scripts/task_workflows_smoke.py": "85f1d172d943445337abcebed93264a65891e3bbb0736367fde94651674ff0a9",
+    "config/schemas/task-engine-v1.json": "25158ac3feba91e0c31874bcd1f8460a4f7ad646d6c87fc8564a27bca874951e",
+    "mcp/src/task_engine/schemas.rs": "b34f80bc03a1c65044aab11589d71f1594c607be06272198043cf32fb0aa1dfb",
+    "mcp/src/task_engine/mod.rs": "343f8ecfc56f0ce4fe738e70cfd1693723e9827e5a8cbcfe26551ceaeab78da5",
+    "crates/harness/src/provider.rs": "1e8c6bdd39d7b6852661f8e21f5c380368154128156477fedccfea6c17c13d89",
+    "scripts/check.sh": "ee59b8d73d8a4753d79ddd1439dc5b062e46e4c2c1ae053178ce705b55a2122e"
+  }
+}

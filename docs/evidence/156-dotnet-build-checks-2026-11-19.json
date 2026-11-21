@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-19",
+  "goal_status": "active_incomplete",
+  "scope": "Native owner-frozen offline .NET managed-DLL compilation capability; no application execution, task-level specialist validator integration, Angular/Cosmos acceptance or production model admission",
+  "source_sha256": {
+    "mcp/src/dotnet_check.rs": "e205c14d38b10fb3372dbb4785a10d5908be6414bfaadf16064d9880045bb465",
+    "mcp/src/dotnet_check/sandbox.rs": "ea65d8e8fb59d59dc9f88a39ffa912cb412e569ed8a00fdaedb4caa9bf5e1732",
+    "mcp/src/functions/dotnet_check.rs": "41d7faea34acb4a6f70fc4b21871b5f4756508bd66c779fd566e6ce9325dd2c0",
+    "mcp/tests/dotnet_check.rs": "01e6983502b5a94615e82d8d8ac3341196c6c70806f366b3aecd9f2c38180bcd",
+    "mcp/src/lib.rs": "8d182b6cf368fab74b594ea20eb11d0d58cef3f234cb4bc9bd73b56ad002df42",
+    "mcp/src/functions/mod.rs": "8e091ea56f63a7d749bb74dc7871a15276d29dbeeaa9169238a9187dc0aebab5",
+    "mcp/src/functions/media_generate.rs": "2ec4aec77531ffbd92a633aeb1cda6731061df348d1c591fbb6c05205bbe5d85",
+    "mcp/src/client.rs": "d32fe8d224c16592966a6870b83ebaaa614ea0a4aae16f9936578b12132f60b0",
+    "mcp/src/completion.rs": "e85c4b7ea38a2ae97f0e1a761307da839228fac71268f9e50ac389780332b06e",
+    "mcp/src/owner_inputs.rs": "ff4403763f5aaf59ad041102498cea742a933fe2933009d0892c0fe09cc535da",
+    "crates/harness/src/autonomy.rs": "0b14b93ea2cfeb50ff309ad09a1c9883f03e75191cdd947a7a4a1f2e50ab888c",
+    "crates/harness/src/recovery_scope.rs": "9140ec0230298cc796842e4438009cc5fba9ac7cb8d7b50f1979e535b7216118",
+    "crates/harness/src/company.rs": "eb983d4d48f848bb402f4a7627f9abf419baa31e5b6ca2f7c5f8ef560ffcc355",
+    "config/company-tool-inputs.json": "882729c9bcb2ed65b4847ae5696e5df2c35ab166cf758600f2153790b39bbee4",
+    "config/company-tools.json": "54709d2a0f3349c2755eeed5913505d41750bce734d2781e78a09b4d09840118",
+    "docs/156-offline-dotnet-build-checks.md": "6478ba52d5f0a2f10cd66cf1df24471e0f565250f10533d268f2f77f4e8aba31",
+    "docs/151-task-engine-completion-audit.md": "f99bf13a1d2d1971aa0151d55dba375047869085ddbe9ceb89d33a133c340d8f",
+    "mcp/README.md": "4f3d6e3be4e59e8bb1c7cf3deeda5fd3bed8030ae19862e882bc95a5f594d591"
+  },
+  "full_repository_check": {
+    "command": "CARGO_NET_OFFLINE=true bash scripts/check.sh",
+    "exit_code": 0,
+    "log_sha256": "6924053d8a30b68d304aa7a960fca0d95c92e260a7b47ad23095429994035672",
+    "archived_log": "data/task-dotnet-live/2026-11-19-native-check/gents-dotnet-full-check.log",
+    "rust_passed": 666,
+    "rust_failed": 0,
+    "rust_ignored": 28,
+    "scope": "Strict formatting/Clippy, Rust tests/build, Python/Node/HTTP/native stdio+SSE workflow fixtures, web build and site tests; native model fixtures are protocol tests, not model quality qualification"
+  },
+  "live_check": {
+    "command": "GENTS_DOTNET=/opt/homebrew/bin/dotnet GENTS_DOTNET_TEST_REPORT=<report-path> cargo test --offline -p gents-local-mcp --test dotnet_check -- --include-ignored --nocapture",
+    "exit_code": 0,
+    "report": "data/task-dotnet-live/2026-11-19-native-check/report-final.json",
+    "report_sha256": "a5e4b13908744ac4544dff732bbc32ae46f93122d3049eea80c09b84a7eb1100",
+    "checks": {
+      "canonical_receipt_required": true,
+      "current_access_required": true,
+      "frozen_project_write_denied": true,
+      "negative_compile": true,
+      "planner_denied": true,
+      "source_change_invalidates": true,
+      "sse_build": true,
+      "stale_identity_denied": true,
+      "stdio_build": true,
+      "unlisted_code_and_targets_excluded": true,
+      "wrong_actor_denied": true
+    },
+    "receipts": [
+      {
+        "transport": "in_process_negative",
+        "status": "build_failed",
+        "elapsed_ms": 1360,
+        "artifact_sha256": null,
+        "sdk_version": "10.0.401",
+        "dotnet_sha256": "fcc4b90284be437a15dc56dfc9b855fed4feaac7811e4aec85d583fc89b60f46",
+        "source_identity": "f720d16ba54f0452d0bf423b9c1b79935fd2e5803c8d01fff8599c763c491752",
+        "result_sha256": "414ca7322085054d2f49f36fb9445dfaa74eae181f71313db6438a4a998855c3",
+        "canonical_result_hash_verified": true,
+        "sampled_process_group_rss_bytes": 334970880,
+        "sampled_scratch_bytes": 68842
+      },
+      {
+        "transport": "stdio",
+        "status": "build_passed",
+        "elapsed_ms": 1547,
+        "artifact_sha256": "45db8e229b9307fceb23397fbab00f2b25eef3bfeca0aff91b0041430c8b9d3c",
+        "sdk_version": "10.0.401",
+        "dotnet_sha256": "fcc4b90284be437a15dc56dfc9b855fed4feaac7811e4aec85d583fc89b60f46",
+        "source_identity": "41760d43612fbb9622fd09d4e3988fe62e7a131df47438c19e671891eb1bbef2",
+        "result_sha256": "b1fc27424425e7904dec44290341b9f9081d9db6213c40ee86ea21fce1e41bdf",
+        "canonical_result_hash_verified": true,
+        "sampled_process_group_rss_bytes": 350797824,
+        "sampled_scratch_bytes": 68852
+      },
+      {
+        "transport": "sse",
+        "status": "build_passed",
+        "elapsed_ms": 1779,
+        "artifact_sha256": "f9746819bf77d9c0413f8fdb012767582060dadb91a651e278c6b12695cabd19",
+        "sdk_version": "10.0.401",
+        "dotnet_sha256": "fcc4b90284be437a15dc56dfc9b855fed4feaac7811e4aec85d583fc89b60f46",
+        "source_identity": "41760d43612fbb9622fd09d4e3988fe62e7a131df47438c19e671891eb1bbef2",
+        "result_sha256": "fd3647a1e742a2f8576d4b99c1c7f89349d0ce058e792ca1b0b745bf7e18e5c9",
+        "canonical_result_hash_verified": true,
+        "sampled_process_group_rss_bytes": 348536832,
+        "sampled_scratch_bytes": 90939
+      }
+    ],
+    "generative_model_calls": 0,
+    "provider_cost_usd": 0,
+    "qualified": false,
+    "promoted": false
+  },
+  "watchdog": {
+    "regression": "dotnet_check::sandbox::mac::tests::watchdog_kills_owned_process_group_when_server_exits_without_drop",
+    "passed_in_full_check": true,
+    "scope": "Independent parent process terminates with _exit; watchdog-owned process group has no surviving active process. No C# app/runtime behavior tested."
+  },
+  "retained_development_checks": {
+    "initial_clippy": {
+      "exit_code": 101,
+      "log_sha256": "b5b738a2ed0118a1de0a26b03c8a7d01bbed4cc1da37d982d0f75745e7ae60b8",
+      "reason": "Intentional abrupt-parent-death test lacked explicit clippy::zombie_processes annotation; normal production child paths own wait/kill cleanup."
+    },
+    "final_focused_clippy": {
+      "exit_code": 0,
+      "log_sha256": "ca2cf2bf3a9f7aff3b5af71f831a20362bac8bf52104a1a5256cce1049ab486c"
+    }
+  },
+  "limitations": [
+    "Only package-free explicit copied standard SDK source projects; not the complete original repository build.",
+    "Managed DLL compilation only. No candidate application or independent functional/API acceptance.",
+    "SDK/runtime library closure not fully content-addressed; executable SHA and selected SDK version recorded.",
+    "Sampled process-group RSS and scratch usage are enforcement observations, not hard instantaneous limits or total Apple unified memory.",
+    "Identical source identity does not promise byte-identical DLLs across temporary debug paths.",
+    "Task-level validator registry integration, Angular checks, observed Cosmos API/query/RU receipts and independent model/specialist qualification remain.",
+    "Zero sampled maxima on a phase shorter than the first 100 ms interval mean no sample, not zero actual memory or scratch usage."
+  ],
+  "publication": {
+    "commit": false,
+    "push": false,
+    "deploy": false
+  },
+  "model_downloads": 0,
+  "cloud_inference_calls": 0
+}

@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-19",
+  "goal_status": "active_incomplete",
+  "scope": "Registered governed Angular MCP capability and asynchronous native task validator; actual SDK/DOM cases and current canonical receipts; worker fixtures are mocks and no model qualification is claimed",
+  "git": {
+    "root": "/Users/rmonzingo/repo-applications/gents-rust-lab",
+    "branch": "codex/feature/public-research-view",
+    "head": "23b7d823956586a3a4d760767d7eb5b7e18d63a3",
+    "origin": "https://github.com/Monzingo89/gents-rust-lab.git",
+    "published": false
+  },
+  "source_sha256": {
+    "config/company-tool-inputs.json": "b5d3299127e6b64096d68ec690e13d539c8ad80d4a42c21a559c92c1e609ecf2",
+    "config/company-tools.json": "ff888b9d5e4b6a4750f4446fb28c4449073affbd23fe59c71d7ee21692a54b8b",
+    "crates/harness/src/autonomy.rs": "528138121c3ccc0f82147a558e305e97a3821470b1d27e3d69dd993cbf445a5b",
+    "crates/harness/src/company.rs": "7cf9ae1d0282b8b32eeedb1e6b1c907adcb5f03e7fa33615c8a37b152ed17da6",
+    "crates/harness/src/main.rs": "06288efcc72e0b6847f2f4582542638a623eb4cf41524aaa7d5ac730fec95d55",
+    "crates/harness/src/recovery_scope.rs": "abdf3ea8d06b1c8c17ac4ffd282bcfa4add5059fbb0ed6f3341acd844d5b2af5",
+    "crates/harness/src/task_workflows.rs": "a0168cf170c8d14b9a28696d330ab04644f024564af9cf7476f042432f3a3ef9",
+    "mcp/src/angular_check.rs": "e8bde2c076e51ec560171e3f2af5cdc09f51a8e4aa0c650a5aa685ff43f2f5c1",
+    "mcp/src/angular_check/native.rs": "a71cb240e73d9949ef4a80109fcdb1a08df83514b7d4439800b2365b90813c67",
+    "mcp/src/angular_check/runtime.rs": "a5052ccc5d2b696cb4d9118c49f72e3351978b69013412aa5ad28834d862b0df",
+    "mcp/src/angular_check/browser.mjs": "9531b34fb07bdec10b8ac9ddadfea325bc2c67a213baedd37ed44dc91a1e3693",
+    "mcp/src/angular_check/browser_profile.mjs": "241683151af1d0d145d7005481388c94816cb8fef6ceeb6382c712bf76dd194e",
+    "mcp/src/authority.rs": "f7319aec21957e5ae605069d7458bb46dbd2cfa370e06d36a4d2e0a888ed6cf6",
+    "mcp/src/client.rs": "ed3bf63f8a3d0f2cfd4d7d46fc092bc493b69cee6fda729955104304727ebedf",
+    "mcp/src/functions/angular_check.rs": "279099991b04e68ab3fe049d8081f62e9b261ee247973676f2db9cdb36c3ddcc",
+    "mcp/src/functions/media_generate.rs": "4dacfb153446ddcd15f790fedb66c73be0c553ed645cc0ed1a153526c3b177db",
+    "mcp/src/functions/mod.rs": "fc6dedd760c40f97662a0b1f16ddd5ea973b59b5ecc12714de6bf529e8dc50a5",
+    "mcp/src/functions/tasks.rs": "cf0a7bd07c6e1202dd8198b2b4b86f7cecfc209f64395ed263dabb8d438495cb",
+    "mcp/src/lib.rs": "3b97fc6f139ec71308f486485e772c6fa452501ed7dcaef68e3c8c01ca862d08",
+    "mcp/src/registry_angular.rs": "deb076670cceb0fe51e7d9b70d494c39bf8579cde2e48ec5f6bbabd07d834ac1",
+    "mcp/src/skills.rs": "14680169a170f1290a45038f37261be8fa2da142e0434632ebb828104c9bd66f",
+    "mcp/src/task_engine/native.rs": "bc81ff446f1b1f350b854f2102537ad5c64c2d86012ce5989fbbd2aee925044d",
+    "mcp/src/task_engine/validators.rs": "a655355c2fee85d11f920e0105fe76ac29174d8c0a4a55ea6e9f52c62e7644e9",
+    "mcp/tests/angular_check.rs": "db5b48ed54c40361b81f59a266a39b67218c3912f694cf33f7c53c8d22f59d67",
+    "mcp/tests/angular_native_check.rs": "604609eabe4d3b184a19883ffd5438af0206031da9a45851299e879d6782a2e8",
+    "mcp/tests/support/angular.rs": "77ba20acf5129020d76d5dabcf1f7097a3a985ec660c6748c0edab8a473ac723",
+    "mcp/tests/support/mod.rs": "1283c627ffc8d544694156803f327abd5a562b066a502f54728c3cc01d0d1aab",
+    "mcp/tests/task_validators.rs": "dad47b817d9ac369e0eaeecdad6250180c80cbbbb924da637f83c6dd6d9e8cc4",
+    "scripts/task_angular_validation_smoke.py": "4e7833c5a3c865043bfeef93066a86190dd18ecb7e5e4625b523480cc612d64a",
+    "scripts/task_validation_smoke.py": "a75368fbb897e90472d3f91e4f42ab24f359abef89749017f46c1e40257b0dd6",
+    "scripts/verify_task_angular_reports.py": "93318812035b120c91be417288b8bb8704caed51b5b292bfce2cdd4c53740e81",
+    "mcp/README.md": "974a9edacf1da02fe7e7471147b1748965d2a62effa44f594f014bbf6dee92d5",
+    "docs/151-task-engine-completion-audit.md": "e86e961cd2c6bd5a077a05aa6fc6c4de815931280088c47977309e7eb37dbebb",
+    "docs/159-pinned-angular-sdk-executor.md": "e70a8d4a200e8f32f4e34e0bbd218a67040d082566328ed29cbb088c27f0389f",
+    "docs/160-governed-angular-task-validation.md": "18fbc8be2a7ca851981f72da262f7f151c661f759838e29fee5aa533686b84df"
+  },
+  "full_repository_check": {
+    "command": "bash scripts/check.sh",
+    "exit_code": 0,
+    "rust_passed": 686,
+    "rust_ignored": 32,
+    "log": "/tmp/gents-angular-governed-full-check-complete.log",
+    "log_sha256": "d5c87800b63f2ddc6343a83aebaf7f168e68785156ef27a61c93897175869662",
+    "checks": "fmt; strict workspace Clippy; Rust tests/build; Python, Node, HTTP, native MCP stdio/SSE; web/site builds and checks"
+  },
+  "live_component_check": {
+    "command": "GENTS_ANGULAR_NATIVE_REPORT=<report> cargo test --offline -p gents-local-mcp --test angular_native_check -- --ignored --nocapture",
+    "exit_code": 0,
+    "checks": {
+      "audit_corruption_rejected": true,
+      "concurrent_writer_unlocked_and_source_rechecked": true,
+      "other_actor_and_planner_denied": true,
+      "read_grant_revocation_invalidated": true,
+      "source_change_invalidated": true,
+      "stale_identity_rejected": true,
+      "tool_revoked_during_unlocked_execution_rejected": true,
+      "wrong_ui_self_report_failed": true
+    },
+    "canonical_results": 4,
+    "scope": "Installed Node/Angular/Playwright/headless runtime; native authority, snapshot, audit, transport and revocation boundaries; no model quality claim"
+  },
+  "live_task_checks": {
+    "task-stdio-release.json": {
+      "transport": "actual native MCP stdio, HTTP owner admission and SQLite",
+      "checks": {
+        "actual_task_build_and_dom_receipt": true,
+        "source_invalidation_and_wrong_ui_rejection": true,
+        "canonical_audit_rechecked_at_status": true,
+        "sensitive_result_rejected_without_replay": true,
+        "running_browser_cancelled_and_owned_processes_stopped": true
+      },
+      "statuses": [
+        "generated",
+        "blocked",
+        "generated",
+        "blocked"
+      ],
+      "tool_calls": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "native_results": 3,
+      "source_identities": [
+        "709a7af025a98165e118b1e13b77e5abde97bc18d720ebff434f93a8568a27b5",
+        "537eeb273f95d5ad12711d5a516ece7485bb144d0444c53193fa778c7ac8a333",
+        "709a7af025a98165e118b1e13b77e5abde97bc18d720ebff434f93a8568a27b5"
+      ],
+      "native_binary_sha256": "d0c6adbf39e6ca596b2639d906e58e35d710e0dc19916274f87c73c0c49f3723",
+      "harness_binary_sha256": "7944e470176ec8f3d748be68887fbf148eb7b560d58390070d33e2f63b4bd1a4",
+      "sdk_elapsed_ms": [
+        4772,
+        6898,
+        6241
+      ]
+    },
+    "task-sse-release.json": {
+      "transport": "actual native MCP sse, HTTP owner admission and SQLite",
+      "checks": {
+        "actual_task_build_and_dom_receipt": true,
+        "source_invalidation_and_wrong_ui_rejection": true,
+        "canonical_audit_rechecked_at_status": true,
+        "sensitive_result_rejected_without_replay": true,
+        "running_browser_cancelled_and_owned_processes_stopped": true
+      },
+      "statuses": [
+        "generated",
+        "blocked",
+        "generated",
+        "blocked"
+      ],
+      "tool_calls": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "native_results": 3,
+      "source_identities": [
+        "cae1420c424087ad89ee5ee465175c36d344a5fd6e50b1526951da230e9608ec",
+        "1f836fc074945cb27b0b0b159b7c867f0258b43f6252d6a0422619e99b5807eb",
+        "cae1420c424087ad89ee5ee465175c36d344a5fd6e50b1526951da230e9608ec"
+      ],
+      "native_binary_sha256": "d0c6adbf39e6ca596b2639d906e58e35d710e0dc19916274f87c73c0c49f3723",
+      "harness_binary_sha256": "7944e470176ec8f3d748be68887fbf148eb7b560d58390070d33e2f63b4bd1a4",
+      "sdk_elapsed_ms": [
+        4554,
+        5508,
+        4466
+      ]
+    }
+  },
+  "independent_receipt_check": {
+    "command": "python3 scripts/verify_task_angular_reports.py <stdio-report> <sse-report> --output <verification>",
+    "canonical_results_verified": 6,
+    "native_task_receipts_verified": 6,
+    "tampering_checks": {
+      "receipt_source_rejected": true,
+      "audit_actor_rejected": true,
+      "parent_actor_rejected": true
+    },
+    "verified_scope": "Frozen approval/intake, source inputs, source/implementation/run/actor identities, canonical result/audit/argument hashes, task receipt facets, exact DOM hashes, failure/privacy/no-replay and archived dispatch counts; no SDK execution simulated by verifier"
+  },
+  "shared_dotnet_regression": {
+    "command": "GENTS_DOTNET=/opt/homebrew/bin/dotnet cargo test --offline -p gents-local-mcp --test dotnet_api_check -- --include-ignored --nocapture",
+    "exit_code": 0,
+    "passed": 2,
+    "scope": "Actual installed SDK/HTTP oracle plus deterministic contract test"
+  },
+  "retained_failures_and_fixes": [
+    "Initial integrated task status performed full SDK hashing while holding SQLite writer; a metadata-only version also contended under concurrent load. Final code collects request-local SDK observations before writer transactions, prohibits fallback scans in a transaction, and rechecks source/policy/approval/canonical custody inside the commit. Existing database timeouts unchanged.",
+    "Adding an unavailable Angular schema to unrelated legacy prompts exceeded a mock model context budget during autonomy recovery. The schema is now included only for jobs with a frozen Angular contract; native capability registration/authorization remain independent. Context limits and original mission retention were unchanged; standalone and full autonomy regressions pass."
+  ],
+  "sdk": {
+    "pins": {
+      "angular_cli_version": "21.2.26",
+      "browser_tree_sha256": "3fc9e653c9bf58781357ca0d6a979514281fe1ddf39aa523a39c9d7c9002af43",
+      "driver_tree_sha256": "4b0bb7fcc57379da72b03308fbb86c7addc67169893b291510707c2af4e3289d",
+      "node_sha256": "798d7f9c0d38051608d11ba87a12fbb01e92bfa457cd77ec612b5bad2a73a05e",
+      "node_version": "v24.21.0",
+      "sdk_tree_sha256": "0d165777d09736f1a49c0b6a1a2a66be13e25427d8834b80bfc7b064cf515cd1"
+    },
+    "metadata_currentness": "Full content hashes verified before/after actual execution. Canonical result records SDK metadata seal. Fresh per-request metadata includes file identity/size/mode/link/mtime/ctime; actual equal-size/restored-mtime regression passed. Opaque proof expires after five seconds and grants no permissions. SDKs are outside actor workspace.",
+    "browser": "Outer required Seatbelt; inner Chromium sandbox disabled due observed nesting failure; both loopback families reserved at asset port; finite literal host cases; no arbitrary endpoint/flags/evaluate; renderer limit and watchdog-owned process group",
+    "resource_policy": "3 GiB estimated native process-group allowance reserved through scheduler; actual MCP call charged to task-wide tool budget; RSS/scratch are sampled, not total unified-memory measurements"
+  },
+  "local_report_sha256": {
+    "data/task-angular-native-live/2026-11-19/component-release.json": "f12b643b629f949cb5f14dc79ae5dc1c7bec25e15fa4c36aeda00a6bd96fa6e8",
+    "data/task-angular-native-live/2026-11-19/task-stdio-release.json": "fc5270427950b195971931f23e6dbcd8ae5801c4ff83079f03ee20549916e03a",
+    "data/task-angular-native-live/2026-11-19/task-stdio-release.sqlite3": "dfaa03102cf70d0f07b5e912304dc6ca392a9c637338b25f2b66e2903b44ac84",
+    "data/task-angular-native-live/2026-11-19/task-sse-release.json": "2ef6e3d04b851e79e234dd70bf4d2faadc522c167f181ef5d892ad10032aef72",
+    "data/task-angular-native-live/2026-11-19/task-sse-release.sqlite3": "8d2a102e5d4e46105bdf9f43191239a98d6a70fce9153c9777f6fa6a5237e04a",
+    "data/task-angular-native-live/2026-11-19/verification-release.json": "b2d24186cde5f1ed9ec06b637701cba6b070e01f587c1d2f084a51a88dc954a9",
+    "data/task-angular-native-live/2026-11-19/verification-negatives.json": "ff6f116b7232ced906a2f8d504e074c784e70935f4d6cfb579242ffda877b0c2",
+    "data/task-angular-native-live/2026-11-19/task-stdio-final.failure.log": "5a9517c109bb28b9cb1c95cb4488a0ebf3368a613afa24a973c4f1ffba83a47d",
+    "data/task-angular-native-live/2026-11-19/task-stdio-final.failure.sqlite3": "0996040f2302595da4dd105b32a0d40f377d771f166359998545c64d14d4a826",
+    "data/task-angular-native-live/2026-11-19/cosmos-next-step.json": "215e04097a7a868a03ce001cc3551cf6a7ebc0b43c1ed00f4b6e4e792992f28c"
+  },
+  "retained_log_sha256": {
+    "/tmp/gents-angular-governed-full-check-complete.log": "d5c87800b63f2ddc6343a83aebaf7f168e68785156ef27a61c93897175869662",
+    "/tmp/gents-angular-native-live-release.log": "61f24d5a1bf0595ee1431064f871c3f0666581998f894d0f75e32632bec47316",
+    "/tmp/gents-angular-task-stdio-release.log": "e968c456661aaaf4bb0fc4e07b74bdb72464615b05cf04be852ee6d3b5f97a96",
+    "/tmp/gents-angular-task-sse-release.log": "29e37c850bea8b0ea757aa73e14206bbe2d1d6cff09a0f07b631eb185810753e",
+    "/tmp/gents-angular-independent-release.log": "3cf3d54849a158f4ef7a6291c95dc66051275038c4f38f9ee48f823ab9daa146",
+    "/tmp/gents-angular-proof-dotnet-regression.log": "2ce0bff447c5cac21bb18b4aaf32ebf0c944a3a85fe2d79a5c9955b31f4c1524",
+    "/tmp/gents-angular-autonomy-regression.log": "f168c75a56bacf82b33b189219164043a75a95fddc5686a9163f695eaf3ee8f1",
+    "/tmp/gents-angular-governed-full-check.log": "e857e5fa0320fc666d78738b47db2129fae0d1cc2c6b7cb0f83424fd32566495",
+    "/tmp/gents-angular-task-stdio.log": "e9aa86fb6804845ef5c5c243a2bf03c2cd79b14c7bfa04797bceec28801199a3",
+    "/tmp/gents-angular-task-stdio-final.log": "fcb19b8827d827469f4cc1ece82d6648f0a73bb3555ddf2518ea1294f573b175"
+  },
+  "limitations": [
+    "Initial bounded standard root Angular application layout only; broader Angular project/build/test configurations remain unsupported.",
+    "System/Homebrew dynamic-library closure outside pinned SDK trees is not fully content-addressed.",
+    "Current SDK metadata is a bounded point-in-time observation, compared with an actual content-verified canonical result; no cross-filesystem/database atomicity is promised.",
+    "Scoped authority observation is request-local, short-lived, never model supplied, and not a general authorization or persistent SDK cache.",
+    "SDK/resource execution was tested on this installed macOS ARM64 runtime; other environments fail closed when unsupported.",
+    "Cosmos/query/RU and real cross-domain integration, broader providers and independent quality qualification remain open.",
+    "Original fifteen-section goal remains active; finite SDK success is not expert qualification, independent acceptance or promotion."
+  ],
+  "model_inference_calls": 0,
+  "model_downloads": 0,
+  "provider_cost_usd": 0,
+  "qualified": false,
+  "promoted": false
+}

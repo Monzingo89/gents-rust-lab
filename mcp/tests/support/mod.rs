@@ -1,4 +1,6 @@
 #![allow(dead_code)]
+#[cfg(target_os = "macos")]
+pub mod angular;
 pub mod audio;
 use gents_local_mcp::{
     authority::{Authority, SqliteAuthority},

@@ -37,6 +37,7 @@ fn input(ask: &str) -> TaskInput {
 fn source() -> KnowledgeSource {
     let text = "Gerald Ford served as US president during 1976.\nJimmy Carter won the 1976 election and took office in 1977.\n";
     KnowledgeSource {
+        dependencies: Default::default(),
         source_id: "history".into(),
         revision: "fixture-v1".into(),
         title: "Synthetic chronology fixture".into(),

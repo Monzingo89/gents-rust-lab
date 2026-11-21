@@ -41,12 +41,11 @@ impl Model {
         {
             bail!("local_reasoning_tokens requires native local inference and 0..4096 tokens");
         }
-        if self
-            .context_tokens
-            .is_some_and(|tokens| self.provider != "local" || !(2048..=16384).contains(&tokens))
-        {
+        if self.context_tokens.is_some_and(|tokens| {
+            !matches!(self.provider.as_str(), "local" | "mlx") || !(2048..=16384).contains(&tokens)
+        }) {
             bail!(
-                "context_tokens currently requires native local inference and 2048..16384 tokens"
+                "context_tokens currently requires owned local or MLX inference and 2048..16384 tokens"
             );
         }
         if self.adapter.is_some() && self.provider != "mlx" {
@@ -156,6 +155,8 @@ pub struct LocalExecution {
     pub generation_budget: Option<crate::local_generation::GenerationBudget>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub separated_reasoning_observed: Option<bool>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prompt_preflight: Option<crate::mlx_prompt::Preflight>,
 }
 #[async_trait]
 pub trait LanguageModel: Send + Sync {
@@ -186,7 +187,49 @@ impl LanguageModel for Gateway {
         let start = Instant::now();
         if m.provider == "mock" {
             tokio::time::sleep(std::time::Duration::from_millis(1000)).await;
-            let text = if system.starts_with("LOCAL_GROUNDED_ANSWER:") {
+            let text = if system.starts_with("LOCAL_TASK_INTAKE:") {
+                let value: Value = serde_json::from_str(input)?;
+                let profiles = value["available_profiles"]
+                    .as_array()
+                    .context("fixture profiles absent")?;
+                let domain = profiles
+                    .iter()
+                    .find(|p| p.as_str() == Some("general"))
+                    .unwrap_or(&profiles[0]);
+                let ask = value["input"]["original_ask"].as_str().unwrap_or_default();
+                json!({"domain":domain,"task_type":"answer","ambiguity":if ask.contains("missing-intent-fixture"){"essential_intent_missing"}else{"clear"},"difficulty":"routine","evidence_required":false,"decomposition_useful":false,"work_shape":"atomic","subtasks":[],"relevant_literals":[],"environment_requirements":[],"assumptions":[],"essential_questions":if ask.contains("missing-intent-fixture"){vec!["SIMULATED: which deliverable do you want?"]}else{vec![]},"routing_justification":"SIMULATED intake schema fixture, not model competence evidence"}).to_string()
+            } else if system.starts_with("LOCAL_TASK_STAGE:") {
+                let value: Value = serde_json::from_str(input)?;
+                if matches!(
+                    m.model.as_str(),
+                    "mock-task-workspace" | "mock-task-workspace-unauthorized"
+                ) {
+                    let count = value["tool_results"].as_array().map_or(0, Vec::len);
+                    if count < 3 {
+                        let path = [
+                            "frontend/package.json",
+                            "api/Service.csproj",
+                            "db/cosmos.json",
+                        ][count];
+                        return Ok(Reply{text:json!({"status":"tool","answer":"","citations":[],"missing_evidence":[],"tool":{"name":"workspace_read","arguments":{"path":path,"offset_bytes":0,"limit_bytes":2048}}}).to_string(),usage:Usage{cost_usd:Some(0.0),source:"SIMULATED workspace tool protocol fixture".into(),..Usage::default()},latency_ms:start.elapsed().as_millis() as u64,response_id:None,local_execution:None});
+                    }
+                }
+                if value["allowed_tools"]
+                    .as_array()
+                    .is_some_and(|a| a.iter().any(|v| v == "search_knowledge"))
+                    && value["tool_results"]
+                        .as_array()
+                        .is_some_and(|a| a.is_empty())
+                {
+                    return Ok(Reply{text:json!({"status":"tool","answer":"","citations":[],"missing_evidence":[],"tool":{"name":"search_knowledge","arguments":{"query":"reference"}}}).to_string(),usage:Usage{cost_usd:Some(0.0),source:"simulated task tool-loop fixture".into(),..Usage::default()},latency_ms:start.elapsed().as_millis() as u64,response_id:None,local_execution:None});
+                }
+                let citations = if value["evidence"].as_array().is_some_and(|e| !e.is_empty()) {
+                    json!([{"passage":0,"quote":value["evidence"][0]["quote"].as_str().unwrap().chars().take(100).collect::<String>()}])
+                } else {
+                    json!([])
+                };
+                json!({"status":"answer","answer":format!("SIMULATED stage {} with {} dependencies",value["node_id"].as_str().unwrap_or("unknown"),value["dependencies"].as_object().map(|m|m.len()).unwrap_or(0)),"citations":citations,"missing_evidence":[],"tool":null}).to_string()
+            } else if system.starts_with("LOCAL_GROUNDED_ANSWER:") {
                 // Explicit provider=mock only: protocol coverage, never evidence
                 // of real generation quality, factual accuracy or token use.
                 let value: Value = serde_json::from_str(input)?;
@@ -224,10 +267,23 @@ impl LanguageModel for Gateway {
                     || value["operator_answers"]
                         .as_array()
                         .is_some_and(|a| !a.is_empty());
-                let written = evidence
-                    .iter()
-                    .any(|e| e["action"] == "files" && e["arguments"]["op"] == "write");
-                let tested = evidence.iter().any(|e| e["action"] == "shell");
+                // The optional transcript can be compacted away. The host's
+                // successful-operation index survives; this mock must consume
+                // that same progress instead of replaying an executed write.
+                let observed = || {
+                    evidence
+                        .iter()
+                        .chain(
+                            value["verified_progress"]["successful_action_index"]
+                                .as_array()
+                                .into_iter()
+                                .flatten(),
+                        )
+                        .filter(|e| e["result"]["ok"] == true || e["ok"] == true)
+                };
+                let written =
+                    observed().any(|e| e["action"] == "files" && e["arguments"]["op"] == "write");
+                let tested = observed().any(|e| e["action"] == "shell");
                 let artifact_stall = value["task"]
                     .as_str()
                     .is_some_and(|s| s.contains("autonomy-artifact-stall-smoke"));
@@ -488,6 +544,55 @@ fn parse_usage(v: &Value) -> Usage {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[tokio::test]
+    async fn mock_operator_retains_execution_progress_after_optional_transcript_compaction() {
+        let gateway = Gateway {
+            client: reqwest::Client::new(),
+            local: crate::runtime_pool::RuntimePool::serial_at_port(std::env::temp_dir(), 1)
+                .unwrap(),
+        };
+        let model: Model =
+            serde_json::from_value(json!({"provider":"mock","model":"autonomy-fixture"})).unwrap();
+        let packet = json!({"task_input":{"task":"autonomy-ambiguous-smoke","operator_answers":["The interrupted action did not occur; do not replay it."],"recent_evidence":[{"action":"files","arguments":{"op":"write"},"result":{"ok":true},"optional_text":"x".repeat(20000)}],"verified_progress":{"successful_action_index":[{"action":"files","arguments":{"op":"write"},"ok":true},{"action":"shell","ok":true}]}}});
+        let compacted = crate::context::compact(&packet.to_string(), 1024).unwrap();
+        let mut decoded: Value = serde_json::from_str(&compacted).unwrap();
+        assert!(decoded["task_input"]["recent_evidence"]
+            .as_array()
+            .unwrap()
+            .is_empty());
+        let cancel = AtomicBool::new(false);
+        let result = gateway
+            .complete(
+                &model,
+                "COMPANY_OPERATOR: fixture",
+                &compacted,
+                128,
+                &cancel,
+            )
+            .await
+            .unwrap();
+        assert_eq!(
+            serde_json::from_str::<Value>(&result.text).unwrap()["action"],
+            "finish"
+        );
+        decoded["task_input"]["verified_progress"]["successful_action_index"][0]["ok"] =
+            json!(false);
+        let result = gateway
+            .complete(
+                &model,
+                "COMPANY_OPERATOR: fixture",
+                &decoded.to_string(),
+                128,
+                &cancel,
+            )
+            .await
+            .unwrap();
+        assert_eq!(
+            serde_json::from_str::<Value>(&result.text).unwrap()["action"],
+            "files"
+        );
+        assert_eq!(result.usage.cost_usd, Some(0.0));
+    }
     #[test]
     fn final_allowance_override_is_explicit_bounded_and_native_only() {
         let mut model: Model = serde_json::from_value(
@@ -532,7 +637,7 @@ mod tests {
         }
     }
     #[test]
-    fn model_specific_context_budget_is_explicit_and_native_only() {
+    fn model_specific_context_budget_is_explicit_and_owned_only() {
         let model = json!({"provider":"local","model":"candidate","path":"models/candidate.gguf","context_tokens":8192});
         let mut value: Model = serde_json::from_value(model).unwrap();
         value.validate().unwrap();
@@ -542,6 +647,9 @@ mod tests {
         }
         value.context_tokens = Some(8192);
         value.provider = "mlx".into();
+        value.path = Some("models/fixture-mlx".into());
+        value.validate().unwrap();
+        value.provider = "mock".into();
         assert!(value.validate().is_err());
     }
     #[test]

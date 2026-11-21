@@ -15,7 +15,7 @@ with tempfile.TemporaryDirectory(prefix="gents-proposal-feedback-") as temporary
     root = Path(temporary)
     (root / "scripts").mkdir()
     (root / "config").mkdir()
-    for name in ["company_tools.py", "public_network.py"]:
+    for name in ["company_tools.py", "public_network.py", "public_research.py"]:
         shutil.copyfile(REPO / "scripts" / name, root / "scripts" / name)
     shutil.copyfile(REPO / "config/public-network-policy.json", root / "config/public-network-policy.json")
     model = {"provider": "mock", "model": "proposal-feedback-bootstrap"}
