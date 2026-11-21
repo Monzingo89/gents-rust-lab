@@ -1,15 +1,31 @@
 """Read-only model artifact inspection; no inference, network or model execution."""
+
 import hashlib
 import json
 import os
-from pathlib import Path
 import stat
 import struct
+from itertools import pairwise
+from pathlib import Path
+
 from model_inventory import GgufMetadata
 
 WEIGHTS = {".gguf", ".safetensors"}
-EXECUTABLE = {".py", ".pyc", ".pkl", ".pickle", ".pt", ".pth", ".bin",
-              ".so", ".dylib", ".dll", ".exe", ".sh", ".js"}
+EXECUTABLE = {
+    ".py",
+    ".pyc",
+    ".pkl",
+    ".pickle",
+    ".pt",
+    ".pth",
+    ".bin",
+    ".so",
+    ".dylib",
+    ".dll",
+    ".exe",
+    ".sh",
+    ".js",
+}
 
 
 def directory(path, create=False):
@@ -27,7 +43,9 @@ def directory(path, create=False):
                     os.mkdir(part, 0o700, dir_fd=fd)
                 except FileExistsError:
                     pass
-            following = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=fd)
+            following = os.open(
+                part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=fd
+            )
             os.close(fd)
             fd = following
         return fd
@@ -69,9 +87,17 @@ def validate_header(stream, suffix, size):
         if not isinstance(value, dict) or not isinstance(value.get("dtype"), str):
             raise ValueError("invalid tensor descriptor")
         shape, offsets = value.get("shape"), value.get("data_offsets")
-        if not isinstance(shape, list) or len(shape) > 16 or any(type(n) is not int or n < 0 for n in shape):
+        if (
+            not isinstance(shape, list)
+            or len(shape) > 16
+            or any(type(n) is not int or n < 0 for n in shape)
+        ):
             raise ValueError("invalid tensor shape")
-        if not isinstance(offsets, list) or len(offsets) != 2 or any(type(n) is not int for n in offsets):
+        if (
+            not isinstance(offsets, list)
+            or len(offsets) != 2
+            or any(type(n) is not int for n in offsets)
+        ):
             raise ValueError("invalid tensor offsets")
         start, end = offsets
         if not 0 <= start <= end <= size - 8 - length:
@@ -79,7 +105,7 @@ def validate_header(stream, suffix, size):
         if start != end:
             ranges.append((start, end))
     ordered = sorted(ranges)
-    if any(left[1] > right[0] for left, right in zip(ordered, ordered[1:])):
+    if any(left[1] > right[0] for left, right in pairwise(ordered)):
         raise ValueError("overlapping tensor ranges")
 
 
@@ -88,12 +114,21 @@ def inspect(root, pins, progress=lambda _: None):
     records, findings, seen = [], [], set()
     total_files = 0
     try:
-        for folder, dirs, names, fd in os.fwalk(".", dir_fd=model_fd, follow_symlinks=False):
+        for folder, dirs, names, fd in os.fwalk(
+            ".", dir_fd=model_fd, follow_symlinks=False
+        ):
             if len(Path(folder).parts) > 16:
                 raise ValueError("model directory depth exceeds bound")
             for name in list(dirs):
-                if stat.S_ISLNK(os.stat(name, dir_fd=fd, follow_symlinks=False).st_mode):
-                    findings.append({"path":str(Path("models") / folder / name),"kind":"symlink_directory"})
+                if stat.S_ISLNK(
+                    os.stat(name, dir_fd=fd, follow_symlinks=False).st_mode
+                ):
+                    findings.append(
+                        {
+                            "path": str(Path("models") / folder / name),
+                            "kind": "symlink_directory",
+                        }
+                    )
                     dirs.remove(name)
             for name in sorted(names):
                 total_files += 1
@@ -105,10 +140,15 @@ def inspect(root, pins, progress=lambda _: None):
                 suffix = Path(name).suffix.lower()
                 info = os.stat(name, dir_fd=fd, follow_symlinks=False)
                 if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
-                    findings.append({"path":path,"kind":"special_or_linked_file"})
+                    findings.append({"path": path, "kind": "special_or_linked_file"})
                     continue
                 if suffix in EXECUTABLE:
-                    findings.append({"path":path,"kind":"executable_or_unsafe_serialization_present"})
+                    findings.append(
+                        {
+                            "path": path,
+                            "kind": "executable_or_unsafe_serialization_present",
+                        }
+                    )
                 if name == "config.json":
                     try:
                         with ordinary_file(fd, name) as stream:
@@ -119,9 +159,14 @@ def inspect(root, pins, progress=lambda _: None):
                         if not isinstance(config, dict):
                             raise ValueError("configuration must be object")
                         if config.get("auto_map") or config.get("trust_remote_code"):
-                            findings.append({"path":path,"kind":"remote_code_configuration_requires_review"})
+                            findings.append(
+                                {
+                                    "path": path,
+                                    "kind": "remote_code_configuration_requires_review",
+                                }
+                            )
                     except (ValueError, OSError):
-                        findings.append({"path":path,"kind":"invalid_configuration"})
+                        findings.append({"path": path, "kind": "invalid_configuration"})
                 if suffix not in WEIGHTS:
                     continue
                 seen.add(path)
@@ -132,22 +177,50 @@ def inspect(root, pins, progress=lambda _: None):
                         validate_header(stream, suffix, before.st_size)
                         stream.seek(0)
                         digest = hashlib.file_digest(stream, "sha256").hexdigest()
-                        if identity(before) != identity(os.fstat(stream.fileno())) or identity(before) != identity(os.stat(name, dir_fd=fd, follow_symlinks=False)):
+                        if identity(before) != identity(
+                            os.fstat(stream.fileno())
+                        ) or identity(before) != identity(
+                            os.stat(name, dir_fd=fd, follow_symlinks=False)
+                        ):
                             raise ValueError("artifact changed while scanning")
                     matched = digest == pins.get(path)
-                    records.append({"path":path,"bytes":before.st_size,"sha256":digest,
-                                    "reviewed_pin_matches":matched,"format_header_checked":True})
+                    records.append(
+                        {
+                            "path": path,
+                            "bytes": before.st_size,
+                            "sha256": digest,
+                            "reviewed_pin_matches": matched,
+                            "format_header_checked": True,
+                        }
+                    )
                     if not matched:
-                        findings.append({"path":path,"kind":"reviewed_hash_mismatch" if path in pins else "unreviewed_weight"})
+                        findings.append(
+                            {
+                                "path": path,
+                                "kind": "reviewed_hash_mismatch"
+                                if path in pins
+                                else "unreviewed_weight",
+                            }
+                        )
                 except (ValueError, OSError, UnicodeError, RecursionError):
                     # Never echo arbitrary model metadata or parser diagnostics.
-                    findings.append({"path":path,"kind":"artifact_inspection_failed"})
+                    findings.append(
+                        {"path": path, "kind": "artifact_inspection_failed"}
+                    )
         for missing in sorted(set(pins) - seen):
-            findings.append({"path":missing,"kind":"reviewed_weight_missing"})
+            findings.append({"path": missing, "kind": "reviewed_weight_missing"})
     finally:
         os.close(model_fd)
-    return {"version":1,"offline":True,"provider_cost_usd":0,"model_code_executed":False,
-            "status":"REVIEW_REQUIRED" if findings else "CHECKS_PASSED",
-            "artifacts":records,"findings":findings,"files_inspected":total_files,
-            "production_admitted":False,"vulnerability_free":None,
-            "limits":"Integrity and bounded header/configuration checks only; no backdoor detection, current advisory lookup, license or compliance certification. No automatic model promotion or deletion."}
+    return {
+        "version": 1,
+        "offline": True,
+        "provider_cost_usd": 0,
+        "model_code_executed": False,
+        "status": "REVIEW_REQUIRED" if findings else "CHECKS_PASSED",
+        "artifacts": records,
+        "findings": findings,
+        "files_inspected": total_files,
+        "production_admitted": False,
+        "vulnerability_free": None,
+        "limits": "Integrity and bounded header/configuration checks only; no backdoor detection, current advisory lookup, license or compliance certification. No automatic model promotion or deletion.",
+    }

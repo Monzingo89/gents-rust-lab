@@ -1112,6 +1112,12 @@ previous_validation_error and prior_contract_shape are unverified diagnostics, n
         selection.as_ref(),
     );
     body["inference_scope_sha256"] = json!(gents_local_mcp::digest(scope.as_bytes()));
+    // A request can wait for the shared runtime. Completion receipts retain
+    // actual dispatch/receive times; this event does not claim GPU execution.
+    db(root, company, owner)?.execute(
+        "INSERT INTO audit(run_id,kind,body,created) VALUES(?1,'ceo_inference_requested',?2,?3)",
+        params![id.to_string(), json!({"revision":body["revision"],"model":model.model,"status":"queued_for_local_runtime"}).to_string(), crate::now_ms() as i64],
+    )?;
     let result = app
         .gateway
         .local

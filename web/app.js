@@ -1,6 +1,6 @@
 import {mountBasicAnswers} from './assets/basic-answers.js';
 import {taskWorkbench} from './assets/task-workbench.js';
-import {currentTaskActivity,currentTaskUsage} from './assets/task-activity.js';
+import {currentTaskActivity,currentTaskUsage,ceoPlanningActivity} from './assets/task-activity.js';
 import {localComputerPanel} from './assets/local-computer-check.js';
 import {architectureReviewPanel} from './assets/architecture-review.js';
 import {appendInvocation} from './assets/owned-invocations.js';
@@ -133,7 +133,7 @@ const localTasks=taskWorkbench({request:(path,options)=>api(path,options),contex
 canvas.parentElement.after(ceoPlanningPanel);
 const architecturePanel=architectureReviewPanel({request:(path,options)=>api(path,options),context:()=>({company:companyId,session:ceoSession,revision:ceoRevision,visible:!ceoPlanningPanel.hidden}),invalidate:()=>clearCeoReview()});
 ceoPlanningPanel.querySelector('#ceo-execution').before(architecturePanel.element);
-let ceoSession=null,ceoRevision=0,ceoState=null,ceoReview=null,ceoBusy=false,ceoInitialAcceptance=[];
+let ceoSession=null,ceoRevision=0,ceoState=null,ceoReview=null,ceoBusy=false,ceoInitialAcceptance=[],companyObservation=null;
 const taskIntentLabel=document.createElement('label');taskIntentLabel.innerHTML='<span>Type of request</span><select id="ceo-task-intent"><option value="auto">Let the CEO decide</option><option value="answer">Answer from local references</option><option value="action">Perform work</option></select>';$('ceo-plan-message').closest('label').after(taskIntentLabel);
 const localComputer=localComputerPanel({request:(path,options)=>api(path,options),context:()=>({company:companyId,config}),onBrief:brief=>{if(ceoSession)throw Error('Start a new CEO conversation before loading this brief.');$('ceo-plan-message').value=`Goal: ${brief.goal}\nDeliverable: ${brief.output}\nDone when: ${brief.definition_of_done}`;}});ceoPlanningPanel.querySelector('#ceo-plan-form').before(localComputer.element);
 const ownedSelectionPanel=document.createElement('section');ownedSelectionPanel.hidden=true;
@@ -413,7 +413,9 @@ function render(){
  $('events').replaceChildren(...events.slice(-80).reverse().map(e=>{const d=document.createElement('details');d.className='event';const title=document.createElement('summary');title.textContent=`#${e.seq} ${new Date(e.timestamp_ms).toLocaleTimeString()} ${e.agent} / ${e.role} · ${e.kind}`;d.append(title);const p=document.createElement('pre');p.textContent=(e.call_id?`Call ${e.call_id}\n`:'')+(e.model?e.model+'\n':'')+e.message+(e.reply?'\n\n'+e.reply.text:'');d.append(p);if(e.reply){const m=document.createElement('div');m.className='metrics';const u=e.reply.usage;m.textContent=`Input ${n(u.input)} · output ${n(u.output)} · cached subset ${n(u.cached_input)} · reasoning subset ${n(u.reasoning)} · USD ${n(u.cost_usd)} · ${e.reply.latency_ms} ms · ${u.source}`;d.append(m);}return d;}));
 }
 async function refreshCompany(){
+ const scope={origin:base,company:companyId};
  companyState=await api(`/api/companies/${encodeURIComponent(companyId)}`,{method:'POST',body:JSON.stringify({op:'status'})});
+ companyObservation={...scope,observed_at_ms:Date.now(),events:companyState.events};
  $('company-name').textContent=companyState.name;
  $('company-context').textContent=companyState.tiers.map(t=>`${t.tier}: ${t.records}`).join(' · ')||'No context records yet';
  renderLearning();
@@ -471,7 +473,7 @@ $('attention-form').onsubmit=async e=>{
  catch(e){$('attention-error').textContent=e.message;}finally{button.disabled=false;}
 };
 function selectedTask(){return currentTaskActivity(selectedTaskActivity,{origin:base,company:companyId,connected:backendOnline});}
-function resetTaskTelemetry(){companyTaskUsage=null;officePollEpoch++;localTasks.reset();}
+function resetTaskTelemetry(){companyObservation=null;companyTaskUsage=null;officePollEpoch++;localTasks.reset();}
 function dashboardTelemetry(){return {...officeTelemetry,task:selectedTask(),task_usage:currentTaskUsage(companyTaskUsage,{origin:base,company:companyId,connected:backendOnline})};}
 function updateSignal(){
  if(tourMode){
@@ -492,8 +494,12 @@ function updateSignal(){
 function updateSpriteActivity(){
  const resolved=new Set(events.filter(e=>e.reply).map(e=>e.call_id));
  const task=selectedTask();
+ const planning=ceoPlanningActivity(companyObservation,ceoSession,{origin:base,company:companyId,connected:backendOnline});
  for(const sprite of sprites){
   sprite.runtimeTaskId=null;sprite.runtimeTaskPhase=null;
+  if(sprite.id==='CEO'&&planning?.active){
+   sprite.busy=true;sprite.activity=planning.label;sprite.runtimeTaskId=planning.task_id;sprite.runtimeTaskPhase=planning.phase;continue;
+  }
   const matching=events.filter(e=>sameAgent(e.agent,sprite.id)&&(activityRole(e.role)===sprite.role||sprite.role==='worker'&&activityRole(e.role)==='judge'||['Operations Gent','Training Gent','CEO'].includes(sprite.id)));
   const latest=matching.at(-1);
   sprite.busy=backendOnline&&working&&!attention&&!!latest&&(['loading','tool_started','context_retrieved'].includes(latest.kind)||latest.kind==='call_started'&&!resolved.has(latest.call_id));

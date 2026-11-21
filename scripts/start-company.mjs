@@ -4,20 +4,30 @@ import {setTimeout as delay} from 'node:timers/promises';
 import {pathToFileURL} from 'node:url';
 import {createCompanyEnvLoader} from './company-env.mjs';
 import {startOwnedProcess,waitForReadiness,probeCompany} from './company-lifecycle.mjs';
+import {followCompany} from './company-events.mjs';
 
 export async function startCompany({root=process.cwd(),office='http://127.0.0.1:8788',company='we-need-gents-lc',
- env=process.env,signal,startupTimeoutMs=300000,shutdownTimeoutMs=5000,restartDelayMs=2000}={}){
+ env=process.env,signal,follow=false,startupTimeoutMs=300000,shutdownTimeoutMs=5000,restartDelayMs=2000}={}){
  const runtimeEnv={...env},owned=new Set();
- const requestedMcpTransport=runtimeEnv.GENTS_MCP_TRANSPORT;
+ const pinned=Object.fromEntries(['GENTS_MCP_TRANSPORT','GENTS_EMAIL_AUTO_START','GENTS_DISABLE_SCHEDULER','GENTS_OFFICE_ACTIVITY','GENTS_AUTO_RESUME'].filter(k=>k in runtimeEnv).map(k=>[k,runtimeEnv[k]]));
  const reload=createCompanyEnvLoader({root,env:runtimeEnv});
- const load=()=>{reload();if(requestedMcpTransport!==undefined)runtimeEnv.GENTS_MCP_TRANSPORT=requestedMcpTransport;if(!['stdio','sse'].includes(runtimeEnv.GENTS_MCP_TRANSPORT||'stdio'))throw new Error('GENTS_MCP_TRANSPORT must be stdio or sse');};
+ const load=()=>{reload();Object.assign(runtimeEnv,pinned,{GENTS_LOCAL_ONLY:'1',HF_HUB_OFFLINE:'1',HF_HUB_DISABLE_TELEMETRY:'1',TRANSFORMERS_OFFLINE:'1'});if(!['stdio','sse'].includes(runtimeEnv.GENTS_MCP_TRANSPORT||'stdio'))throw new Error('GENTS_MCP_TRANSPORT must be stdio or sse');};
+ const watcher=new AbortController();
+ let watching;
+ const ready=()=>{
+  console.log('\nTask input: '+office+'/?autoconnect=1');
+  console.log('Status: local harness + building UI ready; sealed MCP tools ready; local models load on CEO demand.');
+  console.log('Enter a task, select Plan with the CEO, then review its proposal in the CEO panel.');
+  console.log('Live logs: this terminal (JSON event metadata; private content stays in the UI). Ctrl+C stops owned processes.');
+  if(follow&&!watching)watching=followCompany({origin:office,company,signal:watcher.signal});
+ };
  const launch=(command,args,options={})=>{
   signal?.throwIfAborted();
   const handle=startOwnedProcess(command,args,{cwd:root,stdio:'inherit',env:runtimeEnv,...options});
   owned.add(handle);return handle;
  };
  const close=async handle=>{if(handle){await handle.stop('SIGTERM',shutdownTimeoutMs);owned.delete(handle);}};
- const abort=()=>{for(const handle of owned)void handle.stop('SIGTERM',shutdownTimeoutMs).catch(error=>console.error(error.message));};
+ const abort=()=>{watcher.abort();for(const handle of owned)void handle.stop('SIGTERM',shutdownTimeoutMs).catch(error=>console.error(error.message));};
  signal?.addEventListener('abort',abort,{once:true});
  async function run(command,args,options={}){
   const handle=launch(command,args,options);
@@ -41,7 +51,7 @@ export async function startCompany({root=process.cwd(),office='http://127.0.0.1:
   if(await run('python3',['scripts/gents.py','doctor'])!==0)return 1;
   const probe=(probeSignal,startupId)=>probeCompany({origin:office,transport:runtimeEnv.GENTS_MCP_TRANSPORT||'stdio',startupId,signal:probeSignal});
   if(await probe(signal)){
-   await ensureCompany();signal?.throwIfAborted();openOffice();console.log('The company is already running at '+office);return 0;
+   await ensureCompany();signal?.throwIfAborted();openOffice();console.log('Reusing the company at '+office);ready();if(watching)await watching;return 0;
   }
   for(;;){
    signal?.throwIfAborted();load();
@@ -60,6 +70,7 @@ export async function startCompany({root=process.cwd(),office='http://127.0.0.1:
      inbox.child.once('error',()=>console.error('Email request listener could not start; check local configuration'));
     }
     if(!opened){openOffice();opened=true;}
+    ready();
     console.log('\nThe Gents office control plane and native bundle are ready at '+office+'.');
     console.log('Keep this terminal open. Models load on demand; readiness does not establish task completion.');
     console.log('Paid inference is disabled by the local company launcher. Ctrl-C stops its owned processes.\n');
@@ -76,13 +87,16 @@ export async function startCompany({root=process.cwd(),office='http://127.0.0.1:
    }finally{await close(inbox);await close(awake);await close(harness);}
   }
  }catch(error){if(signal?.aborted)return 0;console.error(error.message);return 1;}
- finally{signal?.removeEventListener('abort',abort);await Promise.all([...owned].map(close));}
+ finally{watcher.abort();await watching;signal?.removeEventListener('abort',abort);await Promise.all([...owned].map(close));}
 }
 
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  const controller=new AbortController();
  const stop=()=>controller.abort(new Error('Company launcher stopped'));
  process.on('SIGINT',stop);process.on('SIGTERM',stop);
- try{process.exitCode=await startCompany({signal:controller.signal});}
+ // The interactive launcher does not start an email intake or background
+ // research campaign unless explicitly requested in its process environment.
+ const env={...process.env,GENTS_EMAIL_AUTO_START:process.env.GENTS_EMAIL_AUTO_START||'0',GENTS_DISABLE_SCHEDULER:process.env.GENTS_DISABLE_SCHEDULER||'1',GENTS_OFFICE_ACTIVITY:process.env.GENTS_OFFICE_ACTIVITY||'0',GENTS_AUTO_RESUME:process.env.GENTS_AUTO_RESUME||'0'};
+ try{process.exitCode=await startCompany({signal:controller.signal,env,follow:true});}
  finally{process.off('SIGINT',stop);process.off('SIGTERM',stop);}
 }

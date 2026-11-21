@@ -6,6 +6,10 @@ use serde_json::{json, Value};
 use std::sync::atomic::AtomicBool;
 use std::time::Instant;
 
+// The six-actor company planning contract exceeds 16K tokens. Explicit GGUF
+// profiles may reserve 32K; runtime fit and observed slot checks still apply.
+pub const MAX_LOCAL_CONTEXT: usize = 32768;
+
 #[derive(Clone, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Model {
@@ -42,10 +46,16 @@ impl Model {
             bail!("local_reasoning_tokens requires native local inference and 0..4096 tokens");
         }
         if self.context_tokens.is_some_and(|tokens| {
-            !matches!(self.provider.as_str(), "local" | "mlx") || !(2048..=16384).contains(&tokens)
+            let maximum = if self.provider == "local" {
+                MAX_LOCAL_CONTEXT as u32
+            } else {
+                16384
+            };
+            !matches!(self.provider.as_str(), "local" | "mlx")
+                || !(2048..=maximum).contains(&tokens)
         }) {
             bail!(
-                "context_tokens currently requires owned local or MLX inference and 2048..16384 tokens"
+                "context_tokens requires owned inference: local GGUF 2048..32768, MLX 2048..16384"
             );
         }
         if self.adapter.is_some() && self.provider != "mlx" {
@@ -641,7 +651,9 @@ mod tests {
         let model = json!({"provider":"local","model":"candidate","path":"models/candidate.gguf","context_tokens":8192});
         let mut value: Model = serde_json::from_value(model).unwrap();
         value.validate().unwrap();
-        for cap in [0, 1024, 16385] {
+        value.context_tokens = Some(32768);
+        value.validate().unwrap();
+        for cap in [0, 1024, 32769] {
             value.context_tokens = Some(cap);
             assert!(value.validate().is_err());
         }
@@ -649,6 +661,9 @@ mod tests {
         value.provider = "mlx".into();
         value.path = Some("models/fixture-mlx".into());
         value.validate().unwrap();
+        value.context_tokens = Some(32768);
+        assert!(value.validate().is_err());
+        value.context_tokens = Some(8192);
         value.provider = "mock".into();
         assert!(value.validate().is_err());
     }

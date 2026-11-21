@@ -1793,7 +1793,9 @@ async fn main() -> Result<()> {
     {
         tokio::spawn(task_native::monitor(s.clone(), std::env::current_dir()?));
     }
-    if s.config.company_tools || s.config.enterprise.is_some() {
+    if (s.config.company_tools || s.config.enterprise.is_some())
+        && std::env::var("GENTS_AUTO_RESUME").as_deref() != Ok("0")
+    {
         let mut runs = s.runs.lock().await;
         let mut resumable = Vec::new();
         for (id, run) in runs.iter_mut() {

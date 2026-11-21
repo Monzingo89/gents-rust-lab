@@ -1,0 +1,1020 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-21",
+  "head": "4a72d483ea8c1ea428e6cd042c315966f1766f05",
+  "scope": "First-party Rust/Python cleanup; preserves existing dirty work and monorepo boundaries",
+  "tools": {
+    "ruff": "0.17.6 defaults; no repository configuration or new suppressions",
+    "mypy": {
+      "checker": "Mypy 2.4.1 in temporary isolated development environment",
+      "python_version": "3.12",
+      "flags": [
+        "--explicit-package-bases"
+      ],
+      "runtime_interpreters": [
+        ".venv-inference/bin/python",
+        ".venv-media/bin/python"
+      ],
+      "official_stub_packages": [
+        "types-Markdown==3.11.3.20261108",
+        "types-reportlab==5.1.0.20261104"
+      ],
+      "stub_contents_modified": false,
+      "diagnostic_suppression_flags": [],
+      "fixture_imports_use_actual_candidate_and_company_test_files": true
+    },
+    "runtime_python": "3.12.13; separate inference/media environments"
+  },
+  "changes": {
+    "python_files_with_content_edits": [
+      "scripts/acquire_audio_training_checkpoint.py",
+      "scripts/architecture_native_probe.py",
+      "scripts/audio_inspect_interop.py",
+      "scripts/audio_timing_experiment.py",
+      "scripts/audio_weight_interpolation.py",
+      "scripts/audit-desktop-dependencies.py",
+      "scripts/autonomy_live_smoke.py",
+      "scripts/company_factory_smoke.py",
+      "scripts/company_schedule.py",
+      "scripts/convert_audio_checkpoint_sandboxed.py",
+      "scripts/coordination_smoke.py",
+      "scripts/experiment_evaluation.py",
+      "scripts/frozen_artifact_gate_smoke.py",
+      "scripts/inference_budget_smoke.py",
+      "scripts/interactive_owner_ui_fixture.py",
+      "scripts/local_trial.py",
+      "scripts/media-routing-native-probe.py",
+      "scripts/model_provenance.py",
+      "scripts/model_security_inspection.py",
+      "scripts/owned_discovery_smoke.py",
+      "scripts/prepare_weight_reconciliation.py",
+      "scripts/quarter_report.py",
+      "scripts/review_protocol_smoke.py",
+      "scripts/run_audio_reconstruction.py",
+      "scripts/run_audio_timing_experiment.py",
+      "scripts/run_audio_timing_synthesis.py",
+      "scripts/run_audio_voice_parity.py",
+      "scripts/run_audio_weight_interpolation.py",
+      "scripts/run_image_weight_training.py",
+      "scripts/rust_proposal_feedback_smoke.py",
+      "scripts/task_engine_live.py",
+      "scripts/task_model_discovery.py",
+      "scripts/test_company_schedule.py",
+      "scripts/test_desktop_backports.py",
+      "scripts/test_enterprise_campaign.py",
+      "scripts/test_experiment_evaluation.py",
+      "scripts/test_local_evaluate.py",
+      "scripts/test_local_sqlite.py",
+      "scripts/test_local_trial.py",
+      "scripts/test_mcp_curriculum.py",
+      "scripts/test_task_evidence.py",
+      "scripts/verify_coordination_candidate.py",
+      "scripts/verify_introduction.py",
+      "scripts/verify_task_angular_reports.py"
+    ],
+    "shebang_entrypoints_made_executable": [
+      "scripts/acquire_audio_training_checkpoint.py",
+      "scripts/audit-desktop-dependencies.py",
+      "scripts/autonomy_live_smoke.py",
+      "scripts/autonomy_smoke.py",
+      "scripts/company_inbox.py",
+      "scripts/company_schedule.py",
+      "scripts/company_tools.py",
+      "scripts/convert_audio_checkpoint_sandboxed.py",
+      "scripts/document_renderer.py",
+      "scripts/enterprise_campaign.py",
+      "scripts/evaluate_image_weight_baseline.py",
+      "scripts/evaluate_image_weight_candidate.py",
+      "scripts/gents.py",
+      "scripts/mcp-curriculum-journal.py",
+      "scripts/mlx_prompt_tokens.py",
+      "scripts/model_capability_report.py",
+      "scripts/model_improvement_inventory.py",
+      "scripts/model_inventory.py",
+      "scripts/model_provenance.py",
+      "scripts/model_security_scan.py",
+      "scripts/paired_campaign.py",
+      "scripts/pdf_tools.py",
+      "scripts/prepare_audio_weight_dataset.py",
+      "scripts/prepare_image_count_experiment.py",
+      "scripts/prepare_image_weight_experiment.py",
+      "scripts/prepare_phi_weight_experiment.py",
+      "scripts/prepare_task_angular_sdk.py",
+      "scripts/prepare_weight_diverse_events.py",
+      "scripts/prepare_weight_experiment.py",
+      "scripts/prepare_weight_output_intent.py",
+      "scripts/prepare_weight_reconciliation.py",
+      "scripts/quarter_report.py",
+      "scripts/role_probe_campaign.py",
+      "scripts/run_audio_reconstruction.py",
+      "scripts/run_audio_timing_experiment.py",
+      "scripts/run_audio_timing_synthesis.py",
+      "scripts/run_audio_voice_parity.py",
+      "scripts/run_audio_weight_interpolation.py",
+      "scripts/run_image_weight_training.py",
+      "scripts/task_angular_boundary_smoke.py",
+      "scripts/task_angular_validation_smoke.py",
+      "scripts/task_cosmos_emulator_live.py",
+      "scripts/task_engine_live.py",
+      "scripts/task_intake_live.py",
+      "scripts/task_mlx_live.py",
+      "scripts/task_model_discovery.py",
+      "scripts/task_native_smoke.py",
+      "scripts/task_validation_smoke.py",
+      "scripts/task_workflows_smoke.py",
+      "scripts/task_workspace_live.py",
+      "scripts/train_role.py",
+      "scripts/verify_task_angular_reports.py",
+      "scripts/verify_task_cosmos_report.py",
+      "scripts/verify_weight_experiment.py"
+    ],
+    "rust_implementation_changes": 0,
+    "protected_sources_unchanged": [
+      "docs/evidence/focused-observer-test-patch-2026-11-15.py",
+      "docs/evidence/python-review-candidate-2026-11-15.py",
+      "docs/evidence/python-review-host-checks-2026-11-15.py",
+      "scripts/fixtures/public-research/acceptance.py",
+      "scripts/fixtures/showcase-observer/acceptance.py",
+      "scripts/fixtures/showcase-observer/company_quality.py",
+      "scripts/fixtures/showcase-observer/company_tests.py",
+      "scripts/public_research.py",
+      "scripts/showcase_observer.py"
+    ],
+    "cleanup_python_content_edits": [
+      "scripts/architecture_native_probe.py",
+      "scripts/audio_inspect_interop.py",
+      "scripts/audio_timing_experiment.py",
+      "scripts/audio_weight_interpolation.py",
+      "scripts/audit-desktop-dependencies.py",
+      "scripts/autonomy_live_smoke.py",
+      "scripts/company_factory_smoke.py",
+      "scripts/company_schedule.py",
+      "scripts/convert_audio_checkpoint_sandboxed.py",
+      "scripts/coordination_smoke.py",
+      "scripts/experiment_evaluation.py",
+      "scripts/frozen_artifact_gate_smoke.py",
+      "scripts/inference_budget_smoke.py",
+      "scripts/interactive_owner_ui_fixture.py",
+      "scripts/local_trial.py",
+      "scripts/media-routing-native-probe.py",
+      "scripts/model_provenance.py",
+      "scripts/model_security_inspection.py",
+      "scripts/owned_discovery_smoke.py",
+      "scripts/prepare_weight_reconciliation.py",
+      "scripts/quarter_report.py",
+      "scripts/review_protocol_smoke.py",
+      "scripts/run_audio_reconstruction.py",
+      "scripts/run_audio_timing_experiment.py",
+      "scripts/run_audio_timing_synthesis.py",
+      "scripts/run_audio_voice_parity.py",
+      "scripts/run_audio_weight_interpolation.py",
+      "scripts/run_image_weight_training.py",
+      "scripts/rust_proposal_feedback_smoke.py",
+      "scripts/task_engine_live.py",
+      "scripts/task_model_discovery.py",
+      "scripts/test_company_schedule.py",
+      "scripts/test_desktop_backports.py",
+      "scripts/test_enterprise_campaign.py",
+      "scripts/test_experiment_evaluation.py",
+      "scripts/test_local_evaluate.py",
+      "scripts/test_local_sqlite.py",
+      "scripts/test_local_trial.py",
+      "scripts/test_mcp_curriculum.py",
+      "scripts/test_task_evidence.py",
+      "scripts/verify_coordination_candidate.py",
+      "scripts/verify_introduction.py",
+      "scripts/verify_task_angular_reports.py"
+    ],
+    "independent_python_content_edit_preserved": "scripts/acquire_audio_training_checkpoint.py"
+  },
+  "validation": {
+    "root_and_desktop_rustfmt": "passed",
+    "root_and_desktop_clippy_all_targets_all_features_strict_offline_locked": "passed; fix mode also executed",
+    "rust_tests": {
+      "exit_code": 0,
+      "elapsed_seconds": 550.12,
+      "totals": [
+        712,
+        0,
+        34
+      ]
+    },
+    "python_tests": [
+      {
+        "environment": "media",
+        "exit_code": 0,
+        "elapsed_seconds": 10.16
+      },
+      {
+        "environment": "documents",
+        "exit_code": 0,
+        "elapsed_seconds": 0.41
+      }
+    ],
+    "python_test_total_passed": 276,
+    "python_syntax_files": 166,
+    "ruff_format_files": 166,
+    "office_build": "passed with installed Vite 7.3.7; does not qualify independent requested version upgrades",
+    "offline_suite": {
+      "report": "data/local-evaluation/8994be34-6088-4c5b-8332-c883537f7a0f/report.json",
+      "sha256": "7378c17faa3fe8cc3f6b2378f4e2f23887c5cd920808981046120fb6ab38cccc",
+      "passed_checks": 11,
+      "measurements": {
+        "verified_real_tasks": null,
+        "generative_model_calls": 0,
+        "paid_calls": 0,
+        "actual_provider_cost_usd": 0,
+        "estimated_total_cost_usd": null,
+        "resident_bytes": null,
+        "model_context_tokens": null,
+        "cache_hit_ratio": null
+      }
+    },
+    "additional_integration": {
+      "report": "data/lint-cleanup/03f9162f-d9cf-41ed-949a-0746ff04e47b/report.json",
+      "sha256": "bb289a5e77000e7183c54ea5fcf3010e9d01462af420537f74251c8ccb633681",
+      "passed_checks": 10,
+      "note": "One entry is the full eleven-check offline suite; the other nine exercise changed smoke paths"
+    }
+  },
+  "unresolved": {
+    "ruff_exit_code": 1,
+    "ruff_diagnostics": [
+      {
+        "cell": null,
+        "code": "B023",
+        "end_location": {
+          "column": 22,
+          "row": 16
+        },
+        "filename": "docs/evidence/focused-observer-test-patch-2026-11-15.py",
+        "location": {
+          "column": 17,
+          "row": 16
+        },
+        "message": "Function definition does not bind loop variable `calls`",
+        "name": "function-uses-loop-variable",
+        "noqa_row": 16,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/function-uses-loop-variable"
+      },
+      {
+        "cell": null,
+        "code": "B023",
+        "end_location": {
+          "column": 76,
+          "row": 143
+        },
+        "filename": "docs/evidence/focused-observer-test-patch-2026-11-15.py",
+        "location": {
+          "column": 73,
+          "row": 143
+        },
+        "message": "Function definition does not bind loop variable `bad`",
+        "name": "function-uses-loop-variable",
+        "noqa_row": 143,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/function-uses-loop-variable"
+      },
+      {
+        "cell": null,
+        "code": "BLE001",
+        "end_location": {
+          "column": 21,
+          "row": 82
+        },
+        "filename": "mcp/media/worker.py",
+        "location": {
+          "column": 12,
+          "row": 82
+        },
+        "message": "Do not catch blind exception: `Exception`",
+        "name": "blind-except",
+        "noqa_row": 82,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/blind-except"
+      },
+      {
+        "cell": null,
+        "code": "TRY004",
+        "end_location": {
+          "column": 65,
+          "row": 33
+        },
+        "filename": "scripts/audio_checkpoint_conversion.py",
+        "location": {
+          "column": 9,
+          "row": 33
+        },
+        "message": "Prefer `TypeError` exception for invalid type",
+        "name": "type-check-without-type-error",
+        "noqa_row": 33,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/type-check-without-type-error"
+      },
+      {
+        "cell": null,
+        "code": "BLE001",
+        "end_location": {
+          "column": 25,
+          "row": 89
+        },
+        "filename": "scripts/company_inbox.py",
+        "location": {
+          "column": 16,
+          "row": 89
+        },
+        "message": "Do not catch blind exception: `Exception`",
+        "name": "blind-except",
+        "noqa_row": 89,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/blind-except"
+      },
+      {
+        "cell": null,
+        "code": "BLE001",
+        "end_location": {
+          "column": 29,
+          "row": 289
+        },
+        "filename": "scripts/company_schedule.py",
+        "location": {
+          "column": 20,
+          "row": 289
+        },
+        "message": "Do not catch blind exception: `Exception`",
+        "name": "blind-except",
+        "noqa_row": 289,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/blind-except"
+      },
+      {
+        "cell": null,
+        "code": "BLE001",
+        "end_location": {
+          "column": 25,
+          "row": 308
+        },
+        "filename": "scripts/company_tools.py",
+        "location": {
+          "column": 16,
+          "row": 308
+        },
+        "message": "Do not catch blind exception: `Exception`",
+        "name": "blind-except",
+        "noqa_row": 308,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/blind-except"
+      },
+      {
+        "cell": null,
+        "code": "BLE001",
+        "end_location": {
+          "column": 21,
+          "row": 224
+        },
+        "filename": "scripts/document_renderer.py",
+        "location": {
+          "column": 12,
+          "row": 224
+        },
+        "message": "Do not catch blind exception: `Exception`",
+        "name": "blind-except",
+        "noqa_row": 224,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/blind-except"
+      },
+      {
+        "cell": null,
+        "code": "BLE001",
+        "end_location": {
+          "column": 25,
+          "row": 1212
+        },
+        "filename": "scripts/enterprise_campaign.py",
+        "location": {
+          "column": 16,
+          "row": 1212
+        },
+        "message": "Do not catch blind exception: `Exception`",
+        "name": "blind-except",
+        "noqa_row": 1212,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/blind-except"
+      },
+      {
+        "cell": null,
+        "code": "TRY004",
+        "end_location": {
+          "column": 67,
+          "row": 476
+        },
+        "filename": "scripts/experiment_loop.py",
+        "location": {
+          "column": 21,
+          "row": 476
+        },
+        "message": "Prefer `TypeError` exception for invalid type",
+        "name": "type-check-without-type-error",
+        "noqa_row": 476,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/type-check-without-type-error"
+      },
+      {
+        "cell": null,
+        "code": "B023",
+        "end_location": {
+          "column": 73,
+          "row": 108
+        },
+        "filename": "scripts/fixtures/showcase-observer/acceptance.py",
+        "location": {
+          "column": 69,
+          "row": 108
+        },
+        "message": "Function definition does not bind loop variable `cost`",
+        "name": "function-uses-loop-variable",
+        "noqa_row": 108,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/function-uses-loop-variable"
+      },
+      {
+        "cell": null,
+        "code": "B023",
+        "end_location": {
+          "column": 76,
+          "row": 199
+        },
+        "filename": "scripts/fixtures/showcase-observer/acceptance.py",
+        "location": {
+          "column": 71,
+          "row": 199
+        },
+        "message": "Function definition does not bind loop variable `reply`",
+        "name": "function-uses-loop-variable",
+        "noqa_row": 199,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/function-uses-loop-variable"
+      },
+      {
+        "cell": null,
+        "code": "B023",
+        "end_location": {
+          "column": 43,
+          "row": 262
+        },
+        "filename": "scripts/fixtures/showcase-observer/acceptance.py",
+        "location": {
+          "column": 37,
+          "row": 262
+        },
+        "message": "Function definition does not bind loop variable `status`",
+        "name": "function-uses-loop-variable",
+        "noqa_row": 262,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/function-uses-loop-variable"
+      },
+      {
+        "cell": null,
+        "code": "B023",
+        "end_location": {
+          "column": 43,
+          "row": 308
+        },
+        "filename": "scripts/fixtures/showcase-observer/acceptance.py",
+        "location": {
+          "column": 37,
+          "row": 308
+        },
+        "message": "Function definition does not bind loop variable `status`",
+        "name": "function-uses-loop-variable",
+        "noqa_row": 308,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/function-uses-loop-variable"
+      },
+      {
+        "cell": null,
+        "code": "B023",
+        "end_location": {
+          "column": 43,
+          "row": 330
+        },
+        "filename": "scripts/fixtures/showcase-observer/acceptance.py",
+        "location": {
+          "column": 37,
+          "row": 330
+        },
+        "message": "Function definition does not bind loop variable `status`",
+        "name": "function-uses-loop-variable",
+        "noqa_row": 330,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/function-uses-loop-variable"
+      },
+      {
+        "cell": null,
+        "code": "SIM117",
+        "end_location": {
+          "column": 49,
+          "row": 88
+        },
+        "filename": "scripts/fixtures/showcase-observer/company_tests.py",
+        "location": {
+          "column": 13,
+          "row": 85
+        },
+        "message": "Use a single `with` statement with multiple contexts instead of nested `with` statements",
+        "name": "multiple-with-statements",
+        "noqa_row": 85,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/multiple-with-statements"
+      },
+      {
+        "cell": null,
+        "code": "B023",
+        "end_location": {
+          "column": 26,
+          "row": 102
+        },
+        "filename": "scripts/fixtures/showcase-observer/company_tests.py",
+        "location": {
+          "column": 21,
+          "row": 102
+        },
+        "message": "Function definition does not bind loop variable `calls`",
+        "name": "function-uses-loop-variable",
+        "noqa_row": 102,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/function-uses-loop-variable"
+      },
+      {
+        "cell": null,
+        "code": "B023",
+        "end_location": {
+          "column": 80,
+          "row": 268
+        },
+        "filename": "scripts/fixtures/showcase-observer/company_tests.py",
+        "location": {
+          "column": 77,
+          "row": 268
+        },
+        "message": "Function definition does not bind loop variable `bad`",
+        "name": "function-uses-loop-variable",
+        "noqa_row": 268,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/function-uses-loop-variable"
+      },
+      {
+        "cell": null,
+        "code": "S110",
+        "end_location": {
+          "column": 17,
+          "row": 434
+        },
+        "filename": "scripts/local_sqlite.py",
+        "location": {
+          "column": 9,
+          "row": 433
+        },
+        "message": "`try`-`except`-`pass` detected, consider logging the exception",
+        "name": "try-except-pass",
+        "noqa_row": 433,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/try-except-pass"
+      },
+      {
+        "cell": null,
+        "code": "BLE001",
+        "end_location": {
+          "column": 25,
+          "row": 433
+        },
+        "filename": "scripts/local_sqlite.py",
+        "location": {
+          "column": 16,
+          "row": 433
+        },
+        "message": "Do not catch blind exception: `Exception`",
+        "name": "blind-except",
+        "noqa_row": 433,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/blind-except"
+      },
+      {
+        "cell": null,
+        "code": "TRY004",
+        "end_location": {
+          "column": 76,
+          "row": 190
+        },
+        "filename": "scripts/mcp-curriculum-journal.py",
+        "location": {
+          "column": 21,
+          "row": 190
+        },
+        "message": "Prefer `TypeError` exception for invalid type",
+        "name": "type-check-without-type-error",
+        "noqa_row": 190,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/type-check-without-type-error"
+      },
+      {
+        "cell": null,
+        "code": "BLE001",
+        "end_location": {
+          "column": 21,
+          "row": 458
+        },
+        "filename": "scripts/mcp-curriculum-journal.py",
+        "location": {
+          "column": 12,
+          "row": 458
+        },
+        "message": "Do not catch blind exception: `Exception`",
+        "name": "blind-except",
+        "noqa_row": 458,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/blind-except"
+      },
+      {
+        "cell": null,
+        "code": "BLE001",
+        "end_location": {
+          "column": 25,
+          "row": 107
+        },
+        "filename": "scripts/media-routing-native-probe.py",
+        "location": {
+          "column": 16,
+          "row": 107
+        },
+        "message": "Do not catch blind exception: `Exception`",
+        "name": "blind-except",
+        "noqa_row": 107,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/blind-except"
+      },
+      {
+        "cell": null,
+        "code": "TRY004",
+        "end_location": {
+          "column": 54,
+          "row": 52
+        },
+        "filename": "scripts/mlx_prompt_tokens.py",
+        "location": {
+          "column": 9,
+          "row": 52
+        },
+        "message": "Prefer `TypeError` exception for invalid type",
+        "name": "type-check-without-type-error",
+        "noqa_row": 52,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/type-check-without-type-error"
+      },
+      {
+        "cell": null,
+        "code": "BLE001",
+        "end_location": {
+          "column": 21,
+          "row": 77
+        },
+        "filename": "scripts/mlx_prompt_tokens.py",
+        "location": {
+          "column": 12,
+          "row": 77
+        },
+        "message": "Do not catch blind exception: `Exception`",
+        "name": "blind-except",
+        "noqa_row": 77,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/blind-except"
+      },
+      {
+        "cell": null,
+        "code": "TRY004",
+        "end_location": {
+          "column": 58,
+          "row": 88
+        },
+        "filename": "scripts/model_security_inspection.py",
+        "location": {
+          "column": 13,
+          "row": 88
+        },
+        "message": "Prefer `TypeError` exception for invalid type",
+        "name": "type-check-without-type-error",
+        "noqa_row": 88,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/type-check-without-type-error"
+      },
+      {
+        "cell": null,
+        "code": "TRY004",
+        "end_location": {
+          "column": 77,
+          "row": 160
+        },
+        "filename": "scripts/model_security_inspection.py",
+        "location": {
+          "column": 29,
+          "row": 160
+        },
+        "message": "Prefer `TypeError` exception for invalid type",
+        "name": "type-check-without-type-error",
+        "noqa_row": 160,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/type-check-without-type-error"
+      },
+      {
+        "cell": null,
+        "code": "BLE001",
+        "end_location": {
+          "column": 25,
+          "row": 343
+        },
+        "filename": "scripts/paired_campaign.py",
+        "location": {
+          "column": 16,
+          "row": 343
+        },
+        "message": "Do not catch blind exception: `Exception`",
+        "name": "blind-except",
+        "noqa_row": 343,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/blind-except"
+      },
+      {
+        "cell": null,
+        "code": "BLE001",
+        "end_location": {
+          "column": 21,
+          "row": 149
+        },
+        "filename": "scripts/pdf_tools.py",
+        "location": {
+          "column": 12,
+          "row": 149
+        },
+        "message": "Do not catch blind exception: `Exception`",
+        "name": "blind-except",
+        "noqa_row": 149,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/blind-except"
+      },
+      {
+        "cell": null,
+        "code": "TRY004",
+        "end_location": {
+          "column": 56,
+          "row": 40
+        },
+        "filename": "scripts/python_snapshot_check.py",
+        "location": {
+          "column": 13,
+          "row": 40
+        },
+        "message": "Prefer `TypeError` exception for invalid type",
+        "name": "type-check-without-type-error",
+        "noqa_row": 40,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/type-check-without-type-error"
+      },
+      {
+        "cell": null,
+        "code": "PLW1509",
+        "end_location": {
+          "column": 18,
+          "row": 244
+        },
+        "filename": "scripts/python_snapshot_check.py",
+        "location": {
+          "column": 17,
+          "row": 242
+        },
+        "message": "`preexec_fn` argument is unsafe when using threads",
+        "name": "subprocess-popen-preexec-fn",
+        "noqa_row": 242,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/subprocess-popen-preexec-fn"
+      },
+      {
+        "cell": null,
+        "code": "PIE810",
+        "end_location": {
+          "column": 53,
+          "row": 28
+        },
+        "filename": "scripts/showcase_observer.py",
+        "location": {
+          "column": 8,
+          "row": 28
+        },
+        "message": "Call `startswith` once with a `tuple`",
+        "name": "multiple-starts-ends-with",
+        "noqa_row": 28,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/multiple-starts-ends-with"
+      },
+      {
+        "cell": null,
+        "code": "TRY004",
+        "end_location": {
+          "column": 52,
+          "row": 128
+        },
+        "filename": "scripts/showcase_observer.py",
+        "location": {
+          "column": 9,
+          "row": 128
+        },
+        "message": "Prefer `TypeError` exception for invalid type",
+        "name": "type-check-without-type-error",
+        "noqa_row": 128,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/type-check-without-type-error"
+      },
+      {
+        "cell": null,
+        "code": "TRY004",
+        "end_location": {
+          "column": 58,
+          "row": 143
+        },
+        "filename": "scripts/showcase_observer.py",
+        "location": {
+          "column": 9,
+          "row": 143
+        },
+        "message": "Prefer `TypeError` exception for invalid type",
+        "name": "type-check-without-type-error",
+        "noqa_row": 143,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/type-check-without-type-error"
+      },
+      {
+        "cell": null,
+        "code": "TRY004",
+        "end_location": {
+          "column": 60,
+          "row": 152
+        },
+        "filename": "scripts/showcase_observer.py",
+        "location": {
+          "column": 9,
+          "row": 152
+        },
+        "message": "Prefer `TypeError` exception for invalid type",
+        "name": "type-check-without-type-error",
+        "noqa_row": 152,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/type-check-without-type-error"
+      },
+      {
+        "cell": null,
+        "code": "TRY004",
+        "end_location": {
+          "column": 53,
+          "row": 207
+        },
+        "filename": "scripts/showcase_observer.py",
+        "location": {
+          "column": 9,
+          "row": 207
+        },
+        "message": "Prefer `TypeError` exception for invalid type",
+        "name": "type-check-without-type-error",
+        "noqa_row": 207,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/type-check-without-type-error"
+      },
+      {
+        "cell": null,
+        "code": "TRY004",
+        "end_location": {
+          "column": 63,
+          "row": 214
+        },
+        "filename": "scripts/showcase_observer.py",
+        "location": {
+          "column": 9,
+          "row": 214
+        },
+        "message": "Prefer `TypeError` exception for invalid type",
+        "name": "type-check-without-type-error",
+        "noqa_row": 214,
+        "severity": "error",
+        "url": "https://docs.astral.sh/ruff/rules/type-check-without-type-error"
+      }
+    ],
+    "ruff_counts": {
+      "B023": 9,
+      "BLE001": 12,
+      "TRY004": 12,
+      "SIM117": 1,
+      "S110": 1,
+      "PLW1509": 1,
+      "PIE810": 1
+    },
+    "frozen_source_diagnostics": 16,
+    "mypy_errors": [
+      "scripts/audio_voice_parity_probe.py:9: error: Skipping analyzing \"onnxruntime\": module is installed, but missing library stubs or py.typed marker  [import-untyped]",
+      "mcp/media/worker.py:43: error: Skipping analyzing \"mflux.models.flux2.variants\": module is installed, but missing library stubs or py.typed marker  [import-untyped]"
+    ],
+    "mypy_groups": [
+      {
+        "group": "inference",
+        "runtime": ".venv-inference/bin/python",
+        "targets": 136,
+        "exit_code": 0,
+        "errors": []
+      },
+      {
+        "group": "media",
+        "runtime": ".venv-media/bin/python",
+        "targets": 22,
+        "exit_code": 1,
+        "errors": [
+          "scripts/audio_voice_parity_probe.py:9: error: Skipping analyzing \"onnxruntime\": module is installed, but missing library stubs or py.typed marker  [import-untyped]",
+          "mcp/media/worker.py:43: error: Skipping analyzing \"mflux.models.flux2.variants\": module is installed, but missing library stubs or py.typed marker  [import-untyped]"
+        ]
+      },
+      {
+        "group": "docs-companies-we-need-getns-llc-owner-evaluation-evaluate.py",
+        "runtime": ".venv-inference/bin/python",
+        "targets": 1,
+        "exit_code": 0,
+        "errors": []
+      },
+      {
+        "group": "docs-evidence-focused-observer-test-patch-2026-11-15.py",
+        "runtime": ".venv-inference/bin/python",
+        "targets": 1,
+        "exit_code": 0,
+        "errors": []
+      },
+      {
+        "group": "docs-evidence-python-review-candidate-2026-11-15.py",
+        "runtime": ".venv-inference/bin/python",
+        "targets": 1,
+        "exit_code": 0,
+        "errors": []
+      },
+      {
+        "group": "docs-evidence-python-review-host-checks-2026-11-15.py",
+        "runtime": ".venv-inference/bin/python",
+        "targets": 1,
+        "exit_code": 0,
+        "errors": []
+      },
+      {
+        "group": "scripts-fixtures-public-research-acceptance.py",
+        "runtime": ".venv-inference/bin/python",
+        "targets": 1,
+        "exit_code": 0,
+        "errors": []
+      },
+      {
+        "group": "scripts-fixtures-showcase-observer-acceptance.py",
+        "runtime": ".venv-inference/bin/python",
+        "targets": 1,
+        "exit_code": 0,
+        "errors": []
+      },
+      {
+        "group": "scripts-fixtures-showcase-observer-company_quality.py",
+        "runtime": ".venv-inference/bin/python",
+        "targets": 1,
+        "exit_code": 0,
+        "errors": []
+      },
+      {
+        "group": "scripts-fixtures-showcase-observer-company_tests.py",
+        "runtime": ".venv-inference/bin/python",
+        "targets": 1,
+        "exit_code": 0,
+        "errors": []
+      }
+    ],
+    "preexisting_evidence_hash_drift": true,
+    "later_independent_dependency_version_edit_preserved": "package.json",
+    "independent_downloader_trust_store_edit_preserved": "scripts/acquire_audio_training_checkpoint.py"
+  },
+  "preservation": {
+    "head_unchanged": true,
+    "rust_sources_manifests_and_locks_unchanged": true,
+    "third_party_vendor_sources_unchanged": true,
+    "frozen_sources_match_turn_start": true,
+    "no_diagnostic_suppressions_added": true,
+    "runtime_environments_not_modified": true
+  },
+  "logs": "data/lint-cleanup/03f9162f-d9cf-41ed-949a-0746ff04e47b/tooling-logs",
+  "limitations": [
+    "Remaining lint findings deliberately remain nonzero and visible",
+    "Mypy normal coverage does not prove unannotated function-body type safety",
+    "Real-model generation and routing quality not requalified",
+    "No Linux/iOS/desktop-GUI runtime verification",
+    "Historical acceptance records and mismatched frozen bytes were not rewritten",
+    "Late independent downloader CA-store change was preserved and is not qualified by the preceding cleanup tests"
+  ]
+}

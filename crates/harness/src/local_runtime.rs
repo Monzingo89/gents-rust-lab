@@ -112,7 +112,7 @@ impl LocalRuntime {
         let generation = crate::local_generation::GenerationBudget::for_model(model, max_tokens)?;
         generation.arguments(self.bounded_reasoning_supported)?;
         let context_tokens = model.context_tokens.unwrap_or(16384) as usize;
-        if !(2048..=16384).contains(&context_tokens)
+        if !(2048..=crate::provider::MAX_LOCAL_CONTEXT).contains(&context_tokens)
             || (model.provider == "local"
                 && generation.total_generation_tokens as usize + 256 >= context_tokens)
         {

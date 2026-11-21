@@ -1,4 +1,5 @@
 """Pure evaluation-contract tests: never start a model or backend."""
+
 import unittest
 
 from paired_campaign import cases, expected
@@ -25,14 +26,18 @@ class EvaluationContractTests(unittest.TestCase):
         record = cases(2731, "train")[2]
         result = expected(record)
         self.assertLess(record["payments"][2]["cents"], 0)
-        self.assertEqual(result["observed_cents"], sum(p["cents"] for p in record["payments"]))
+        self.assertEqual(
+            result["observed_cents"], sum(p["cents"] for p in record["payments"])
+        )
         self.assertEqual(result["status"], "duplicate")
 
     def test_fresh_holdout_preserves_full_status_coverage(self):
         for seed in (17, 93615, 734252):
             records = cases(seed, "heldout")
-            self.assertEqual({expected(row)["status"] for row in records},
-                             {"matched", "mismatch", "duplicate", "invalid_currency", "missing"})
+            self.assertEqual(
+                {expected(row)["status"] for row in records},
+                {"matched", "mismatch", "duplicate", "invalid_currency", "missing"},
+            )
 
 
 if __name__ == "__main__":

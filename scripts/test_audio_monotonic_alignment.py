@@ -2,7 +2,6 @@ import itertools
 import unittest
 
 import numpy as np
-
 from audio_monotonic_alignment import maximum_path
 
 
@@ -14,7 +13,9 @@ class AlignmentTests(unittest.TestCase):
                 scores = rng.normal(size=(frames, tokens))
                 alternatives = []
                 for boundaries in itertools.combinations(range(1, frames), tokens - 1):
-                    indices = np.searchsorted(boundaries, np.arange(frames), side='right')
+                    indices = np.searchsorted(
+                        boundaries, np.arange(frames), side="right"
+                    )
                     alternatives.append(scores[np.arange(frames), indices].sum())
                 path = maximum_path(scores)
                 self.assertAlmostEqual(float((scores * path).sum()), max(alternatives))
@@ -25,10 +26,10 @@ class AlignmentTests(unittest.TestCase):
                 np.testing.assert_array_equal(path, maximum_path(scores))
 
     def test_invalid_inputs(self):
-        for scores in (np.zeros((2, 3)), np.zeros((0, 0)), [[float('nan')]], [1, 2]):
+        for scores in (np.zeros((2, 3)), np.zeros((0, 0)), [[float("nan")]], [1, 2]):
             with self.assertRaises(ValueError):
                 maximum_path(scores)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

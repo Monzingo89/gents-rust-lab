@@ -1,29 +1,39 @@
-from pathlib import Path
 import struct
 import tempfile
 import unittest
+from pathlib import Path
+
 import model_inventory as inventory
 
 
 class InventoryTests(unittest.TestCase):
     def test_candidate_manifest_is_pinned_without_claiming_enterprise_admission(self):
         import json
-        data = json.loads((inventory.ROOT / "config/enterprise-model-candidates.json").read_text())
+
+        data = json.loads(
+            (inventory.ROOT / "config/enterprise-model-candidates.json").read_text()
+        )
         self.assertTrue(data["admission"].startswith("pending_"))
         candidates = data["new_candidates"]
         self.assertEqual(len({item["base_id"] for item in candidates}), 3)
-        paths = [item["path"] for item in candidates] + data["preexisting_gguf_candidates_needing_provenance_review"]
+        paths = [item["path"] for item in candidates] + data[
+            "preexisting_gguf_candidates_needing_provenance_review"
+        ]
         self.assertEqual(len(set(paths)), 10)
         for item in candidates:
             self.assertRegex(item["source_revision"], r"^[a-f0-9]{40}$")
             self.assertRegex(item["sha256"], r"^[a-f0-9]{64}$")
-            self.assertLessEqual(item["evaluation_context_tokens"], item["documented_context_tokens"])
+            self.assertLessEqual(
+                item["evaluation_context_tokens"], item["documented_context_tokens"]
+            )
 
     def test_metadata_is_read_without_loading_tensor_payload(self):
         text = lambda value: struct.pack("<Q", len(value)) + value
         fixture = b"GGUF" + struct.pack("<IQQ", 3, 42, 2)
         fixture += text(b"general.name") + struct.pack("<I", 8) + text(b"Fixture base")
-        fixture += text(b"general.architecture") + struct.pack("<I", 8) + text(b"fixture")
+        fixture += (
+            text(b"general.architecture") + struct.pack("<I", 8) + text(b"fixture")
+        )
         with tempfile.TemporaryFile() as stream:
             stream.write(fixture)
             stream.seek(0)
@@ -57,7 +67,9 @@ class InventoryTests(unittest.TestCase):
                 (folder / "config.json").write_text('{"model_type":"phi"}')
             result = inventory.inventory(root=root)
             self.assertEqual(result["candidate_group_count"], 1)
-            self.assertEqual(len(result["candidate_identity_groups"][0]["artifacts"]), 2)
+            self.assertEqual(
+                len(result["candidate_identity_groups"][0]["artifacts"]), 2
+            )
             self.assertEqual(result["provenance_admitted_base_count"], 0)
 
     def test_cache_metadata_cannot_echo_arbitrary_text_as_an_etag(self):
@@ -70,7 +82,9 @@ class InventoryTests(unittest.TestCase):
             (folder / "config.json").write_text('{"model_type":"fixture"}')
             cache = folder / ".cache/huggingface/download"
             cache.mkdir(parents=True)
-            (cache / "model.safetensors.metadata").write_text("a" * 40 + "\nPRIVATE VALUE\n")
+            (cache / "model.safetensors.metadata").write_text(
+                "a" * 40 + "\nPRIVATE VALUE\n"
+            )
             result = inventory.artifact(weights, root=root)
             self.assertIsNone(result["cached_etag_claim"])
             self.assertNotIn("PRIVATE VALUE", str(result))

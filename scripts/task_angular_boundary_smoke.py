@@ -4,17 +4,18 @@
 Only temporary de-identified sentinels and host-held loopback sockets are used.
 No browser/model install, credentials, background service or paid provider.
 """
+
 import argparse
 import hashlib
 import json
 import os
-from pathlib import Path
 import signal
 import socket
 import subprocess
 import tempfile
+from pathlib import Path
 
-SOURCE = r'''
+SOURCE = r"""
 #include <arpa/inet.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -49,11 +50,17 @@ int main(int argc,char **argv) {
   printf("{\"outside_read_denied\":%s,\"outside_write_denied\":%s,\"oracle_read_denied\":%s,\"profile_write_allowed\":%s,\"asset_port_allowed\":%s,\"unrelated_loopback_denied\":%s,\"external_connect_denied\":%s,\"new_tcp_bind_denied\":%s,\"parent_argv_denied\":%s,\"shell_exec_denied\":%s}\n",read_denied?"true":"false",write_denied?"true":"false",oracle_denied?"true":"false",profile_write?"true":"false",asset_port?"true":"false",unrelated_port?"true":"false",external?"true":"false",bind_denied?"true":"false",argv_denied?"true":"false",exec_denied?"true":"false");
   return read_denied&&write_denied&&oracle_denied&&profile_write&&asset_port&&unrelated_port&&external&&bind_denied&&argv_denied&&exec_denied?0:1;
 }
-'''
+"""
 
 
 def bounded(command, **kwargs):
-    process = subprocess.Popen(command, start_new_session=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
+    process = subprocess.Popen(
+        command,
+        start_new_session=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        **kwargs,
+    )
     try:
         stdout, stderr = process.communicate(timeout=20)
     except subprocess.TimeoutExpired:
@@ -66,7 +73,9 @@ def bounded(command, **kwargs):
         except ProcessLookupError:
             pass
     if process.returncode:
-        raise RuntimeError(f"boundary probe exit {process.returncode}; stdout={stdout[:2000]!r}; stderr={stderr[:1000]!r}")
+        raise RuntimeError(
+            f"boundary probe exit {process.returncode}; stdout={stdout[:2000]!r}; stderr={stderr[:1000]!r}"
+        )
     return stdout
 
 
@@ -76,35 +85,77 @@ def main():
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
-    profile_source = root/"mcp/src/angular_check/browser_profile.mjs"
+    profile_source = root / "mcp/src/angular_check/browser_profile.mjs"
     env = {"PATH": "/usr/bin:/bin", "LC_ALL": "C", "OPENSSL_CONF": "/dev/null"}
-    with tempfile.TemporaryDirectory(prefix="gents-angular-boundary-") as directory, socket.socket() as assets, socket.socket() as unrelated:
+    with (
+        tempfile.TemporaryDirectory(prefix="gents-angular-boundary-") as directory,
+        socket.socket() as assets,
+        socket.socket() as unrelated,
+    ):
         control = Path(directory).resolve()
-        sdk = control/"sdk"
+        sdk = control / "sdk"
         sdk.mkdir()
-        profile = control/"profile"
+        profile = control / "profile"
         profile.mkdir()
-        sentinel = control/"outside-sentinel"
+        sentinel = control / "outside-sentinel"
         sentinel.write_text("de-identified sentinel")
-        oracle = control/"oracle-private"
+        oracle = control / "oracle-private"
         oracle.write_text("owner expected values stay outside browser authority")
-        source = sdk/"probe.c"
+        source = sdk / "probe.c"
         source.write_text(SOURCE)
-        binary = sdk/"chrome-headless-shell"
-        bounded(["/usr/bin/clang", "-Wall", "-Werror", str(source), "-o", str(binary)], env=env)
+        binary = sdk / "chrome-headless-shell"
+        bounded(
+            ["/usr/bin/clang", "-Wall", "-Werror", str(source), "-o", str(binary)],
+            env=env,
+        )
         assets.bind(("127.0.0.1", 0))
         assets.listen(2)
         unrelated.bind(("127.0.0.1", 0))
         unrelated.listen(2)
         port = assets.getsockname()[1]
         code = f"import {{browserProfile}} from {json.dumps(profile_source.as_uri())};process.stdout.write(browserProfile(...JSON.parse(process.argv[1])));"
-        actual_profile = bounded([str(args.node.resolve(strict=True)), "--input-type=module", "-e", code, json.dumps([str(binary), str(profile), port])], env=env).decode()
-        observed = json.loads(bounded(["/usr/bin/sandbox-exec", "-p", actual_profile, str(binary), str(sentinel), str(oracle), str(profile/"allowed-file"), str(port), str(unrelated.getsockname()[1]), str(os.getpid())], env=env))
+        actual_profile = bounded(
+            [
+                str(args.node.resolve(strict=True)),
+                "--input-type=module",
+                "-e",
+                code,
+                json.dumps([str(binary), str(profile), port]),
+            ],
+            env=env,
+        ).decode()
+        observed = json.loads(
+            bounded(
+                [
+                    "/usr/bin/sandbox-exec",
+                    "-p",
+                    actual_profile,
+                    str(binary),
+                    str(sentinel),
+                    str(oracle),
+                    str(profile / "allowed-file"),
+                    str(port),
+                    str(unrelated.getsockname()[1]),
+                    str(os.getpid()),
+                ],
+                env=env,
+            )
+        )
         assert all(observed.values()) and len(observed) == 10, observed
         assert sentinel.read_text() == "de-identified sentinel"
-        report = {"schema_version": 1, "scope": "Native OS probes against actual checked-in browser profile, independent of Playwright routing/CSP; all fixtures de-identified", "profile_source_sha256": hashlib.sha256(profile_source.read_bytes()).hexdigest(), "profile_sha256": hashlib.sha256(actual_profile.encode()).hexdigest(), "checks": observed, "provider_cost_usd": 0, "model_calls": 0}
+        report = {
+            "schema_version": 1,
+            "scope": "Native OS probes against actual checked-in browser profile, independent of Playwright routing/CSP; all fixtures de-identified",
+            "profile_source_sha256": hashlib.sha256(
+                profile_source.read_bytes()
+            ).hexdigest(),
+            "profile_sha256": hashlib.sha256(actual_profile.encode()).hexdigest(),
+            "checks": observed,
+            "provider_cost_usd": 0,
+            "model_calls": 0,
+        }
         args.report.parent.mkdir(parents=True, exist_ok=True)
-        args.report.write_text(json.dumps(report, indent=2)+"\n")
+        args.report.write_text(json.dumps(report, indent=2) + "\n")
         print(json.dumps(report))
 
 

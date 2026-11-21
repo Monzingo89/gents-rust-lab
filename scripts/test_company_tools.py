@@ -78,11 +78,17 @@ class CompanyTools(unittest.TestCase):
             )
         self.assertEqual((self.root / result["path"]).read_text(), "original")
         with self.assertRaisesRegex(ValueError, "native MCP"):
-            self.tool("files",op="rename",path="answer.txt",destination="renamed.txt",expected_sha256="a"*64)
+            self.tool(
+                "files",
+                op="rename",
+                path="answer.txt",
+                destination="renamed.txt",
+                expected_sha256="a" * 64,
+            )
         self.assertEqual((self.root / result["path"]).read_text(), "original")
         self.assertFalse((self.root / result["path"]).with_name("renamed.txt").exists())
-        with self.assertRaisesRegex(ValueError,"native MCP"):
-            self.tool("files",op="read",path="answer.txt",metadata_only=True)
+        with self.assertRaisesRegex(ValueError, "native MCP"):
+            self.tool("files", op="read", path="answer.txt", metadata_only=True)
 
     @unittest.skipUnless(
         sys.platform == "darwin" and Path("/usr/bin/sandbox-exec").exists(),
@@ -147,8 +153,9 @@ class CompanyTools(unittest.TestCase):
                     tools.source_target(spelling)
 
     def test_inference_budget_requires_owner_review(self):
-        with self.assertRaisesRegex(ValueError, 'require human review'):
-            tools.source_target('crates/harness/src/inference_budget.rs')
+        with self.assertRaisesRegex(ValueError, "require human review"):
+            tools.source_target("crates/harness/src/inference_budget.rs")
+
     def test_snapshot_verification_experiment_requires_owner_review(self):
         for path in (
             "scripts/python_snapshot_check.py",

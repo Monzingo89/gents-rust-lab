@@ -95,8 +95,12 @@ SOURCE_PREFIXES = ("crates/", "scripts/", "web/", "config/", "docs/")
 SOURCE_SUFFIXES = {".rs", ".py", ".js", ".mjs", ".json", ".md", ".css", ".html"}
 # Frozen acceptance, launch/admission code and authority readers are host-owned.
 # New reviewed curriculum helpers inherit this boundary without a filename list.
-PROTECTED_SOURCE_PREFIXES = ("scripts/fixtures/", "scripts/mcp-", "config/company.mcp-",
-                             "crates/harness/src/local_runtime/")
+PROTECTED_SOURCE_PREFIXES = (
+    "scripts/fixtures/",
+    "scripts/mcp-",
+    "config/company.mcp-",
+    "crates/harness/src/local_runtime/",
+)
 PROTECTED_SOURCE_FILES = {
     "crates/harness/src/auth.rs",
     "crates/harness/src/security.rs",
@@ -1197,9 +1201,13 @@ def execute(company, run, action, args):
         )
     if action == "files":
         if args.get("op") == "rename":
-            raise ValueError("File rename requires the governed native MCP adapter; no legacy fallback")
+            raise ValueError(
+                "File rename requires the governed native MCP adapter; no legacy fallback"
+            )
         if "metadata_only" in args:
-            raise ValueError("Metadata-only file reads require the governed native MCP adapter")
+            raise ValueError(
+                "Metadata-only file reads require the governed native MCP adapter"
+            )
         if "expected_sha256" in args:
             raise ValueError(
                 "hash-conditioned writes require governed native MCP; legacy adapter cannot enforce this precondition"

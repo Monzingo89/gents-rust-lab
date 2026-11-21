@@ -49,6 +49,24 @@ test('readiness deadline and early process exit cannot be reported ready',async 
  const absent=startOwnedProcess(join(folder,'absent-executable'),[],{stdio:'ignore'});t.after(()=>absent.stop());
  await assert.rejects(waitForReadiness({owned:absent,probe:async()=>null,timeoutMs:1000}),/ENOENT/);
 });
+test('shutdown handles a transient group-reaping denial but reports persistent permission errors',{skip:process.platform==='win32'},async t=>{
+ const folder=await temporary(t),owned=launch('never-ready',join(folder,'reap'),0);
+ await until(()=>readFile(join(folder,'reap.waiting')));
+ const kill=process.kill.bind(process);let denials=1;
+ const mocked=t.mock.method(process,'kill',(pid,signal)=>{
+  if(pid===-owned.child.pid&&denials-->0)throw Object.assign(new Error('fixture permission denial'),{code:'EPERM'});
+  return kill(pid,signal);
+ });
+ assert.equal((await owned.stop('SIGKILL',100)).signal,'SIGKILL');
+ const blocked=launch('never-ready',join(folder,'denied'),0);
+ await until(()=>readFile(join(folder,'denied.waiting')));
+ mocked.mock.mockImplementation((pid,signal)=>{
+  if(pid===-blocked.child.pid)throw Object.assign(new Error('persistent fixture permission denial'),{code:'EPERM'});
+  return kill(pid,signal);
+ });
+ await assert.rejects(blocked.stop('SIGTERM',100),/persistent fixture permission denial/);
+ mocked.mock.restore();kill(-blocked.child.pid,'SIGKILL');await blocked.exited;
+});
 test('group shutdown kills an orphan descendant while an unrelated listener survives',{skip:process.platform==='win32'},async t=>{
  const folder=await temporary(t),state=join(folder,'orphan');const parent=launch('orphan-parent',state,0),other=launch('ready',join(folder,'other'),0);
  t.after(()=>Promise.all([parent.stop('SIGTERM',100),other.stop('SIGTERM',100)]));
@@ -125,4 +143,15 @@ test('an incompatible existing listener is rejected and left running',async t=>{
  assert.equal(existing.result,undefined);
  assert.ok((await fetch(`http://127.0.0.1:${f.port}/api/config`)).ok);
  assert.equal((await readFile(f.state+'.starts','utf8')).trim(),'start');
+});
+
+test('interactive reuse keeps following until Ctrl+C without taking ownership',async t=>{
+ const f=await supervisorFixture(t,'ready'),existing=launch('ready',f.state,f.port);t.after(()=>existing.stop());
+ await until(()=>readFile(f.state+'.listener'));
+ let finished=false;
+ const running=startCompany({...f.options,follow:true}).then(code=>{finished=true;return code;});
+ await until(async()=>(await readFile(f.state+'.commands','utf8')).includes('status'));
+ await delay(60);assert.equal(finished,false);
+ f.controller.abort();assert.equal(await running,0);assert.equal(existing.result,undefined);
+ assert.ok((await fetch(`http://127.0.0.1:${f.port}/api/config`)).ok);
 });

@@ -60,5 +60,10 @@ test('direct company launch loads integrations while preserving runtime isolatio
     loadCompanyRuntimeEnv({root,env});
     assert.equal(env.GENTS_STARTUP_ID,'owned-startup');
     assert.equal(env.GENTS_SUPERVISOR_PID,'1234');
+    Object.assign(env,{GENTS_EMAIL_AUTO_START:'0',GENTS_DISABLE_SCHEDULER:'1',GENTS_OFFICE_ACTIVITY:'0',GENTS_AUTO_RESUME:'0'});
+    writeFileSync(join(root,'.env.company'),'GENTS_EMAIL_AUTO_START=1\nGENTS_DISABLE_SCHEDULER=0\nGENTS_OFFICE_ACTIVITY=1\nGENTS_AUTO_RESUME=1\n');
+    loadCompanyRuntimeEnv({root,env});
+    assert.equal(env.GENTS_EMAIL_AUTO_START,'0');assert.equal(env.GENTS_DISABLE_SCHEDULER,'1');
+    assert.equal(env.GENTS_OFFICE_ACTIVITY,'0');assert.equal(env.GENTS_AUTO_RESUME,'0');
   } finally { rmSync(root, { recursive: true }); }
 });

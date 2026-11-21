@@ -1,8 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {taskActivity,currentTaskActivity,currentTaskUsage} from '../web/assets/task-activity.js';
+import {taskActivity,currentTaskActivity,currentTaskUsage,ceoPlanningActivity} from '../web/assets/task-activity.js';
 import {screenDefinitions,screenValue,dashboardDetail} from '../web/assets/office-dashboards.js';
 const task='190f3065-d78d-4575-a335-fc36822c39ad',job='b53b850b-640f-4fc4-9df9-b3cdf2e23eaf';
+test('only current scoped persisted CEO requests animate planning, and terminal events stop it',()=>{
+ const context={origin:'http://127.0.0.1:8788',company:'one',connected:true};
+ const observation={...context,observed_at_ms:1000,events:[{run_id:task,seq:1,kind:'ceo_inference_requested'}]};
+ assert.equal(ceoPlanningActivity(observation,task,context,1001).active,true);
+ assert.equal(ceoPlanningActivity(observation,job,context,1001),null);
+ assert.equal(ceoPlanningActivity(observation,task,{...context,company:'two'},1001),null);
+ assert.equal(ceoPlanningActivity(observation,task,{...context,connected:false},1001),null);
+ assert.equal(ceoPlanningActivity(observation,task,context,17000).active,false);
+ observation.events.push({run_id:task,seq:2,kind:'ceo_planning_completed'});
+ assert.equal(ceoPlanningActivity(observation,task,context,1001),null);
+});
 test('host requests animate task monitoring without fabricating actual inference or known usage',()=>{
  const activity=taskActivity({task_id:task,status:'running',progress:{job_id:job,phase:'model_request_pending',model_dispatches:2,model_returns:1,pending_model_requests:1},measurements:{generative_model_calls:null,input_tokens:null,provider_cost_usd:null}});
  assert.equal(activity.active,true);assert.equal(activity.label,'Model request pending');

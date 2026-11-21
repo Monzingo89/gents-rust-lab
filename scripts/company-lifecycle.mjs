@@ -17,9 +17,15 @@ export function startOwnedProcess(command,args,{ownGroup=true,...options}={}){
   try{if(grouped)process.kill(-child.pid,signal);else child.kill(signal);return true;}
   catch(error){if(error.code==='ESRCH')return false;error.message+=` (owned ${command}, pid ${child.pid}, group ${grouped}, exited ${result!==undefined})`;throw error;}
  }
- function alive(){
+ async function signalAfterReap(signal){
+  // macOS can briefly report EPERM for a group whose last child is exiting
+  // before Node reaps it. Retry that race; persistent denial remains an error.
+  const deadline=performance.now()+250;
+  for(;;){try{return send(signal);}catch(error){if(error.code!=='EPERM'||performance.now()>=deadline)throw error;await delay(10);}}
+ }
+ async function alive(){
   if(!grouped)return result===undefined;
-  return send(0);
+  return signalAfterReap(0);
  }
  return {child,exited,get result(){return result;},signal:send,
   stop(signal='SIGTERM',graceMs=5000){
@@ -27,11 +33,11 @@ export function startOwnedProcess(command,args,{ownGroup=true,...options}={}){
     // Node can expose a PID before the detached child has finished launching.
     // Wait for spawn/error before attempting to address its process group.
     await spawned;
-    send(signal);
+    await signalAfterReap(signal);
     const deadline=performance.now()+graceMs;
-    while(alive()&&performance.now()<deadline)await delay(Math.min(25,Math.max(1,deadline-performance.now())));
-    const forced=alive();
-    if(forced)send('SIGKILL');
+    while(await alive()&&performance.now()<deadline)await delay(Math.min(25,Math.max(1,deadline-performance.now())));
+    const forced=await alive();
+    if(forced)await signalAfterReap('SIGKILL');
     await exited;
     return {...result,forced};
    })();

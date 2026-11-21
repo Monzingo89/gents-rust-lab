@@ -36,6 +36,10 @@ To run the **local company**, first follow the [setup and model requirements](do
 npm run company
 ```
 
+Enter your task at **http://127.0.0.1:8788/?autoconnect=1**, choose **Plan with the CEO**, then **Discuss with local CEO**. Follow the existing local judge and frozen execution review before approving a run. Watch live JSON event metadata in the launch terminal and detailed results in the building's work log. A compatible running office is reused; the terminal continues following its events. Ctrl+C stops only processes this launcher started.
+
+This interactive command defaults to task intake without email polling, scheduled work, efficiency research or automatic recovery of older interrupted jobs. Those records remain available for explicit resume. Existing operators can opt in with process settings `GENTS_EMAIL_AUTO_START=1`, `GENTS_DISABLE_SCHEDULER=0`, `GENTS_OFFICE_ACTIVITY=1` or `GENTS_AUTO_RESUME=1`. Local inference and offline model loading remain enforced. See [local launcher validation](docs/177-local-company-launcher.md).
+
 Run `npm run env:check` to audit private settings without revealing credential values. Local inference needs **no API key**. See [environment files and architecture review](docs/122-local-environment-and-architecture-review.md).
 
 Keep its terminal open. The launcher opens the local office and checks readiness. Describe one bounded outcome, answer the CEO's questions, and review the exact definition of done and permissions before starting. Missing models or unsupported tools are errors, not permission to substitute a simulation or paid provider. The ready-plan panel can now request a local CEO recommendation and a distinct local judge review, with fresh hardware checks and a proposed agent count. Use the ready-plan Prepare button for the guided factory path. Review data scope, the exact local reviewer, tools and memory ceilings before approving. Older/manual execution paths have separate contracts; tool-enabled hub/peer execution remains unavailable.

@@ -1,5 +1,5 @@
-import re
 import math
+import re
 
 
 def redact_public_at_tokens(value):

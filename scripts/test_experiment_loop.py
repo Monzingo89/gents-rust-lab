@@ -1,13 +1,14 @@
 """Durability, admission and no-inference checks; API decisions here are fixtures."""
+
 import copy
 import json
 import os
-from pathlib import Path
 import tempfile
 import threading
 import unittest
 import urllib.error
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from pathlib import Path
 from unittest.mock import patch
 
 import experiment_loop as m
@@ -18,8 +19,19 @@ class API:
         self.calls = []
         self.jobs = []
         self.runs = {}
-        self.config = {"local_only": True, "company_mode": True, "company_tools": True, "auth": "local",
-                       "agents": [{"id": "Engineer", "worker_provider": "local", "planner_provider": "local"}]}
+        self.config = {
+            "local_only": True,
+            "company_mode": True,
+            "company_tools": True,
+            "auth": "local",
+            "agents": [
+                {
+                    "id": "Engineer",
+                    "worker_provider": "local",
+                    "planner_provider": "local",
+                }
+            ],
+        }
         self.fail = None
         self.lost_dispatch_response = False
 
@@ -31,11 +43,20 @@ class API:
             return copy.deepcopy(self.config)
         if path.startswith("/api/companies/"):
             if body["op"] == "intake":
-                self.jobs.append({"run_id": body["run_id"], "digest": "owner-digest", "state": "draft"})
+                self.jobs.append(
+                    {
+                        "run_id": body["run_id"],
+                        "digest": "owner-digest",
+                        "state": "draft",
+                    }
+                )
             return {"jobs": copy.deepcopy(self.jobs)}
         if path == "/api/runs":
             run = body["run_id"]
-            self.runs[run] = {"status": "completed", "events": [{"reply": {"usage": {"cost_usd": 0}}}]}
+            self.runs[run] = {
+                "status": "completed",
+                "events": [{"reply": {"usage": {"cost_usd": 0}}}],
+            }
             if self.lost_dispatch_response:
                 raise OSError("response lost after dispatch")
             return {"id": run}
@@ -55,10 +76,21 @@ class ControllerTests(unittest.TestCase):
         self.input.parent.mkdir(parents=True)
         self.input.write_text("baseline")
         self.api = API()
-        trial = {"id": "first", "actor": "Engineer", "task": "Author bounded candidate source",
-                 "criteria": ["Independent review remains required"], "tools": ["files:write", "files:read"], "max_model_calls": 1}
-        self.plan = {"version": 1, "company": "one", "evidence_paths": ["data/experiment-inputs/research.json"],
-                     "max_model_calls": 2, "experiments": [trial, {**trial, "id": "second"}]}
+        trial = {
+            "id": "first",
+            "actor": "Engineer",
+            "task": "Author bounded candidate source",
+            "criteria": ["Independent review remains required"],
+            "tools": ["files:write", "files:read"],
+            "max_model_calls": 1,
+        }
+        self.plan = {
+            "version": 1,
+            "company": "one",
+            "evidence_paths": ["data/experiment-inputs/research.json"],
+            "max_model_calls": 2,
+            "experiments": [trial, {**trial, "id": "second"}],
+        }
         self.controller = m.Controller(self.root, "example", self.api)
         self.controller.freeze(self.plan)
         self.api.calls.clear()
@@ -90,7 +122,9 @@ class ControllerTests(unittest.TestCase):
     def test_one_claim_per_distinct_evidence_and_finite_plan_never_renews(self):
         self.change()
         run = self.finish()
-        self.assertFalse(self.controller.status()["trials"][0]["result"]["independently_accepted"])
+        self.assertFalse(
+            self.controller.status()["trials"][0]["result"]["independently_accepted"]
+        )
         self.assertEqual(self.controller.poll()["status"], "unchanged")
         self.change("baseline")
         self.assertEqual(self.controller.poll()["status"], "unchanged")
@@ -105,11 +139,21 @@ class ControllerTests(unittest.TestCase):
     def test_allowance_and_exact_grants_reach_actual_intake_and_policy_requests(self):
         self.change()
         self.controller.poll()
-        intake = next(body["intake"] for _, body in self.api.calls if body and body.get("op") == "intake")
+        intake = next(
+            body["intake"]
+            for _, body in self.api.calls
+            if body and body.get("op") == "intake"
+        )
         self.assertEqual(intake["max_model_calls"], 1)
         self.assertEqual(intake["budget_usd"], 0)
-        policy = next(body["policy"] for _, body in self.api.calls if body and body.get("op") == "governance_install")
-        self.assertEqual(policy["grants"]["Engineer"]["tools"], self.plan["experiments"][0]["tools"])
+        policy = next(
+            body["policy"]
+            for _, body in self.api.calls
+            if body and body.get("op") == "governance_install"
+        )
+        self.assertEqual(
+            policy["grants"]["Engineer"]["tools"], self.plan["experiments"][0]["tools"]
+        )
 
     def test_preparation_failure_burns_claim_and_never_replays_any_mutation(self):
         self.change()
@@ -120,7 +164,9 @@ class ControllerTests(unittest.TestCase):
         writes = [call for call in self.api.calls if call[1] is not None]
         for _ in range(3):
             self.assertEqual(self.controller.poll()["status"], "needs_reconciliation")
-        self.assertEqual([call for call in self.api.calls if call[1] is not None], writes)
+        self.assertEqual(
+            [call for call in self.api.calls if call[1] is not None], writes
+        )
         self.assertEqual(self.controller.status()["reserved_model_calls"], 1)
         self.assertEqual(self.post_count(), 0)
 
@@ -137,9 +183,11 @@ class ControllerTests(unittest.TestCase):
 
     def test_crash_after_durable_claim_before_intake_does_not_replay(self):
         self.change()
+
         def crash(_, body):
             if body and body.get("op") == "intake":
                 raise KeyboardInterrupt()
+
         self.api.fail = crash
         with self.assertRaises(KeyboardInterrupt):
             self.controller.poll()
@@ -152,10 +200,18 @@ class ControllerTests(unittest.TestCase):
     def test_active_and_interrupted_runs_remain_outstanding_without_resume(self):
         self.change()
         run = self.controller.poll()["run_id"]
-        for status in ("running", "queued", "interrupted", "needs_reconciliation", "timed_out"):
+        for status in (
+            "running",
+            "queued",
+            "interrupted",
+            "needs_reconciliation",
+            "timed_out",
+        ):
             self.api.runs[run]["status"] = status
             self.assertEqual(self.controller.poll()["status"], "observing")
-            self.assertEqual(self.controller.status()["trials"][0]["state"], "observing")
+            self.assertEqual(
+                self.controller.status()["trials"][0]["state"], "observing"
+            )
         self.assertEqual(self.post_count(), 1)
         self.assertFalse(any(path.endswith("/resume") for path, _ in self.api.calls))
 
@@ -173,7 +229,11 @@ class ControllerTests(unittest.TestCase):
         run = self.controller.poll()["run_id"]
         self.api.runs[run]["status"] = "running"
         original = self.controller.api
-        self.controller.api = lambda path, body=None: {"attention": {"answer": None}} if path.endswith("/attention") else original(path, body)
+        self.controller.api = lambda path, body=None: (
+            {"attention": {"answer": None}}
+            if path.endswith("/attention")
+            else original(path, body)
+        )
         report = self.controller.poll()
         self.assertEqual(report["status"], "observing")
         self.assertEqual(report["result"]["status"], "attention")
@@ -213,19 +273,23 @@ class ControllerTests(unittest.TestCase):
         self.change()
         entered, release = threading.Event(), threading.Event()
         original = self.api
+
         def slow(path, body=None):
             if body and body.get("op") == "intake":
                 entered.set()
                 if not release.wait(10):
                     raise RuntimeError("fixture timeout")
             return original(path, body)
+
         self.controller.api = slow
         reports = []
         thread = threading.Thread(target=lambda: reports.append(self.controller.poll()))
         thread.start()
         try:
             self.assertTrue(entered.wait(10))
-            self.assertEqual(m.Controller(self.root, "example", self.api).poll()["status"], "busy")
+            self.assertEqual(
+                m.Controller(self.root, "example", self.api).poll()["status"], "busy"
+            )
         finally:
             release.set()
             thread.join(10)
@@ -255,10 +319,18 @@ class ControllerTests(unittest.TestCase):
 
     def evaluation_controller(self):
         trial = copy.deepcopy(self.plan["experiments"][0])
-        trial["evaluation"] = {"kind": "rust_acceptance", "tests_path": "data/experiment-inputs/tests.rs", "tests_sha256": "a" * 64}
+        trial["evaluation"] = {
+            "kind": "rust_acceptance",
+            "tests_path": "data/experiment-inputs/tests.rs",
+            "tests_sha256": "a" * 64,
+        }
         plan = {**self.plan, "experiments": [trial], "max_model_calls": 1}
         controller = m.Controller(self.root, "evaluated", self.api)
-        with patch.object(m.experiment_evaluation, "freeze", side_effect=lambda root, spec, trial, read: spec):
+        with patch.object(
+            m.experiment_evaluation,
+            "freeze",
+            side_effect=lambda root, spec, trial, read: spec,
+        ):
             controller.freeze(plan)
         return controller
 
@@ -267,7 +339,11 @@ class ControllerTests(unittest.TestCase):
         self.change()
         run = controller.poll()["run_id"]
         self.api.runs[run]["status"] = "candidate_submitted"
-        with patch.object(m.experiment_evaluation, "evaluate", return_value={"passed": True, "scope": "frozen suite only"}) as evaluate:
+        with patch.object(
+            m.experiment_evaluation,
+            "evaluate",
+            return_value={"passed": True, "scope": "frozen suite only"},
+        ) as evaluate:
             report = controller.poll()
             evaluate.assert_called_once()
         self.assertEqual(report["result"]["runtime_status"], "candidate_submitted")
@@ -281,7 +357,11 @@ class ControllerTests(unittest.TestCase):
         self.change()
         run = controller.poll()["run_id"]
         self.api.runs[run]["status"] = "candidate_submitted"
-        with patch.object(m.experiment_evaluation, "evaluate", return_value={"passed": False, "scope": "frozen suite only"}):
+        with patch.object(
+            m.experiment_evaluation,
+            "evaluate",
+            return_value={"passed": False, "scope": "frozen suite only"},
+        ):
             report = controller.poll()
         self.assertEqual(report["status"], "result")
         self.assertFalse(report["result"]["independently_accepted"])
@@ -292,7 +372,9 @@ class ControllerTests(unittest.TestCase):
         self.change()
         run = controller.poll()["run_id"]
         self.api.runs[run]["status"] = "candidate_submitted"
-        with patch.object(m.experiment_evaluation, "evaluate", side_effect=OSError("lost result")) as evaluate:
+        with patch.object(
+            m.experiment_evaluation, "evaluate", side_effect=OSError("lost result")
+        ) as evaluate:
             self.assertEqual(controller.poll()["status"], "needs_reconciliation")
             restarted = m.Controller(self.root, "evaluated", self.api)
             self.assertEqual(restarted.poll()["status"], "needs_reconciliation")
@@ -305,12 +387,16 @@ class ControllerTests(unittest.TestCase):
         self.change()
         run = controller.poll()["run_id"]
         self.api.runs[run]["status"] = "candidate_submitted"
-        with patch.object(m.experiment_evaluation, "evaluate", side_effect=KeyboardInterrupt()) as evaluate:
+        with patch.object(
+            m.experiment_evaluation, "evaluate", side_effect=KeyboardInterrupt()
+        ) as evaluate:
             with self.assertRaises(KeyboardInterrupt):
                 controller.poll()
             self.assertEqual(controller.poll()["status"], "needs_reconciliation")
             evaluate.assert_called_once()
-        self.assertEqual(controller.status()["trials"][0]["state"], "evaluation_pending")
+        self.assertEqual(
+            controller.status()["trials"][0]["state"], "evaluation_pending"
+        )
 
     def test_runtime_failure_cannot_bypass_submission_custody_for_evaluation(self):
         controller = self.evaluation_controller()
@@ -320,23 +406,60 @@ class ControllerTests(unittest.TestCase):
         with patch.object(m.experiment_evaluation, "evaluate") as evaluate:
             report = controller.poll()
             evaluate.assert_not_called()
-        self.assertEqual(report["result"]["evaluation"]["status"], "not_run_runtime_not_submitted")
+        self.assertEqual(
+            report["result"]["evaluation"]["status"], "not_run_runtime_not_submitted"
+        )
         self.assertFalse(report["result"]["independently_accepted"])
 
     def continuation_controller(self):
         parent = copy.deepcopy(self.plan["experiments"][0])
-        parent["evaluation"] = {"kind": "rust_acceptance", "tests_path": "data/experiment-inputs/tests.rs", "tests_sha256": "a" * 64}
-        parent["candidate_workflow"] = {"version": 1, "actor": "Engineer", "path": "candidate.rs", "max_bytes": 8192, "max_attempts": 1}
-        child = {**copy.deepcopy(parent), "id": "repair", "after": {"experiment": parent["id"], "outcome": "rejected"}}
-        final = {**copy.deepcopy(child), "id": "unused", "after": {"experiment": child["id"], "outcome": "rejected"}}
-        plan = {**self.plan, "max_model_calls": 3, "experiments": [parent, child, final]}
+        parent["evaluation"] = {
+            "kind": "rust_acceptance",
+            "tests_path": "data/experiment-inputs/tests.rs",
+            "tests_sha256": "a" * 64,
+        }
+        parent["candidate_workflow"] = {
+            "version": 1,
+            "actor": "Engineer",
+            "path": "candidate.rs",
+            "max_bytes": 8192,
+            "max_attempts": 1,
+        }
+        child = {
+            **copy.deepcopy(parent),
+            "id": "repair",
+            "after": {"experiment": parent["id"], "outcome": "rejected"},
+        }
+        final = {
+            **copy.deepcopy(child),
+            "id": "unused",
+            "after": {"experiment": child["id"], "outcome": "rejected"},
+        }
+        plan = {
+            **self.plan,
+            "max_model_calls": 3,
+            "experiments": [parent, child, final],
+        }
         controller = m.Controller(self.root, "continuation", self.api)
-        with patch.object(m.experiment_evaluation, "freeze", side_effect=lambda root, spec, trial, read: spec):
+        with patch.object(
+            m.experiment_evaluation,
+            "freeze",
+            side_effect=lambda root, spec, trial, read: spec,
+        ):
             controller.freeze(plan)
         self.change()
         run = controller.poll()["run_id"]
         self.api.runs[run]["status"] = "candidate_submitted"
-        with patch.object(m.experiment_evaluation, "evaluate", return_value={"kind": "rust_acceptance", "passed": False, "scope": "fixed suite", "native_result": {}}):
+        with patch.object(
+            m.experiment_evaluation,
+            "evaluate",
+            return_value={
+                "kind": "rust_acceptance",
+                "passed": False,
+                "scope": "fixed suite",
+                "native_result": {},
+            },
+        ):
             self.assertEqual(controller.poll()["status"], "result")
         return controller, plan
 
@@ -344,11 +467,23 @@ class ControllerTests(unittest.TestCase):
         controller, plan = self.continuation_controller()
         original = self.input.read_bytes()
         feedback = {"source": "untrusted source", "source_sha256": "a" * 64}
-        with patch.object(m.experiment_continuation, "prepare", return_value={"decision": "continue", "feedback": feedback, "predecessor_result_sha256": "b" * 64}):
+        with patch.object(
+            m.experiment_continuation,
+            "prepare",
+            return_value={
+                "decision": "continue",
+                "feedback": feedback,
+                "predecessor_result_sha256": "b" * 64,
+            },
+        ):
             report = controller.poll()
         self.assertEqual(report["status"], "dispatched")
         self.assertEqual(self.input.read_bytes(), original)
-        intake = [body["intake"] for _, body in self.api.calls if body and body.get("op") == "intake"][-1]
+        intake = [
+            body["intake"]
+            for _, body in self.api.calls
+            if body and body.get("op") == "intake"
+        ][-1]
         self.assertEqual(intake["candidate_feedback"], feedback)
         self.assertEqual(intake["idea"], plan["experiments"][1]["task"])
         self.assertEqual(intake["max_model_calls"], 1)
@@ -356,7 +491,11 @@ class ControllerTests(unittest.TestCase):
 
     def test_skipped_conditions_consume_no_calls_or_fake_runs(self):
         controller, _ = self.continuation_controller()
-        with patch.object(m.experiment_continuation, "prepare", return_value={"decision": "skip", "reason": "condition mismatch"}):
+        with patch.object(
+            m.experiment_continuation,
+            "prepare",
+            return_value={"decision": "skip", "reason": "condition mismatch"},
+        ):
             self.assertEqual(controller.poll()["status"], "skipped")
         self.assertEqual(controller.poll()["status"], "skipped")
         self.assertEqual(controller.poll()["status"], "exhausted")
@@ -368,9 +507,13 @@ class ControllerTests(unittest.TestCase):
     def test_corrupt_predecessor_result_cannot_choose_a_branch(self):
         controller, _ = self.continuation_controller()
         with controller.locked() as db:
-            result = json.loads(db.execute("SELECT result FROM trials WHERE position=0").fetchone()[0])
+            result = json.loads(
+                db.execute("SELECT result FROM trials WHERE position=0").fetchone()[0]
+            )
             result["independently_accepted"] = True
-            db.execute("UPDATE trials SET result=? WHERE position=0", (m.canonical(result),))
+            db.execute(
+                "UPDATE trials SET result=? WHERE position=0", (m.canonical(result),)
+            )
             db.commit()
         with self.assertRaisesRegex(ValueError, "result integrity"):
             controller.poll()
@@ -378,14 +521,26 @@ class ControllerTests(unittest.TestCase):
 
     def test_changed_predecessor_custody_stops_before_spending_followup_allowance(self):
         controller, _ = self.continuation_controller()
-        with patch.object(m.experiment_continuation, "prepare", side_effect=ValueError("source changed")):
+        with patch.object(
+            m.experiment_continuation,
+            "prepare",
+            side_effect=ValueError("source changed"),
+        ):
             self.assertEqual(controller.poll()["status"], "needs_reconciliation")
         self.assertEqual(controller.status()["reserved_model_calls"], 1)
 
     def test_lost_followup_dispatch_does_not_repeat_its_feedback_or_claim(self):
         controller, _ = self.continuation_controller()
         self.api.lost_dispatch_response = True
-        with patch.object(m.experiment_continuation, "prepare", return_value={"decision": "continue", "feedback": {"source": "reference"}, "predecessor_result_sha256": "a" * 64}):
+        with patch.object(
+            m.experiment_continuation,
+            "prepare",
+            return_value={
+                "decision": "continue",
+                "feedback": {"source": "reference"},
+                "predecessor_result_sha256": "a" * 64,
+            },
+        ):
             first = controller.poll()
         self.assertEqual(first["status"], "needs_reconciliation")
         self.assertEqual(controller.poll()["status"], "result")
@@ -395,18 +550,47 @@ class ControllerTests(unittest.TestCase):
     def test_multistep_repair_reuses_its_own_approved_feedback_binding(self):
         controller, _ = self.continuation_controller()
         feedback = {"source": "first rejected source"}
-        with patch.object(m.experiment_continuation, "prepare", return_value={"decision": "continue", "feedback": feedback, "predecessor_result_sha256": "a" * 64}):
+        with patch.object(
+            m.experiment_continuation,
+            "prepare",
+            return_value={
+                "decision": "continue",
+                "feedback": feedback,
+                "predecessor_result_sha256": "a" * 64,
+            },
+        ):
             run = controller.poll()["run_id"]
         self.api.runs[run]["status"] = "candidate_submitted"
-        with patch.object(m.experiment_evaluation, "evaluate", return_value={"kind": "rust_acceptance", "passed": False, "scope": "fixed suite", "native_result": {}}):
+        with patch.object(
+            m.experiment_evaluation,
+            "evaluate",
+            return_value={
+                "kind": "rust_acceptance",
+                "passed": False,
+                "scope": "fixed suite",
+                "native_result": {},
+            },
+        ):
             self.assertEqual(controller.poll()["status"], "result")
-        with patch.object(m.experiment_continuation, "prepare", return_value={"decision": "skip", "reason": "bounded stop"}) as prepare:
+        with patch.object(
+            m.experiment_continuation,
+            "prepare",
+            return_value={"decision": "skip", "reason": "bounded stop"},
+        ) as prepare:
             controller.poll()
         self.assertEqual(prepare.call_args.args[3]["candidate_feedback"], feedback)
 
     def test_feedback_tampering_is_detected_before_observation_or_dispatch(self):
         controller, _ = self.continuation_controller()
-        with patch.object(m.experiment_continuation, "prepare", return_value={"decision": "continue", "feedback": {"source": "reference"}, "predecessor_result_sha256": "a" * 64}):
+        with patch.object(
+            m.experiment_continuation,
+            "prepare",
+            return_value={
+                "decision": "continue",
+                "feedback": {"source": "reference"},
+                "predecessor_result_sha256": "a" * 64,
+            },
+        ):
             controller.poll()
         count = len(self.api.calls)
         with controller.locked() as db:
@@ -425,7 +609,11 @@ class ControllerTests(unittest.TestCase):
         self.assertEqual(ledger.stat().st_mtime_ns, before)
 
     def test_special_oversized_hardlinked_and_traversal_inputs_fail_before_api(self):
-        for name in ("data/experiment-inputs/../outside", "/absolute", "data/experiment-inputs/.hidden"):
+        for name in (
+            "data/experiment-inputs/../outside",
+            "/absolute",
+            "data/experiment-inputs/.hidden",
+        ):
             with self.assertRaises(ValueError):
                 m.bounded_file(self.root, name)
         hardlink = self.input.with_name("hardlink")
@@ -460,14 +648,18 @@ class ValidationTests(unittest.TestCase):
                 self.send_response(302)
                 self.send_header("Location", "http://localhost:1/forbidden")
                 self.end_headers()
+
             def log_message(self, *args):
                 pass
+
         with HTTPServer(("127.0.0.1", 0), Redirect) as server:
             thread = threading.Thread(target=server.serve_forever)
             thread.start()
             try:
                 with self.assertRaises(urllib.error.HTTPError) as caught:
-                    m.LoopbackAPI("http://127.0.0.1:" + str(server.server_port))("/api/config")
+                    m.LoopbackAPI("http://127.0.0.1:" + str(server.server_port))(
+                        "/api/config"
+                    )
                 self.assertEqual(caught.exception.code, 302)
                 caught.exception.close()
             finally:
@@ -475,19 +667,43 @@ class ValidationTests(unittest.TestCase):
                 thread.join(5)
 
     def test_nonloopback_redirect_credentials_and_proxy_targets_are_rejected(self):
-        for server in ("https://127.0.0.1", "http://localhost:8788", "http://127.0.0.1/path", "http://user@127.0.0.1", "http://127.0.0.1?x"):
+        for server in (
+            "https://127.0.0.1",
+            "http://localhost:8788",
+            "http://127.0.0.1/path",
+            "http://user@127.0.0.1",
+            "http://127.0.0.1?x",
+        ):
             with self.assertRaises(ValueError):
                 m.LoopbackAPI(server)
 
     def test_external_authority_and_unbounded_trials_are_rejected(self):
         api = API()
-        trial = {"id": "one", "actor": "Engineer", "task": "bounded", "criteria": ["review"], "tools": [], "max_model_calls": 1}
-        base = {"version": 1, "company": "one", "evidence_paths": ["data/experiment-inputs/a"], "max_model_calls": 1, "experiments": [trial]}
-        mutations = [dict(base, max_model_calls=True), dict(base, max_model_calls=0), dict(base, version=True),
-                     dict(base, evidence_paths=["config/secrets"]), dict(base, extra="authority"),
-                     dict(base, experiments=[dict(trial, tools=["email_send"])]),
-                     dict(base, experiments=[dict(trial, max_model_calls=True)]),
-                     dict(base, experiments=[trial, trial])]
+        trial = {
+            "id": "one",
+            "actor": "Engineer",
+            "task": "bounded",
+            "criteria": ["review"],
+            "tools": [],
+            "max_model_calls": 1,
+        }
+        base = {
+            "version": 1,
+            "company": "one",
+            "evidence_paths": ["data/experiment-inputs/a"],
+            "max_model_calls": 1,
+            "experiments": [trial],
+        }
+        mutations = [
+            dict(base, max_model_calls=True),
+            dict(base, max_model_calls=0),
+            dict(base, version=True),
+            dict(base, evidence_paths=["config/secrets"]),
+            dict(base, extra="authority"),
+            dict(base, experiments=[dict(trial, tools=["email_send"])]),
+            dict(base, experiments=[dict(trial, max_model_calls=True)]),
+            dict(base, experiments=[trial, trial]),
+        ]
         for plan in mutations:
             with self.subTest(plan=plan), self.assertRaises(ValueError):
                 m.validate_plan(plan, api.config)

@@ -1,8 +1,8 @@
 import json
 import unittest
 
-from completed_memory_proof import completed_archive
 import local_sqlite
+from completed_memory_proof import completed_archive
 
 RUN = "00000000-0000-0000-0000-000000000001"
 
@@ -18,8 +18,18 @@ def fixture():
     """)
     db.execute("INSERT INTO jobs VALUES(?,?,'completed')", (RUN, "c" * 64))
     db.execute("INSERT INTO run_governance VALUES(?,1)", (RUN,))
-    db.execute("INSERT INTO context_archive VALUES(?,'A','r','ALTC','fixture','private fixture body',17)", (RUN,))
-    db.execute("INSERT INTO memory_archive_checkpoints VALUES(?,'A','completed',1,?,1,?)", (RUN, "c" * 64, "6beb3d355afe251c9cf9d733bbed7c66f9c50dc6105a879ef9ad8b9812c244ce"))
+    db.execute(
+        "INSERT INTO context_archive VALUES(?,'A','r','ALTC','fixture','private fixture body',17)",
+        (RUN,),
+    )
+    db.execute(
+        "INSERT INTO memory_archive_checkpoints VALUES(?,'A','completed',1,?,1,?)",
+        (
+            RUN,
+            "c" * 64,
+            "6beb3d355afe251c9cf9d733bbed7c66f9c50dc6105a879ef9ad8b9812c244ce",
+        ),
+    )
     db.commit()
     db.execute("BEGIN")
     return db
@@ -29,7 +39,15 @@ class CompletedMemoryProofTests(unittest.TestCase):
     def test_complete_archive_proof_contains_no_payload_or_source(self):
         with fixture() as db:
             proof = completed_archive(db, RUN)
-            self.assertEqual((proof["status"], proof["actors"], proof["cold_records"], proof["hot_records"]), ("PASS", 1, 1, 0))
+            self.assertEqual(
+                (
+                    proof["status"],
+                    proof["actors"],
+                    proof["cold_records"],
+                    proof["hot_records"],
+                ),
+                ("PASS", 1, 1, 0),
+            )
             self.assertNotIn("private fixture body", json.dumps(proof))
             self.assertNotIn("fixture", json.dumps(proof))
 

@@ -30,6 +30,7 @@ export function loadCompanyRuntimeEnv({ root = process.cwd(), env = process.env 
     'AUTH_MODE', 'BIND', 'CONFIG', 'RUN_STORE', 'GENTS_SUPERVISED', 'LOCAL_MODEL_PORT',
     'GENTS_LOCAL_ONLY', 'GENTS_MCP_TRANSPORT', 'HF_HUB_OFFLINE', 'HF_HUB_DISABLE_TELEMETRY', 'TRANSFORMERS_OFFLINE',
     'GENTS_RUNTIME_MANIFEST', 'GENTS_RUNTIME_MANIFEST_SHA256', 'GENTS_SQLITE_BRIDGE', 'GENTS_STARTUP_ID', 'GENTS_SUPERVISOR_PID',
+    'GENTS_EMAIL_AUTO_START', 'GENTS_DISABLE_SCHEDULER', 'GENTS_OFFICE_ACTIVITY', 'GENTS_AUTO_RESUME',
   ].filter(key => key in env).map(key => [key, env[key]]));
   createCompanyEnvLoader({ root, env })();
   Object.assign(env, pinned);

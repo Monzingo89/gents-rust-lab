@@ -20,7 +20,7 @@ pub struct LaunchPolicy {
 impl LaunchPolicy {
     pub fn new(context: usize, recovery: usize, supported: bool) -> Result<Self> {
         ensure!(
-            (2048..=16384).contains(&context),
+            (2048..=crate::provider::MAX_LOCAL_CONTEXT).contains(&context),
             "unsupported frozen context budget"
         );
         Ok(Self {
@@ -82,6 +82,22 @@ mod tests {
         assert!(supports_auto_fit(
             "-fit, --fit [on|off]\n--fit-target MiB\n--fit-ctx N\n'auto'"
         ));
+    }
+    #[test]
+    fn company_context_is_explicit_and_must_match_the_observed_single_slot() {
+        let policy = LaunchPolicy::new(32768, 0, true).unwrap();
+        assert_eq!(
+            policy
+                .verify_context(
+                    &json!({"total_slots":1,"default_generation_settings":{"n_ctx":32768}})
+                )
+                .unwrap(),
+            32768
+        );
+        assert!(policy
+            .verify_context(&json!({"total_slots":1,"default_generation_settings":{"n_ctx":16384}}))
+            .is_err());
+        assert!(LaunchPolicy::new(32769, 0, true).is_err());
     }
     #[test]
     fn fitting_and_cpu_recovery_preserve_context_and_local_only_arguments() {

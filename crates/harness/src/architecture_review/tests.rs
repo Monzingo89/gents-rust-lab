@@ -202,6 +202,13 @@ async fn factory_preparation_binds_the_canonical_review_and_rejects_a_forged_ref
         .unwrap();
     assert_eq!(result["status"], "ready_for_owner_review");
     drop(journal);
+    let audit: String = db.query_row("SELECT body FROM audit WHERE run_id=?1 AND kind='architecture_assessment_checkpoint' ORDER BY seq DESC LIMIT 1", [id.to_string()], |row| row.get(0)).unwrap();
+    let metadata: Value = serde_json::from_str(&audit).unwrap();
+    assert_eq!(metadata["planning_id"], planning.to_string());
+    assert_eq!(metadata["calls"].as_array().unwrap().len(), 3);
+    assert_eq!(metadata["calls"][0]["inference"]["backend_pid"], 1);
+    assert!(!audit.contains("SIMULATED minimal known steps"));
+    assert!(!audit.contains("Summarize supplied text"));
     let input = json!({"expected_revision":2,"specification":{"version":1,"objective":"Summarize a synthetic note","inputs":["Supplied synthetic text"],"outputs":["Concise text summary"],"definition_of_done":proposal["definition_of_done"],"exclusions":["Remote services"],"coordination":"ordered","data_classification":"synthetic","control_profiles":["local_baseline"],"required_capabilities":[]},"input":{"text":"Synthetic note"},"model_sha256":{"A":"a".repeat(64)},"max_delegations":1,"peer_rounds":1,"architecture_assessment":id});
     let prepared = crate::company_factory::preparation::prepare(
         &root,

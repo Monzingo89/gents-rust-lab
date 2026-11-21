@@ -5,8 +5,9 @@ import math
 import os
 import tempfile
 import time
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any
 
 
 def _is_finite_number(value: Any) -> bool:
@@ -29,11 +30,13 @@ def _validate_evidence_name(name: Any) -> str:
     return name
 
 
-def _canonical_json_bytes(value: Dict[str, Any]) -> bytes:
+def _canonical_json_bytes(value: dict[str, Any]) -> bytes:
     if not isinstance(value, dict):
         raise TypeError("evidence value must be a dict")
     try:
-        encoded = json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")
+        encoded = json.dumps(
+            value, sort_keys=True, separators=(",", ":"), allow_nan=False
+        ).encode("utf-8")
     except (TypeError, ValueError) as exc:
         raise ValueError("evidence value must be JSON-serializable and finite") from exc
     return encoded
@@ -56,7 +59,7 @@ class EvidenceStore:
         if not self._directory.is_dir():
             raise ValueError("evidence directory must be a directory")
 
-    def write_if_changed(self, name: str, value: Dict[str, Any]) -> bool:
+    def write_if_changed(self, name: str, value: dict[str, Any]) -> bool:
         name = _validate_evidence_name(name)
         target = self._target(name)
         self._ensure_directory()
@@ -72,7 +75,9 @@ class EvidenceStore:
         fd: int
         tmp_path: Path
         try:
-            fd, tmp_name = tempfile.mkstemp(dir=self._directory, prefix=f".{name}.", suffix=".tmp")
+            fd, tmp_name = tempfile.mkstemp(
+                dir=self._directory, prefix=f".{name}.", suffix=".tmp"
+            )
             tmp_path = Path(tmp_name)
             with os.fdopen(fd, "wb") as handle:
                 handle.write(new_bytes)
@@ -94,7 +99,9 @@ def _validate_run_id(run_id: Any) -> str:
         raise ValueError("run_id must be a non-empty safe path segment")
     for char in run_id:
         if not (char.isalnum() or char in "-_"):
-            raise ValueError("run_id must contain only alphanumeric characters, hyphens, or underscores")
+            raise ValueError(
+                "run_id must contain only alphanumeric characters, hyphens, or underscores"
+            )
     return run_id
 
 
@@ -116,19 +123,19 @@ def _validate_nonnegative_finite(value: Any, label: str) -> float:
     return number
 
 
-def _as_dict(value: Any, label: str) -> Dict[str, Any]:
+def _as_dict(value: Any, label: str) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError(f"{label} must be a dict")
     return value
 
 
-def _get_dict(value: Any, key: str, label: str) -> Dict[str, Any]:
+def _get_dict(value: Any, key: str, label: str) -> dict[str, Any]:
     if not isinstance(value, dict) or key not in value:
         raise ValueError(f"{label} is missing")
     return _as_dict(value[key], f"{label}.{key}")
 
 
-def _get_list(value: Any, key: str, label: str) -> List[Any]:
+def _get_list(value: Any, key: str, label: str) -> list[Any]:
     if not isinstance(value, dict) or key not in value:
         raise ValueError(f"{label} is missing")
     item = value[key]
@@ -158,7 +165,7 @@ def _get_cost(value: Any, key: str, label: str) -> float:
     return number
 
 
-def _extract_reply(event: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+def _extract_reply(event: dict[str, Any]) -> dict[str, Any] | None:
     if "reply" not in event:
         return None
     reply = event["reply"]
@@ -167,7 +174,7 @@ def _extract_reply(event: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     return _as_dict(reply, "event.reply")
 
 
-def _extract_cost(reply: Dict[str, Any]) -> float:
+def _extract_cost(reply: dict[str, Any]) -> float:
     _as_dict(reply, "reply")
     usage = reply.get("usage")
     if usage is None:
@@ -176,7 +183,7 @@ def _extract_cost(reply: Dict[str, Any]) -> float:
     return _get_cost(usage, "cost_usd", "usage")
 
 
-def _summarize_snapshot(snapshot: Dict[str, Any]) -> Tuple[str, int, float]:
+def _summarize_snapshot(snapshot: dict[str, Any]) -> tuple[str, int, float]:
     runtime_status = _get_string(snapshot, "status", "snapshot")
     events = _get_list(snapshot, "events", "snapshot")
     model_calls = 0
@@ -193,7 +200,7 @@ def _summarize_snapshot(snapshot: Dict[str, Any]) -> Tuple[str, int, float]:
     return runtime_status, model_calls, float(provider_cost_usd)
 
 
-def _attention_is_unanswered(attention: Dict[str, Any]) -> bool:
+def _attention_is_unanswered(attention: dict[str, Any]) -> bool:
     if attention is None:
         return False
     if not isinstance(attention, dict):
@@ -211,7 +218,7 @@ def _attention_is_unanswered(attention: Dict[str, Any]) -> bool:
 
 
 def observe_run(
-    api: Callable[[str], Dict[str, Any]],
+    api: Callable[[str], dict[str, Any]],
     run_id: str,
     evidence_dir: Path,
     *,
@@ -219,7 +226,7 @@ def observe_run(
     sleep: Callable[[float], None] = time.sleep,
     timeout_seconds: float = 1800,
     poll_seconds: float = 3,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     run_id = _validate_run_id(run_id)
     timeout_seconds = _validate_nonnegative_finite(timeout_seconds, "timeout_seconds")
     poll_seconds = _validate_positive_finite(poll_seconds, "poll_seconds")

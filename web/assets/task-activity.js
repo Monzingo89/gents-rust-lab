@@ -30,3 +30,10 @@ export function currentTaskUsage(value,context,now=Date.now()){
  if(!Number.isFinite(value.observed_at_ms)||now-value.observed_at_ms>15000||now<value.observed_at_ms)return null;
  return value;
 }
+
+export function ceoPlanningActivity(observation,session,context,now=Date.now()){
+ if(!uuid(session)||!observation)return null;
+ const latest=observation.events?.filter(e=>e.run_id===session&&['ceo_planning_started','ceo_inference_requested','ceo_planning_completed','ceo_planning_abandoned'].includes(e.kind)).sort((a,b)=>a.seq-b.seq).at(-1);
+ if(!latest||!['ceo_planning_started','ceo_inference_requested'].includes(latest.kind))return null;
+ return currentTaskActivity({...observation,task_id:session,phase:'planning',active:true,label:'CEO planning request pending · local runtime'},context,now);
+}

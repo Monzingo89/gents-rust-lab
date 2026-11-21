@@ -93,6 +93,7 @@ def active_group(pid):
         text=True,
         timeout=1,
         env={"PATH": "/usr/bin:/bin", "LC_ALL": "C"},
+        check=False,
     )
     if result.returncode != 0:
         raise RuntimeError("Could not reconcile owned process-group liveness")

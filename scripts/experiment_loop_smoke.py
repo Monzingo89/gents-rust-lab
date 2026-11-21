@@ -1,12 +1,13 @@
 """Actual loopback admission, journals and restart; model decisions are simulated."""
+
 import json
 import os
-from pathlib import Path
 import socket
 import sqlite3
 import subprocess
 import tempfile
 import time
+from pathlib import Path
 
 from experiment_loop import Controller, LoopbackAPI
 
@@ -20,9 +21,22 @@ def main():
         signal.parent.mkdir(parents=True)
         signal.write_text("baseline")
         model = {"provider": "mock", "model": "experiment-lifecycle-fixture"}
-        config = {"company_mode": True, "company_tools": True, "admin_judge": model,
-                  "agents": [{"id": "Engineer Gent", "assignment": "fixture", "planner": model, "worker": model}],
-                  "max_steps": 1, "max_tokens": 512, "max_run_seconds": 120}
+        config = {
+            "company_mode": True,
+            "company_tools": True,
+            "admin_judge": model,
+            "agents": [
+                {
+                    "id": "Engineer Gent",
+                    "assignment": "fixture",
+                    "planner": model,
+                    "worker": model,
+                }
+            ],
+            "max_steps": 1,
+            "max_tokens": 512,
+            "max_run_seconds": 120,
+        }
         (root / "config.json").write_text(json.dumps(config))
         with socket.socket() as listener:
             listener.bind(("127.0.0.1", 0))
@@ -37,14 +51,31 @@ def main():
             result = api(path, body)
             if path == "/api/runs" and lose_next_dispatch:
                 lose_next_dispatch = False
-                raise OSError("fixture: actual dispatch succeeded but response was lost")
+                raise OSError(
+                    "fixture: actual dispatch succeeded but response was lost"
+                )
             return result
 
-        env = {k: v for k, v in os.environ.items() if k in {"PATH", "HOME", "USER", "LANG", "TMPDIR", "SHELL"}}
-        env.update(AUTH_MODE="local", BIND=f"127.0.0.1:{port}", CONFIG=str(root / "config.json"),
-                   RUN_STORE=str(root / "runs.sqlite3"), GENTS_DISABLE_SCHEDULER="1", GENTS_LOCAL_ONLY="1")
-        child = subprocess.Popen([str(REPO / "target/debug/gents-harness")], cwd=root,
-                                 env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        env = {
+            k: v
+            for k, v in os.environ.items()
+            if k in {"PATH", "HOME", "USER", "LANG", "TMPDIR", "SHELL"}
+        }
+        env.update(
+            AUTH_MODE="local",
+            BIND=f"127.0.0.1:{port}",
+            CONFIG=str(root / "config.json"),
+            RUN_STORE=str(root / "runs.sqlite3"),
+            GENTS_DISABLE_SCHEDULER="1",
+            GENTS_LOCAL_ONLY="1",
+        )
+        child = subprocess.Popen(
+            [str(REPO / "target/debug/gents-harness")],
+            cwd=root,
+            env=env,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
         try:
             deadline = time.monotonic() + 20
             while True:
@@ -54,13 +85,28 @@ def main():
                 except OSError:
                     if time.monotonic() > deadline:
                         raise
-                    time.sleep(.1)
-            api("/api/companies/one", {"op": "register", "name": "Experiment lifecycle fixture"})
-            trial = {"id": "first", "actor": "Engineer Gent", "task": "autonomy-tool-failure-smoke bounded experiment",
-                     "criteria": ["Retain the original bounded attempt without claiming acceptance"],
-                     "tools": ["files:read"], "max_model_calls": 1}
-            plan = {"version": 1, "company": "one", "evidence_paths": ["data/experiment-inputs/signal.json"],
-                    "max_model_calls": 2, "experiments": [trial, {**trial, "id": "second"}]}
+                    time.sleep(0.1)
+            api(
+                "/api/companies/one",
+                {"op": "register", "name": "Experiment lifecycle fixture"},
+            )
+            trial = {
+                "id": "first",
+                "actor": "Engineer Gent",
+                "task": "autonomy-tool-failure-smoke bounded experiment",
+                "criteria": [
+                    "Retain the original bounded attempt without claiming acceptance"
+                ],
+                "tools": ["files:read"],
+                "max_model_calls": 1,
+            }
+            plan = {
+                "version": 1,
+                "company": "one",
+                "evidence_paths": ["data/experiment-inputs/signal.json"],
+                "max_model_calls": 2,
+                "experiments": [trial, {**trial, "id": "second"}],
+            }
             controller = Controller(root, "smoke", recorded)
             frozen = controller.freeze(plan)
             assert frozen["initial_dispatch"] is False
@@ -76,7 +122,7 @@ def main():
                     if report["status"] == "result":
                         return report
                     assert report["status"] == "observing", report
-                    time.sleep(.1)
+                    time.sleep(0.1)
                 raise AssertionError("Original bounded run did not reach a result")
 
             signal.write_text("new owner evidence")
@@ -106,11 +152,18 @@ def main():
             assert len(status["trials"]) == 2
             assert sum(path == "/api/runs" for path, _ in calls) == 2
             with sqlite3.connect(root / "data/companies/one/brain.sqlite3") as db:
-                assert db.execute("SELECT COUNT(*) FROM inference_attempt_reservations").fetchone()[0] == 2
+                assert (
+                    db.execute(
+                        "SELECT COUNT(*) FROM inference_attempt_reservations"
+                    ).fetchone()[0]
+                    == 2
+                )
                 jobs = db.execute("SELECT run_id,state,intake FROM jobs").fetchall()
                 assert len(jobs) == 2 and all(j[1] == "budget_exhausted" for j in jobs)
                 assert all(json.loads(j[2])["max_model_calls"] == 1 for j in jobs)
-            print("PASS: actual HTTP/company journals; unchanged evidence made zero HTTP requests; two finite one-call runs; original run reconciled after a lost dispatch response; exactly two durable reservations; no replay, acceptance or promotion. Model decisions simulated; no inference performed.")
+            print(
+                "PASS: actual HTTP/company journals; unchanged evidence made zero HTTP requests; two finite one-call runs; original run reconciled after a lost dispatch response; exactly two durable reservations; no replay, acceptance or promotion. Model decisions simulated; no inference performed."
+            )
         finally:
             child.terminate()
             if child.wait(timeout=15) != 0:

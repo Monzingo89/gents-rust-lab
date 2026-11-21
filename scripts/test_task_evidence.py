@@ -1,11 +1,11 @@
 import csv
 import datetime as dt
 import json
-from pathlib import Path
 import shutil
 import tempfile
 import unittest
 import uuid
+from pathlib import Path
 
 import task_evidence as task
 
@@ -25,27 +25,61 @@ class EvidenceBoundaries(unittest.TestCase):
     def fixture(self):
         directory = task.package_dir(self.root, self.company, self.package)
         directory.mkdir(parents=True)
-        for folder, names in (("task", task.TASK_FILES), ("company", task.COMPANY_FILES)):
+        for folder, names in (
+            ("task", task.TASK_FILES),
+            ("company", task.COMPANY_FILES),
+        ):
             for name in names:
                 destination = directory / "originals" / folder / name
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 if Path(name).suffix in (".mp4", ".wav"):
-                    destination.write_bytes(b"synthetic unit-test media, not real extraction")
+                    destination.write_bytes(
+                        b"synthetic unit-test media, not real extraction"
+                    )
                 else:
-                    shutil.copyfile(REPO / "docs/companies" / task.PACK / folder / name, destination)
+                    shutil.copyfile(
+                        REPO / "docs/companies" / task.PACK / folder / name, destination
+                    )
         task.write_json(directory / "ocr.json", [])
         for stem in ("authorized-policy-update", "onboarding-screen-demo"):
-            task.write_json(directory / (stem + ".json"), {"segments": [{"start": 0, "end": 1, "text": "Synthetic test transcript"}]})
-        task.write_json(directory / "media-review.json", {"reviewed": False, "reviewer": "", "corrections": {}})
-        manifest = {"profile": task.PROFILE, "company_id": self.company, "package_id": self.package,
-                    "files": {str(p.relative_to(directory)): task.sha(p) for p in directory.rglob("*") if p.is_file() and p.name != "media-review.json"},
-                    "status": "review_required", "media_review_sha256": None}
+            task.write_json(
+                directory / (stem + ".json"),
+                {
+                    "segments": [
+                        {"start": 0, "end": 1, "text": "Synthetic test transcript"}
+                    ]
+                },
+            )
+        task.write_json(
+            directory / "media-review.json",
+            {"reviewed": False, "reviewer": "", "corrections": {}},
+        )
+        manifest = {
+            "profile": task.PROFILE,
+            "company_id": self.company,
+            "package_id": self.package,
+            "files": {
+                str(p.relative_to(directory)): task.sha(p)
+                for p in directory.rglob("*")
+                if p.is_file() and p.name != "media-review.json"
+            },
+            "status": "review_required",
+            "media_review_sha256": None,
+        }
         task.write_json(directory / "manifest.json", manifest)
         return directory
 
     def approved_fixture(self):
         directory = self.fixture()
-        task.review(self.root, self.company, self.package, "Synthetic test operator", "2026-10-01", 7, True)
+        task.review(
+            self.root,
+            self.company,
+            self.package,
+            "Synthetic test operator",
+            "2026-10-01",
+            7,
+            True,
+        )
         return directory, task.sha(directory / "manifest.json")
 
     def test_tenant_traversal_and_symlink_rejected(self):
@@ -63,23 +97,33 @@ class EvidenceBoundaries(unittest.TestCase):
     def test_unreviewed_media_cannot_execute(self):
         directory = self.fixture()
         with self.assertRaisesRegex(ValueError, "explicitly reviewed"):
-            task.execute(self.root, self.company, str(uuid.uuid4()), self.package, task.sha(directory / "manifest.json"))
+            task.execute(
+                self.root,
+                self.company,
+                str(uuid.uuid4()),
+                self.package,
+                task.sha(directory / "manifest.json"),
+            )
 
     def test_review_and_source_changes_invalidate_frozen_evidence(self):
         directory, digest = self.approved_fixture()
         review = directory / "media-review.json"
         review.write_text(review.read_text() + " ")
         with self.assertRaisesRegex(ValueError, "explicitly reviewed"):
-            task.execute(self.root, self.company, str(uuid.uuid4()), self.package, digest)
+            task.execute(
+                self.root, self.company, str(uuid.uuid4()), self.package, digest
+            )
         source = directory / "originals/task/employee-records.csv"
         source.write_text(source.read_text() + "\n")
         with self.assertRaisesRegex(ValueError, "hash mismatch"):
             task.load(self.root, self.company, self.package)
 
     def test_full_synthetic_audit_and_idempotent_reuse(self):
-        directory, digest = self.approved_fixture()
+        _directory, digest = self.approved_fixture()
         run = str(uuid.uuid4())
-        summary, output, hit = task.execute(self.root, self.company, run, self.package, digest)
+        summary, output, hit = task.execute(
+            self.root, self.company, run, self.package, digest
+        )
         self.assertFalse(hit)
         self.assertEqual(summary["status"], "verified")
         self.assertEqual(summary["employee_count"], 12)
@@ -96,7 +140,9 @@ class EvidenceBoundaries(unittest.TestCase):
 
     def test_verifier_rejects_forged_gate_even_with_updated_hash(self):
         directory, digest = self.approved_fixture()
-        _, output, _ = task.execute(self.root, self.company, str(uuid.uuid4()), self.package, digest)
+        _, output, _ = task.execute(
+            self.root, self.company, str(uuid.uuid4()), self.package, digest
+        )
         path = output / "decisions.csv"
         with path.open(newline="") as stream:
             reader = csv.DictReader(stream)
@@ -118,14 +164,20 @@ class EvidenceBoundaries(unittest.TestCase):
         manifest["new_field"] = "new version"
         task.write_json(directory / "manifest.json", manifest)
         with self.assertRaisesRegex(ValueError, "SOW was frozen"):
-            task.execute(self.root, self.company, str(uuid.uuid4()), self.package, digest)
+            task.execute(
+                self.root, self.company, str(uuid.uuid4()), self.package, digest
+            )
 
     def test_verifier_rejects_invented_source_fact_even_with_updated_hash(self):
         directory, digest = self.approved_fixture()
-        _, output, _ = task.execute(self.root, self.company, str(uuid.uuid4()), self.package, digest)
+        _, output, _ = task.execute(
+            self.root, self.company, str(uuid.uuid4()), self.package, digest
+        )
         path = output / "evidence.json"
         rows = json.loads(path.read_text())
-        employee = next(r for r in rows if r["source_file"] == "task/employee-records.csv")
+        employee = next(
+            r for r in rows if r["source_file"] == "task/employee-records.csv"
+        )
         employee["observed_fact"]["manager_approved"] = "invented"
         task.write_json(path, rows)
         summary = json.loads((output / "run-summary.json").read_text())
@@ -141,21 +193,48 @@ class EvidenceBoundaries(unittest.TestCase):
     def test_changed_company_policy_requires_a_new_reviewed_rule_profile(self):
         directory, _ = self.approved_fixture()
         policy = directory / "originals/company/departments/Finance-manual.txt"
-        policy.write_text(policy.read_text() + "\nA new, unsupported policy amendment.\n")
+        policy.write_text(
+            policy.read_text() + "\nA new, unsupported policy amendment.\n"
+        )
         with self.assertRaisesRegex(ValueError, "Unsupported policy source hash"):
             task.rule_sources(directory)
 
     def test_inclusive_deadline_and_finance_limit_and_insurance_date(self):
-        employee = {"employee_id": "E777", "hire_date": "2026-10-01", "training_completed_date": "2026-10-08", "manager_approved": "yes"}
-        request = {"cost_center": "C1", "requested_cents": "120000", "charge_type": "MOB-IND", "role_code": "FIELD-READ"}
-        policy = {"effective_hire_date": "2026-10-01", "training_days": 7, "manager_approval_required": True}
-        result = task.decide(employee, request, {"clearance_code": "HRC-2", "assignment_state": "ACTIVE"}, {"status": "ACTIVE"},
-                             {"mfa_state": "VERIFIED"}, {"status": "APPROVED", "insurance_valid_through": "2026-10-15"}, policy, {}, dt.date(2026, 10, 15))
+        employee = {
+            "employee_id": "E777",
+            "hire_date": "2026-10-01",
+            "training_completed_date": "2026-10-08",
+            "manager_approved": "yes",
+        }
+        request = {
+            "cost_center": "C1",
+            "requested_cents": "120000",
+            "charge_type": "MOB-IND",
+            "role_code": "FIELD-READ",
+        }
+        policy = {
+            "effective_hire_date": "2026-10-01",
+            "training_days": 7,
+            "manager_approval_required": True,
+        }
+        result = task.decide(
+            employee,
+            request,
+            {"clearance_code": "HRC-2", "assignment_state": "ACTIVE"},
+            {"status": "ACTIVE"},
+            {"mfa_state": "VERIFIED"},
+            {"status": "APPROVED", "insurance_valid_through": "2026-10-15"},
+            policy,
+            {},
+            dt.date(2026, 10, 15),
+        )
         self.assertEqual(result["training_decision"], "PASS")
         self.assertEqual(result["release_decision"], "ALLOW")
         self.assertEqual(result["release_ticket"], "WNG|E777|C1|READY")
         employee["training_completed_date"] = "2026-10-09"
-        result = task.decide(employee, request, {}, {}, {}, {}, policy, {}, dt.date(2026, 10, 15))
+        result = task.decide(
+            employee, request, {}, {}, {}, {}, policy, {}, dt.date(2026, 10, 15)
+        )
         self.assertEqual(result["release_decision"], "HOLD")
         self.assertEqual(result["release_ticket"], "")
 

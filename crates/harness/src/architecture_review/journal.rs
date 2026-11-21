@@ -134,7 +134,12 @@ impl JournalPort for SqliteJournal {
             "UPDATE architecture_assessments SET state=?2,body=?3,sha256=?4 WHERE id=?1",
             params![self.id.to_string(), state, encoded, sha],
         )?;
-        tx.execute("INSERT INTO audit(run_id,kind,body,created) VALUES(?1,'architecture_assessment_checkpoint',?2,?3)",params![self.id.to_string(),json!({"status":state,"body_sha256":sha,"execution_authorized":false}).to_string(),crate::now_ms() as i64])?;
+        let calls: Vec<Value> = ["ceo", "output_judge", "judge"].into_iter().filter(|role| body["dispatch"][role].is_object()).map(|role| {
+            let receipt = &body["receipts"][role]["reply"]["local_execution"];
+            json!({"agent":role,"model":body["models"][if role=="ceo" {"ceo"} else {"judge"}]["candidate_id"],"requested_at_ms":body["dispatch"][role]["started_at_ms"],"inference":{
+                "backend_pid":receipt["backend_pid"],"dispatched_at_ms":receipt["dispatched_at_ms"],"received_at_ms":receipt["received_at_ms"],"finish_reason":receipt["finish_reason"]}})
+        }).collect();
+        tx.execute("INSERT INTO audit(run_id,kind,body,created) VALUES(?1,'architecture_assessment_checkpoint',?2,?3)",params![self.id.to_string(),json!({"status":state,"body_sha256":sha,"execution_authorized":false,"planning_id":body["planning_id"],"calls":calls}).to_string(),crate::now_ms() as i64])?;
         tx.commit()?;
         Ok(())
     }

@@ -1,16 +1,73 @@
 """Rebuild standalone walkthrough. Optional dependency: pip install Markdown."""
-from pathlib import Path
+
 import html
+from pathlib import Path
+
 import markdown
-root=Path(__file__).resolve().parents[1]
-chapters=sorted((root/'docs').glob('*.md'))
-nav=''.join(f'<a href="#chapter-{i}">{html.escape(f.read_text().splitlines()[0].lstrip("# "))}</a>' for i,f in enumerate(chapters))
-body=''.join(f'<section id="chapter-{i}">'+markdown.markdown(f.read_text(),extensions=['fenced_code','tables','sane_lists'])+'</section>' for i,f in enumerate(chapters))
-paths=['Cargo.toml','crates/harness/Cargo.toml','crates/harness/src/provider.rs','crates/harness/src/auth.rs','crates/harness/src/judges.rs','crates/harness/src/store.rs','crates/harness/src/acceptance.rs','crates/harness/src/main.rs','config/mock.json','config/fixed.mock.json','config/live.example.json','web/index.html','web/style.css','web/app.js','package.json','src-tauri/Cargo.toml','src-tauri/build.rs','src-tauri/src/main.rs','src-tauri/src/lib.rs','src-tauri/tauri.conf.json','src-tauri/capabilities/default.json','infra/main.bicep','infra/Dockerfile','.dockerignore','.gitignore','.env.example','.vscode/extensions.json','.vscode/tasks.json','scripts/check.sh','scripts/smoke.py','scripts/reliability_smoke.py','.github/workflows/ci.yml','SECURITY.md']
-appendix='<section id="source"><h1>Complete source appendix</h1><p>Create each file at its indicated project-relative path. Lockfiles are supplied separately in the ZIP. Expand a file to copy its full contents.</p>'
-for path in paths:appendix+=f'<details><summary>{html.escape(path)}</summary><pre><code>{html.escape((root/path).read_text())}</code></pre></details>'
-appendix+='</section>'
-style="""body{margin:0;background:#f5f3ee;color:#172b3a;font:16px/1.7 system-ui}nav{position:fixed;width:250px;inset:0 auto 0 0;padding:26px;background:#122638;color:white;overflow:auto}nav h2{font-size:21px}nav a{display:block;color:#bce7da;text-decoration:none;font-size:13px;margin:14px 0}main{max-width:1000px;margin:0 30px 0 310px;padding:40px 0 80px}section{border-bottom:2px solid #d3dce1;padding:20px 0 50px;scroll-margin-top:20px}h1{font-size:30px;line-height:1.3}h2{font-size:22px;margin-top:36px}h3{font-size:18px}a{color:#126451}pre{background:#102333;color:#dcefe9;border-radius:8px;padding:18px;overflow:auto;font:13px/1.6 ui-monospace,monospace}code{font-family:ui-monospace,monospace}table{border-collapse:collapse;width:100%;font-size:13px;display:block;overflow:auto}td,th{padding:11px;border:1px solid #cad4dc;text-align:left;vertical-align:top}th{background:#e3eae8}details{margin:15px 0;border:1px solid #c6d4d5;border-radius:6px;padding:14px}summary{cursor:pointer;font-weight:600}@media(max-width:800px){nav{position:static;width:auto}main{margin:0;padding:20px}h1{font-size:25px}}@media print{nav{display:none}main{margin:0;max-width:none}pre{white-space:pre-wrap;overflow-wrap:anywhere}section{break-before:page}}"""
-page='<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gents Rust Harness — Start Here</title><style>'+style+'</style></head><body><nav><h2>Gents Office<br>Rust learning lab</h2><p>Route, plan, work, judge and repair.</p>'+nav+'<a href="#source">Complete source code</a></nav><main><h1>Build your model-agnostic Rust harness</h1><p>The upgraded default adds routing and completion judges. Start with the mock lifecycle, then configure real providers, identity and deployment. Chapter 12 covers model selection, context handoffs and repair loops. Chapter 13 adds checkpointing, replay protection, deadlines and deterministic acceptance.</p>'+body+appendix+'</main></body></html>'
-(root/'START-HERE.html').write_text(page)
-print(f'Guide rebuilt: {len(chapters)} chapters, {len(paths)} complete source blocks')
+
+root = Path(__file__).resolve().parents[1]
+chapters = sorted((root / "docs").glob("*.md"))
+nav = "".join(
+    f'<a href="#chapter-{i}">{html.escape(f.read_text().splitlines()[0].lstrip("# "))}</a>'
+    for i, f in enumerate(chapters)
+)
+body = "".join(
+    f'<section id="chapter-{i}">'
+    + markdown.markdown(
+        f.read_text(), extensions=["fenced_code", "tables", "sane_lists"]
+    )
+    + "</section>"
+    for i, f in enumerate(chapters)
+)
+paths = [
+    "Cargo.toml",
+    "crates/harness/Cargo.toml",
+    "crates/harness/src/provider.rs",
+    "crates/harness/src/auth.rs",
+    "crates/harness/src/judges.rs",
+    "crates/harness/src/store.rs",
+    "crates/harness/src/acceptance.rs",
+    "crates/harness/src/main.rs",
+    "config/mock.json",
+    "config/fixed.mock.json",
+    "config/live.example.json",
+    "web/index.html",
+    "web/style.css",
+    "web/app.js",
+    "package.json",
+    "src-tauri/Cargo.toml",
+    "src-tauri/build.rs",
+    "src-tauri/src/main.rs",
+    "src-tauri/src/lib.rs",
+    "src-tauri/tauri.conf.json",
+    "src-tauri/capabilities/default.json",
+    "infra/main.bicep",
+    "infra/Dockerfile",
+    ".dockerignore",
+    ".gitignore",
+    ".env.example",
+    ".vscode/extensions.json",
+    ".vscode/tasks.json",
+    "scripts/check.sh",
+    "scripts/smoke.py",
+    "scripts/reliability_smoke.py",
+    ".github/workflows/ci.yml",
+    "SECURITY.md",
+]
+appendix = '<section id="source"><h1>Complete source appendix</h1><p>Create each file at its indicated project-relative path. Lockfiles are supplied separately in the ZIP. Expand a file to copy its full contents.</p>'
+for path in paths:
+    appendix += f"<details><summary>{html.escape(path)}</summary><pre><code>{html.escape((root / path).read_text())}</code></pre></details>"
+appendix += "</section>"
+style = """body{margin:0;background:#f5f3ee;color:#172b3a;font:16px/1.7 system-ui}nav{position:fixed;width:250px;inset:0 auto 0 0;padding:26px;background:#122638;color:white;overflow:auto}nav h2{font-size:21px}nav a{display:block;color:#bce7da;text-decoration:none;font-size:13px;margin:14px 0}main{max-width:1000px;margin:0 30px 0 310px;padding:40px 0 80px}section{border-bottom:2px solid #d3dce1;padding:20px 0 50px;scroll-margin-top:20px}h1{font-size:30px;line-height:1.3}h2{font-size:22px;margin-top:36px}h3{font-size:18px}a{color:#126451}pre{background:#102333;color:#dcefe9;border-radius:8px;padding:18px;overflow:auto;font:13px/1.6 ui-monospace,monospace}code{font-family:ui-monospace,monospace}table{border-collapse:collapse;width:100%;font-size:13px;display:block;overflow:auto}td,th{padding:11px;border:1px solid #cad4dc;text-align:left;vertical-align:top}th{background:#e3eae8}details{margin:15px 0;border:1px solid #c6d4d5;border-radius:6px;padding:14px}summary{cursor:pointer;font-weight:600}@media(max-width:800px){nav{position:static;width:auto}main{margin:0;padding:20px}h1{font-size:25px}}@media print{nav{display:none}main{margin:0;max-width:none}pre{white-space:pre-wrap;overflow-wrap:anywhere}section{break-before:page}}"""
+page = (
+    '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gents Rust Harness — Start Here</title><style>'
+    + style
+    + "</style></head><body><nav><h2>Gents Office<br>Rust learning lab</h2><p>Route, plan, work, judge and repair.</p>"
+    + nav
+    + '<a href="#source">Complete source code</a></nav><main><h1>Build your model-agnostic Rust harness</h1><p>The upgraded default adds routing and completion judges. Start with the mock lifecycle, then configure real providers, identity and deployment. Chapter 12 covers model selection, context handoffs and repair loops. Chapter 13 adds checkpointing, replay protection, deadlines and deterministic acceptance.</p>'
+    + body
+    + appendix
+    + "</main></body></html>"
+)
+(root / "START-HERE.html").write_text(page)
+print(f"Guide rebuilt: {len(chapters)} chapters, {len(paths)} complete source blocks")

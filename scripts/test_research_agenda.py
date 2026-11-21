@@ -1,18 +1,23 @@
 """Coordinator invariants. Model proposals/outcomes here are explicit fixtures."""
+
 import copy
 import json
-from pathlib import Path
 import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 import research_agenda as m
 from test_experiment_loop import API
 
-
-PROPOSAL = {"hypothesis": "Handle empty remainder before retreating a boundary.",
-            "procedure": ["Validate the offset and positive limit first.", "Return the end offset when already at end."],
-            "prediction": "The original end-of-input failure will pass."}
+PROPOSAL = {
+    "hypothesis": "Handle empty remainder before retreating a boundary.",
+    "procedure": [
+        "Validate the offset and positive limit first.",
+        "Return the end offset when already at end.",
+    ],
+    "prediction": "The original end-of-input failure will pass.",
+}
 
 
 class Driver:
@@ -31,7 +36,10 @@ class Driver:
         run = identifier + "-run"
         proof = self.owner.proof(source)
         self.owner.artifacts[run] = (source, proof)
-        result = {"runtime_status": "candidate_submitted", "independently_accepted": False}
+        result = {
+            "runtime_status": "candidate_submitted",
+            "independently_accepted": False,
+        }
         if not research:
             result["evaluation"] = self.owner.outcome(source, self.accepted)
             result["independently_accepted"] = self.accepted
@@ -44,26 +52,90 @@ class AgendaTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name).resolve()
         self.api = API()
-        self.api.config["agents"].append({"id": "Researcher", "worker_provider": "local", "planner_provider": "local"})
-        self.runtime = {"adapter": {"path": "/adapter", "sha256": "a" * 64},
-                        "compiler": {"path": "/compiler", "sha256": "b" * 64}}
-        self.spec = {"kind": "rust_acceptance", "tests_path": "data/experiment-inputs/tests.rs", "tests_sha256": "c" * 64}
-        self.sealed = {**self.spec, "runtime": self.runtime, "frozen_tests": "owner tests",
-                       "parser_executable": {"path": "/parser", "sha256": "d" * 64}}
-        self.plan = {"version": 1, "company": "one", "researcher": "Researcher", "author": "Engineer",
-                     "case": {"task": "Owner task including exact end-of-input behavior", "source_path": "candidate.rs", "evaluation": self.spec},
-                     "max_cycles": 2, "max_model_calls": 4,
-                     "failed_reference": {"company": "failed", "actor": "Engineer", "run_id": "failed-run"},
-                     "teacher_reference": {"company": "teacher", "actor": "Engineer", "run_id": "teacher-run"}}
-        self.artifacts = {"failed-run": ("original", self.proof("original")), "teacher-run": ("teacher", self.proof("teacher"))}
+        self.api.config["agents"].append(
+            {
+                "id": "Researcher",
+                "worker_provider": "local",
+                "planner_provider": "local",
+            }
+        )
+        self.runtime = {
+            "adapter": {"path": "/adapter", "sha256": "a" * 64},
+            "compiler": {"path": "/compiler", "sha256": "b" * 64},
+        }
+        self.spec = {
+            "kind": "rust_acceptance",
+            "tests_path": "data/experiment-inputs/tests.rs",
+            "tests_sha256": "c" * 64,
+        }
+        self.sealed = {
+            **self.spec,
+            "runtime": self.runtime,
+            "frozen_tests": "owner tests",
+            "parser_executable": {"path": "/parser", "sha256": "d" * 64},
+        }
+        self.plan = {
+            "version": 1,
+            "company": "one",
+            "researcher": "Researcher",
+            "author": "Engineer",
+            "case": {
+                "task": "Owner task including exact end-of-input behavior",
+                "source_path": "candidate.rs",
+                "evaluation": self.spec,
+            },
+            "max_cycles": 2,
+            "max_model_calls": 4,
+            "failed_reference": {
+                "company": "failed",
+                "actor": "Engineer",
+                "run_id": "failed-run",
+            },
+            "teacher_reference": {
+                "company": "teacher",
+                "actor": "Engineer",
+                "run_id": "teacher-run",
+            },
+        }
+        self.artifacts = {
+            "failed-run": ("original", self.proof("original")),
+            "teacher-run": ("teacher", self.proof("teacher")),
+        }
         self.driver = Driver(self)
         self.agenda = m.Agenda(self.root, "fixture", self.api, self.driver)
         for name, replacement in [
-                ("reference_trial", lambda root, reference, case: {"actor": reference["actor"], "task": case["task"]}),
-                ("evaluation.freeze", lambda *args: copy.deepcopy(self.sealed)),
-                ("evaluation.evaluate", lambda root, company, run, *args: self.outcome(self.artifacts[run][0], run == "teacher-run")),
-                ("evaluation.custody", lambda root, company, run, *args: copy.deepcopy(self.artifacts[run])),
-                ("evaluation.executable_pin", lambda path: copy.deepcopy(next(pin for pin in [*self.runtime.values(), self.sealed["parser_executable"]] if pin["path"] == path)))]:
+            (
+                "reference_trial",
+                lambda root, reference, case: {
+                    "actor": reference["actor"],
+                    "task": case["task"],
+                },
+            ),
+            ("evaluation.freeze", lambda *args: copy.deepcopy(self.sealed)),
+            (
+                "evaluation.evaluate",
+                lambda root, company, run, *args: self.outcome(
+                    self.artifacts[run][0], run == "teacher-run"
+                ),
+            ),
+            (
+                "evaluation.custody",
+                lambda root, company, run, *args: copy.deepcopy(self.artifacts[run]),
+            ),
+            (
+                "evaluation.executable_pin",
+                lambda path: copy.deepcopy(
+                    next(
+                        pin
+                        for pin in [
+                            *self.runtime.values(),
+                            self.sealed["parser_executable"],
+                        ]
+                        if pin["path"] == path
+                    )
+                ),
+            ),
+        ]:
             context = patch("research_agenda." + name, replacement)
             context.start()
             self.addCleanup(context.stop)
@@ -71,13 +143,28 @@ class AgendaTests(unittest.TestCase):
         self.api.calls.clear()
 
     def proof(self, source):
-        return {"source_sha256": m.evaluation.sha(source.encode()), "policy_revision": 1, "native_audit_sequences": [8, 9], "intake_sha256": "e" * 64}
+        return {
+            "source_sha256": m.evaluation.sha(source.encode()),
+            "policy_revision": 1,
+            "native_audit_sequences": [8, 9],
+            "intake_sha256": "e" * 64,
+        }
 
     def outcome(self, source, passed):
-        return {"kind": "rust_acceptance", "passed": passed, "custody": self.proof(source), "runtime": self.runtime,
-                "tests_sha256": self.spec["tests_sha256"], "promotion_authorized": False,
-                "native_result": {"passed": passed, "source_sha256": self.proof(source)["source_sha256"],
-                    "tests_sha256": self.spec["tests_sha256"], "diagnostics": {"stdout": "fixture diagnostic", "stderr": ""}}}
+        return {
+            "kind": "rust_acceptance",
+            "passed": passed,
+            "custody": self.proof(source),
+            "runtime": self.runtime,
+            "tests_sha256": self.spec["tests_sha256"],
+            "promotion_authorized": False,
+            "native_result": {
+                "passed": passed,
+                "source_sha256": self.proof(source)["source_sha256"],
+                "tests_sha256": self.spec["tests_sha256"],
+                "diagnostics": {"stdout": "fixture diagnostic", "stderr": ""},
+            },
+        }
 
     def restart(self):
         self.agenda = m.Agenda(self.root, "fixture", self.api, self.driver)
@@ -98,10 +185,14 @@ class AgendaTests(unittest.TestCase):
             self.assertEqual(self.agenda.poll()["status"], "accepted")
         self.assertEqual(self.api.calls, [])
         self.assertEqual(len(self.driver.calls), 2)
-        self.assertEqual((self.agenda.storage.folder / "ledger.sqlite3").read_bytes(), before)
+        self.assertEqual(
+            (self.agenda.storage.folder / "ledger.sqlite3").read_bytes(), before
+        )
         self.assertEqual(self.agenda.start()["status"], "accepted")
 
-    def test_compiler_preserves_objective_evaluator_grants_and_hides_teacher_from_author(self):
+    def test_compiler_preserves_objective_evaluator_grants_and_hides_teacher_from_author(
+        self,
+    ):
         self.agenda.start()
         self.agenda.poll()
         self.agenda.poll()
@@ -109,7 +200,10 @@ class AgendaTests(unittest.TestCase):
         task = json.loads(author["experiments"][0]["task"])
         self.assertEqual(task["objective"], self.plan["case"]["task"])
         self.assertNotIn("reviewed_teacher_source", task)
-        self.assertEqual(json.loads(research["experiments"][0]["task"])["reviewed_teacher_source"], "teacher")
+        self.assertEqual(
+            json.loads(research["experiments"][0]["task"])["reviewed_teacher_source"],
+            "teacher",
+        )
         for plan in (research, author):
             trial = plan["experiments"][0]
             self.assertEqual(plan["max_model_calls"], 1)
@@ -117,7 +211,9 @@ class AgendaTests(unittest.TestCase):
             self.assertEqual(trial["criteria"], [m.ACCEPTANCE])
             self.assertEqual(trial["candidate_workflow"]["max_attempts"], 1)
         self.assertEqual(author["experiments"][0]["evaluation"], self.spec)
-        self.assertEqual(self.driver.calls[1][2]["experiments"][0]["evaluation"], self.sealed)
+        self.assertEqual(
+            self.driver.calls[1][2]["experiments"][0]["evaluation"], self.sealed
+        )
 
     def test_unknown_dispatch_keeps_same_child_and_reservation_after_restart(self):
         self.driver.pending = "needs_reconciliation"
@@ -161,7 +257,9 @@ class AgendaTests(unittest.TestCase):
     def test_new_rejected_source_and_procedure_can_follow_until_frozen_limit(self):
         self.driver.accepted = False
         self.driver.sources[1] = "second repaired"
-        self.driver.proposals[1] = json.dumps({**PROPOSAL, "procedure": ["Different step one.", "Different step two."]})
+        self.driver.proposals[1] = json.dumps(
+            {**PROPOSAL, "procedure": ["Different step one.", "Different step two."]}
+        )
         self.agenda.start()
         for _ in range(4):
             self.agenda.poll()
@@ -234,18 +332,27 @@ class AgendaTests(unittest.TestCase):
 class ProposalTests(unittest.TestCase):
     def test_strict_schema_bounds_and_duplicate_keys(self):
         self.assertEqual(m.parse_proposal(json.dumps(PROPOSAL)), PROPOSAL)
-        invalid = ["null", "[]", '{"hypothesis":"a","hypothesis":"b","procedure":[],"prediction":"x"}',
-                   json.dumps({**PROPOSAL, "procedure": ["only one"]}),
-                   json.dumps({**PROPOSAL, "hypothesis": "a" * 385}),
-                   json.dumps({**PROPOSAL, "prediction": "```code```"}),
-                   json.dumps({**PROPOSAL, "procedure": ["pub fn x(){}", "step"]}),
-                   json.dumps({**PROPOSAL, "hypothesis": "line\rbreak"})]
+        invalid = [
+            "null",
+            "[]",
+            '{"hypothesis":"a","hypothesis":"b","procedure":[],"prediction":"x"}',
+            json.dumps({**PROPOSAL, "procedure": ["only one"]}),
+            json.dumps({**PROPOSAL, "hypothesis": "a" * 385}),
+            json.dumps({**PROPOSAL, "prediction": "```code```"}),
+            json.dumps({**PROPOSAL, "procedure": ["pub fn x(){}", "step"]}),
+            json.dumps({**PROPOSAL, "hypothesis": "line\rbreak"}),
+        ]
         for source in invalid:
             with self.subTest(source=source), self.assertRaises(ValueError):
                 m.parse_proposal(source)
 
     def test_whitespace_case_changes_do_not_make_novel_procedure(self):
-        changed = {**PROPOSAL, "procedure": ["  " + s.upper().replace(" ", "  ") for s in PROPOSAL["procedure"]]}
+        changed = {
+            **PROPOSAL,
+            "procedure": [
+                "  " + s.upper().replace(" ", "  ") for s in PROPOSAL["procedure"]
+            ],
+        }
         self.assertEqual(m.procedure_key(PROPOSAL), m.procedure_key(changed))
 
 

@@ -4,11 +4,12 @@
   "admin_judge": {
     "provider": "local",
     "model": "Qwen3-8B Admin Judge",
-    "path": "models/qwen3-8b/Qwen3-8B-Q4_K_M.gguf"
+    "path": "models/qwen3-8b/Qwen3-8B-Q4_K_M.gguf",
+    "context_tokens": 32768
   },
-  "max_steps": 100,
-  "max_tokens": 10000,
-  "max_run_seconds": 25920000,
+  "max_steps": 3,
+  "max_tokens": 4096,
+  "max_run_seconds": 2592000,
   "agents": [
     {
       "id": "Law Gent",
@@ -94,5 +95,51 @@
         "path": "models/qwen3-coder-30b-worker/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"
       }
     }
-  ]
+  ],
+  "planning_model_policy": {
+    "failures_before_next": 2,
+    "candidates": [
+      {
+        "id": "configured_local_1",
+        "model": {
+          "provider": "local",
+          "model": "Qwen3-8B Admin Judge",
+          "path": "models/qwen3-8b/Qwen3-8B-Q4_K_M.gguf",
+          "context_tokens": 32768
+        },
+        "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+        "minimum_memory_mib": 6843
+      },
+      {
+        "id": "configured_local_2",
+        "model": {
+          "provider": "local",
+          "model": "Phi-4",
+          "path": "models/phi-4/phi-4-Q4_K.gguf"
+        },
+        "sha256": "5652b9be0ea4ae2842130d04fe31bc869fcb99a2b7106c53b4e754a343fd688f",
+        "minimum_memory_mib": 10682
+      },
+      {
+        "id": "configured_local_3",
+        "model": {
+          "provider": "local",
+          "model": "Qwen3-8B",
+          "path": "models/qwen3-8b/Qwen3-8B-Q4_K_M.gguf"
+        },
+        "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+        "minimum_memory_mib": 6843
+      },
+      {
+        "id": "configured_local_4",
+        "model": {
+          "provider": "local",
+          "model": "Qwen3-Coder-30B-A3B-Instruct",
+          "path": "models/qwen3-coder-30b-worker/Qwen3-Coder-30B-A3B-Instruct-Q4_K_M.gguf"
+        },
+        "sha256": "fadc3e5f8d42bf7e894a785b05082e47daee4df26680389817e2093056f088ad",
+        "minimum_memory_mib": 19746
+      }
+    ]
+  }
 }
