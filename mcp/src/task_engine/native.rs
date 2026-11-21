@@ -395,5 +395,15 @@ pub fn observe(context: &ToolContext<'_>, task: Uuid, cancel: bool) -> Result<Op
         result.answer = None;
         result.evidence.clear();
     }
+    if valid && runtime_receipts_current {
+        super::progress::attach(context.db, &scope, &mut result, crate::now_ms())?;
+    } else {
+        result.progress = None;
+        if job.is_some() {
+            result.measurements.generative_model_calls = None;
+            result.measurements.input_tokens = None;
+            result.measurements.output_tokens = None;
+        }
+    }
     Ok(Some(result))
 }

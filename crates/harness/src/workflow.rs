@@ -214,14 +214,6 @@ impl ControllerLease {
 /// `now` is monotonic elapsed milliseconds, scoped to the fenced controller.
 /// Persisted deadlines are never interpreted across ownership epochs; UTC
 /// audit timestamps are recorded independently inside `event`.
-pub trait WorkflowRepository {
-    fn install(&mut self, graph: &Graph) -> Result<String>;
-    fn claim(&mut self, stage: &str, actor: &str, model_sha256: &str, now: u64) -> Result<Claim>;
-    fn inputs(&mut self, lease: &Lease, now: u64) -> Result<Value>;
-    fn finish(&mut self, lease: &Lease, output: &Output, now: u64) -> Result<()>;
-    fn fail(&mut self, lease: &Lease, retryable: bool, now: u64) -> Result<()>;
-    fn snapshot(&self) -> Result<Value>;
-}
 pub struct SqliteWorkflows {
     db: Connection,
     run: String,
@@ -462,8 +454,8 @@ fn check_lease(
     }
     Ok((graph, policy))
 }
-impl WorkflowRepository for SqliteWorkflows {
-    fn install(&mut self, requested: &Graph) -> Result<String> {
+impl SqliteWorkflows {
+    pub fn install(&mut self, requested: &Graph) -> Result<String> {
         requested.validate()?;
         self.hold_controller()?;
         let body = serde_json::to_string(requested)?;
@@ -520,7 +512,13 @@ impl WorkflowRepository for SqliteWorkflows {
         tx.commit()?;
         Ok(sha)
     }
-    fn claim(&mut self, stage: &str, actor: &str, model_sha256: &str, now: u64) -> Result<Claim> {
+    pub fn claim(
+        &mut self,
+        stage: &str,
+        actor: &str,
+        model_sha256: &str,
+        now: u64,
+    ) -> Result<Claim> {
         self.ensure_controller(now)?;
         let tx = self
             .db
@@ -607,7 +605,7 @@ impl WorkflowRepository for SqliteWorkflows {
             dependency_sha256,
         }))
     }
-    fn inputs(&mut self, lease: &Lease, now: u64) -> Result<Value> {
+    pub fn inputs(&mut self, lease: &Lease, now: u64) -> Result<Value> {
         self.ensure_controller(now)?;
         let tx = self
             .db
@@ -627,7 +625,7 @@ impl WorkflowRepository for SqliteWorkflows {
         tx.commit()?;
         Ok(json!(rows))
     }
-    fn finish(&mut self, lease: &Lease, output: &Output, now: u64) -> Result<()> {
+    pub fn finish(&mut self, lease: &Lease, output: &Output, now: u64) -> Result<()> {
         self.ensure_controller(now)?;
         let body = output.encode()?;
         let sha = digest(body.as_bytes());
@@ -648,7 +646,7 @@ impl WorkflowRepository for SqliteWorkflows {
         tx.commit()?;
         Ok(())
     }
-    fn fail(&mut self, lease: &Lease, retryable: bool, now: u64) -> Result<()> {
+    pub fn fail(&mut self, lease: &Lease, retryable: bool, now: u64) -> Result<()> {
         self.ensure_controller(now)?;
         let tx = self
             .db
@@ -675,7 +673,7 @@ impl WorkflowRepository for SqliteWorkflows {
         tx.commit()?;
         Ok(())
     }
-    fn snapshot(&self) -> Result<Value> {
+    pub fn snapshot(&self) -> Result<Value> {
         let graph = graph(&self.db, &self.run)?;
         let epoch: Option<String> = self
             .db

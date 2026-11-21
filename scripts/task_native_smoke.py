@@ -100,6 +100,27 @@ def main():
                 result=client.call('get_task_status',{'task_id':task})
                 if result['status']!='running':return result
                 assert time.monotonic()<deadline,result;time.sleep(.1)
+        def wait_inflight(store,task):
+            # Observe a committed request with no matching return. Merely
+            # seeing the queue row does not establish mid-call revocation.
+            deadline=time.monotonic()+10
+            while True:
+                with sqlite3.connect(store) as db:
+                    row=db.execute('select job from task_native_queue_v1 where task=?',(task,)).fetchone()
+                    job=row[0] if row else None
+                    events=[] if not job else [(kind,json.loads(body)) for kind,body in db.execute("select kind,body from audit where run_id=? and kind in ('task_model_dispatch','task_model_return') order by seq",(job,))]
+                dispatched=[body['call_id'] for kind,body in events if kind=='task_model_dispatch']
+                returned={body['call_id'] for kind,body in events if kind=='task_model_return'}
+                if len(dispatched)==1 and dispatched[0] not in returned:return job,dispatched[0]
+                assert time.monotonic()<deadline,(task,events)
+                time.sleep(.02)
+        def wait_foreground(expected):
+            deadline=time.monotonic()+5
+            while True:
+                value=req('/api/office/activity')['foreground']['async_task_jobs']
+                if value==expected:return
+                assert time.monotonic()<deadline,(value,expected)
+                time.sleep(.01)
         try:
             child=start();op('register',name='Native task fixture');req('/api/companies/two',{'op':'register','name':'Not enabled for native tasks'})
             intake={'idea':'Bounded native task fixture','acceptance':'Typed results and no scope expansion','exclusions':'Paid services','timeline':'Synthetic','company_signer':'Fixture','provider_signer':'Fixture','budget_usd':0,'max_model_calls':128}
@@ -134,8 +155,14 @@ def main():
                 task=launched['intake']['request']['task_id'];result=wait(worker_client,task)
                 assert result['status']=='generated' and result['verification_state']!='verified',(template,result)
                 assert result['measurements']['generative_model_calls']==0,result
+                assert result['progress']['phase']=='finished' and result['progress']['pending_model_requests']==0,result
+                assert result['progress']['model_dispatches']==result['progress']['model_returns']>=len(result['plan']['nodes']),result
                 assert reader.call('get_task_status',{'task_id':task}) is None
                 records.append({'template':template,'nodes':len(result['plan']['nodes'])})
+            usage=req('/api/companies/one/tasks',{'op':'usage'})
+            assert usage['coverage_complete'] and usage['generative_model_calls']==0 and usage['provider_cost_usd']==0,usage
+            assert usage['sampled_jobs']==len(records) and usage['observed_native_replies']==0,usage
+            assert usage['workflow_return_records']==usage['observed_fixture_replies']>=sum(r['nodes'] for r in records),usage
             duplicate={'input':{'original_ask':'Describe native reference evidence for duplicate subscribers'},'hints':{'template':'pipeline/v1','evidence_required':False}}
             first=worker_client.call('execute_task',duplicate);second=worker_client.call('execute_task',duplicate)
             a,b=[v['intake']['request']['task_id'] for v in [first,second]]
@@ -146,27 +173,51 @@ def main():
                 if len(jobs)==2 and all(jobs):break
                 assert time.monotonic()<deadline;time.sleep(.02)
             assert jobs[0]==jobs[1],jobs
+            wait_foreground(1)
             assert worker_client.call('cancel_task',{'task_id':a})['status']=='cancelled'
             assert wait(worker_client,b)['status']=='generated'
             assert wait(worker_client,a)['status']=='cancelled'
-            # New current epoch revokes execution while preserving status access.
+            wait_foreground(0)
+            # Revoke only AFTER a committed dispatch, before its fixture reply.
+            # New current epoch preserves status access, not work authority.
             pending=worker_client.call('execute_task',{'input':{'original_ask':'Describe native reference evidence while revoking permission'},'hints':{'template':'pipeline/v1','evidence_required':False}})
-            task=pending['intake']['request']['task_id'];policy=json.loads(json.dumps(policy));policy['revision']=2;policy['grants']['Worker']['tools'].remove('execute_task')
+            task=pending['intake']['request']['task_id'];revoked_job,revoked_call=wait_inflight(store,task)
+            policy=json.loads(json.dumps(policy));policy['revision']=2;policy['grants']['Worker']['tools'].remove('execute_task')
             def revise():
                 try:op('governance_install',run_id=run,expected_revision=1,policy=policy);return 'saved'
                 except AssertionError as error:return str(error)
             with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:updates=list(pool.map(lambda _:revise(),range(2)))
             assert updates.count('saved')==1 and sum('stale governance update rejected' in result for result in updates)==1,updates
             result=wait(worker_client,task);assert result['status']=='evidence_invalidated' and result['answer'] is None,result
-            policy['revision']=3;policy['grants']['Worker']['tools'].append('execute_task');op('governance_install',run_id=run,expected_revision=2,policy=policy)
-            restarting=worker_client.call('execute_task',{'input':{'original_ask':'Describe native reference evidence for interrupted worker'},'hints':{'template':'pipeline/v1','evidence_required':False}});restart_task=restarting['intake']['request']['task_id'];deadline=time.monotonic()+10
+            assert result.get('progress') is None,result
+            assert result['measurements']['generative_model_calls'] is None,result
+            # Wait for the executor itself to settle. Status redaction alone
+            # cannot prove cancellation, nor can a reservation prove inference.
+            deadline=time.monotonic()+10
             while True:
                 with sqlite3.connect(store) as db:
-                    row=db.execute('select job from task_native_queue_v1 where task=?',(restart_task,)).fetchone();restart_job=row[0]
-                    started=restart_job and db.execute("select count(*) from audit where run_id=? and kind='task_model_dispatch'",(restart_job,)).fetchone()[0]
-                    old_instance=json.loads(db.execute('select body from task_native_worker_v1').fetchone()[0])['instance']
-                if started:break
-                assert time.monotonic()<deadline;time.sleep(.02)
+                    state,checkpoint=db.execute("select state,result from task_workflow_jobs_v1 where id=?",(revoked_job,)).fetchone()
+                    settled=state=='completed'
+                if settled:break
+                assert time.monotonic()<deadline,'revoked executor did not settle'
+                time.sleep(.02)
+            checkpoint=json.loads(checkpoint)
+            assert checkpoint['status']=='evidence_invalidated' and checkpoint['answer'] is None,checkpoint
+            assert not checkpoint['evidence'] and not checkpoint['artifacts'] and checkpoint['plan'] is None,checkpoint
+            assert checkpoint['measurements']['input_tokens'] is None and checkpoint['measurements']['output_tokens'] is None,checkpoint
+            wait_foreground(0)
+            policy['revision']=3;policy['grants']['Worker']['tools'].append('execute_task');op('governance_install',run_id=run,expected_revision=2,policy=policy)
+            stale=wait(worker_client,task);assert stale['status']=='evidence_invalidated' and stale['answer'] is None,stale
+            with sqlite3.connect(store) as db:
+                revoked_dispatches=db.execute("select count(*) from audit where run_id=? and kind='task_model_dispatch'",(revoked_job,)).fetchone()[0]
+                revoked_returns=db.execute("select count(*) from audit where run_id=? and kind='task_model_return'",(revoked_job,)).fetchone()[0]
+            assert revoked_dispatches==1 and revoked_returns==0,(revoked_dispatches,revoked_returns)
+            uncertain=req('/api/companies/one/tasks',{'op':'usage'})
+            assert uncertain['generative_model_calls'] is None and uncertain['provider_cost_usd'] is None,uncertain
+            assert uncertain['unresolved_workflow_requests']>=1,uncertain
+            restarting=worker_client.call('execute_task',{'input':{'original_ask':'Describe native reference evidence for interrupted worker'},'hints':{'template':'pipeline/v1','evidence_required':False}});restart_task=restarting['intake']['request']['task_id']
+            restart_job,_=wait_inflight(store,restart_task)
+            with sqlite3.connect(store) as db:old_instance=json.loads(db.execute('select body from task_native_worker_v1').fetchone()[0])['instance']
             child.terminate();child.wait(timeout=20);child=start();deadline=time.monotonic()+12
             while True:
                 with sqlite3.connect(store) as db:instance=json.loads(db.execute('select body from task_native_worker_v1').fetchone()[0])['instance']
@@ -187,7 +238,7 @@ def main():
                 assert db.execute('select count(*) from task_workflow_plan_revisions_v1').fetchone()[0]>=9
             with sqlite3.connect(folder/'data/companies/two/brain.sqlite3') as db:
                 assert db.execute("select count(*) from sqlite_master where name='task_native_worker_v1'").fetchone()[0]==0
-            print(json.dumps({'transport':'actual native MCP '+transport+', HTTP owner governance and SQLite','worker':'mock only; no model weights loaded','templates':records,'exact_repeat_zero_generation':True,'actor_private':True,'coalesced_subscriber_cancellation':True,'revocation_invalidated':True,'concurrent_owner_update_stale_rejected':True,'restart_did_not_replay':True,'parent_budget_enforced':True,'parent_budget_reservations':reservations,'dispatch_reservations_not_inference_proof':events,'other_company_not_enabled':True,'provider_cost_usd':0}),flush=True)
+            print(json.dumps({'transport':'actual native MCP '+transport+', HTTP owner governance and SQLite','worker':'mock only; no model weights loaded','templates':records,'exact_repeat_zero_generation':True,'actor_private':True,'coalesced_subscriber_cancellation':True,'shared_job_priority_count':1,'priority_released_after_completion':True,'revocation_invalidated':True,'revocation_after_dispatch':True,'revoked_call_id':revoked_call,'revoked_job_dispatches':revoked_dispatches,'revoked_job_returns':revoked_returns,'revoked_executor_settled':True,'regrant_did_not_revive':True,'concurrent_owner_update_stale_rejected':True,'restart_did_not_replay':True,'parent_budget_enforced':True,'parent_budget_reservations':reservations,'dispatch_reservations_not_inference_proof':events,'other_company_not_enabled':True,'provider_cost_usd':0}),flush=True)
         except Exception:
             log.flush();print((folder/'harness.log').read_text()[-4000:]);raise
         finally:

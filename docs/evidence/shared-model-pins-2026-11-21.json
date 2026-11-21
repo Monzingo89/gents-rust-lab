@@ -1,0 +1,597 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-21",
+  "scope": "Shared local model identity admission, warm-cache root protection, and one existing fixed real-model RAG trial; no production profile qualification",
+  "starting_head": "28a8da823231b792030eff5b6172dba29768442f",
+  "changed_source_sha256": {
+    "crates/harness/src/model_pins.rs": "a4bf9e86531a32fcdce6ba53821c39acaf0c2d74c7221d2bb32937217e590b59",
+    "crates/harness/src/model_artifact.rs": "860b49b296bde754b9637f42e63eefb90627b7c8e5200775e4d61973bfc76331",
+    "crates/harness/src/model_package.rs": "37c15f90ea2c3ce2079f00fb0ef72fe7fbcabb56740b738dad000d836a2fde1f",
+    "crates/harness/src/main.rs": "3574cb327830e77b5fa4e146fedeb1c2754108ba03f66a7c943f5c75a7725b22",
+    "crates/harness/src/task_answers.rs": "b7c1929aa09ed574c0de9c17941883dee9e65e8392c3d9b1912fce5c2bf4951d",
+    "crates/harness/src/task_workflows.rs": "06be44f32b6da3b61c5a7ad043135f0451e255980bdf06c678a185133175bae0",
+    "scripts/company_tools.py": "926cea3807a6a1dbf8fca8a22bc180cdccaa1f397659eccdca29065fefe16bdc",
+    "scripts/test_company_tools.py": "bac5a00cd050206b55125428d8716c7c5ffc27dff6e7e433834519c88fd3275e",
+    "scripts/task_engine_live.py": "6c589b6c1d0b94f5c4c619c31ef2c1157c50d9f09975ae32c98d7860ffc4a79d",
+    ".agents/skills/harness-routing/SKILL.md": "f13e624d5d9b8a73503fdb28eb36e1eeb7ae6523549839eb869365aea06b597b",
+    ".agents/skills/local-evaluate/SKILL.md": "5ae36da41d1cf404d68d2910c4f9c7abfb315cec77cbf53b4fc735867327f0fa",
+    "docs/162-local-execution-baseline.md": "1915fd21a483e2db8f15acc5774f93f75c0b0583653c1771f668c8518c93ad7e",
+    "docs/165-shared-model-pins.md": "4ca8cd1fb885fdc521fff67a7f32684e1f3be0be794ee27d373ea170f57a2441"
+  },
+  "regression": {
+    "name": "warm_gguf_pin_never_bypasses_changed_root_permissions",
+    "before": "failed: warm cached identity accepted newly group-writable root",
+    "after": "passed; current native cache rechecks root/path security metadata",
+    "additional_cases": [
+      "changed expected pin and bytes",
+      "paid provider rejected before credential lookup",
+      "company adapter scope retained",
+      "warm root symlink",
+      "hard links",
+      "FIFO rejected before open"
+    ]
+  },
+  "checks": {
+    "workspace": {
+      "command": "cargo test --workspace --offline --locked",
+      "passed": 704,
+      "failed": 0,
+      "ignored": 33
+    },
+    "clippy": "cargo clippy --workspace --all-targets --offline --locked -- -D warnings passed",
+    "python_governance": {
+      "command": "python3 -m unittest discover -s scripts -p test_company_tools.py",
+      "passed": 32
+    },
+    "formatting": "cargo fmt --all -- --check passed",
+    "diff": "git diff --check passed",
+    "skills": "node scripts/repo-skills.mjs --codegpt and edited frontmatter validation passed; no chat invocation",
+    "raw_logs": {
+      "red": {
+        "path": "/tmp/gents-model-pin-red.log",
+        "sha256": "59a5e09e01970062a4e7968a2a63629d9e330a73a8b18775b456be6cce053396"
+      },
+      "green": {
+        "path": "/tmp/gents-model-pin-green.log",
+        "sha256": "c674773891f9e29ea21fef0c4247677195ad215a3deee1eb1fc054048cae3f11"
+      },
+      "unit": {
+        "path": "/tmp/gents-model-pins-final.log",
+        "sha256": "f9ec38c9f70de12f86d3934ac70be8183b84bfc8ebdb33e332ea7965d9120328"
+      },
+      "clippy": {
+        "path": "/tmp/gents-model-pin-clippy.log",
+        "sha256": "ad597ddf84f6efbaea66ae1f5b5db732854e8463acc07d7781dd94abf179af3e"
+      },
+      "workspace": {
+        "path": "/tmp/gents-model-pin-workspace.log",
+        "sha256": "d969864f6e6255cb492d2b00707a7e49b9d6e97fe2f7c74afd4d86eed0436354"
+      },
+      "governance": {
+        "path": "/tmp/gents-model-pin-governance.log",
+        "sha256": "5a82f9a8bc292014e5ec2c76d75bb7dbb552614b8d4410cbe8b3c2bf61fd8a2f"
+      }
+    }
+  },
+  "suite": {
+    "schema_version": 1,
+    "scope": "synthetic integration fixtures; not real-model task qualification",
+    "head": "28a8da823231b792030eff5b6172dba29768442f",
+    "git_status": " M .github/workflows/ci.yml\n M README.md\n M config/schemas/task-engine-v1.json\n M crates/harness/src/main.rs\n M crates/harness/src/model_artifact.rs\n M crates/harness/src/model_package.rs\n M crates/harness/src/office_activity.rs\n M crates/harness/src/task_answers.rs\n M crates/harness/src/task_workflows.rs\n M mcp/src/task_engine/contracts.rs\n M mcp/src/task_engine/mod.rs\n M mcp/src/task_engine/native.rs\n M mcp/src/task_engine/repository.rs\n M scripts/check.sh\n M scripts/company-env.mjs\n M scripts/company-env.test.mjs\n M scripts/company_tools.py\n M scripts/office-activity.test.mjs\n M scripts/run-harness.mjs\n M scripts/start-company.mjs\n M scripts/task_engine_live.py\n M scripts/task_frontdoor_smoke.py\n M scripts/task_native_smoke.py\n M scripts/task_workflows_browser.mjs\n M scripts/task_workflows_smoke.py\n M scripts/test_company_tools.py\n M web/app.js\n M web/assets/office-dashboards.js\n M web/assets/task-workbench.js\n?? .agents/\n?? .claude/\n?? AGENTS.md\n?? crates/harness/src/model_pins.rs\n?? docs/162-local-execution-baseline.md\n?? docs/163-company-lifecycle.md\n?? docs/164-scoped-task-progress.md\n?? docs/evidence/company-lifecycle-2026-11-21.json\n?? docs/evidence/local-execution-baseline-2026-11-21.json\n?? docs/evidence/scoped-task-progress-2026-11-21.json\n?? mcp/src/task_engine/progress.rs\n?? mcp/tests/task_progress.rs\n?? scripts/company-lifecycle-smoke.mjs\n?? scripts/company-lifecycle.mjs\n?? scripts/company-lifecycle.test.mjs\n?? scripts/fixtures/company-lifecycle.mjs\n?? scripts/local_evaluate.py\n?? scripts/repo-skills.mjs\n?? scripts/task-activity.test.mjs\n?? scripts/test_local_evaluate.py\n?? web/assets/task-activity.js\n",
+    "measurements": {
+      "verified_real_tasks": null,
+      "generative_model_calls": 0,
+      "paid_calls": 0,
+      "actual_provider_cost_usd": 0,
+      "estimated_total_cost_usd": null,
+      "resident_bytes": null,
+      "model_context_tokens": null,
+      "cache_hit_ratio": null
+    },
+    "checks": [
+      {
+        "name": "build",
+        "command": [
+          "cargo",
+          "build",
+          "--workspace",
+          "--offline",
+          "--locked"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 147.755,
+        "log": "build.log",
+        "log_sha256": "c92508a29848820f033cd2ea015c85dde0953c88b07cc967ce34b7c08f610549",
+        "observations": []
+      },
+      {
+        "name": "lifecycle",
+        "command": [
+          "node",
+          "--test",
+          "scripts/company-lifecycle.test.mjs"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 5594.882,
+        "log": "lifecycle.log",
+        "log_sha256": "aebcbcad79b0dff7c23bfdf75cc9bdfc33cfa0703825dbedaaefe5285ae2a275",
+        "observations": []
+      },
+      {
+        "name": "rust-lifecycle",
+        "command": [
+          "node",
+          "scripts/company-lifecycle-smoke.mjs"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 1946.181,
+        "log": "rust-lifecycle.log",
+        "log_sha256": "51f6a256bd1e55d6a947264f71259393163202be47b0c3e4c482db737a904c89",
+        "observations": [
+          {
+            "fixture": "actual-rust-lifecycle",
+            "passed": true,
+            "instance_binding": true,
+            "sealed_bundle_verified": true,
+            "graceful_shutdown": true,
+            "listener_closed": true,
+            "harness_sha256": "513c8e6c32f476f9f7f007f6106819e2f8adaf7ec5476a10261fd2ec4c809500",
+            "measurements": {
+              "startup_ms": 775.598,
+              "shutdown_ms": 724.092,
+              "resident_bytes": 29753344,
+              "resident_scope": "single idle harness RSS sample, not model/peak/GPU memory",
+              "generative_model_calls": 0,
+              "paid_calls": 0,
+              "actual_provider_cost_usd": 0,
+              "verified_real_tasks": null,
+              "model_context_tokens": null,
+              "estimated_total_cost_usd": null
+            }
+          }
+        ]
+      },
+      {
+        "name": "frontdoor",
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+          "scripts/task_frontdoor_smoke.py"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 1769.551,
+        "log": "frontdoor.log",
+        "log_sha256": "d5dcfa16747371a2b835020d006f648ed46dd0d6f06b266b7a1958a3f959c081",
+        "observations": [
+          {
+            "fixture": "exact-cache-and-ceo",
+            "checks_passed": true,
+            "measurements": {
+              "elapsed_ms": 1004.824,
+              "startup_through_concurrent_cache_ms": 942.786,
+              "resident_bytes": 33095680,
+              "resident_scope": "single harness RSS sample before shutdown; not peak or model memory",
+              "generative_model_calls": 0,
+              "model_context_tokens": 0,
+              "request_json_bytes": 123,
+              "cache_requests": 8,
+              "cache_hits": 7,
+              "cache_misses": 1,
+              "cache_hit_ratio": 0.875,
+              "paid_calls": 0,
+              "actual_provider_cost_usd": 0,
+              "estimated_total_cost_usd": null
+            },
+            "completion_scope": "synthetic source/cache fixture only; no model competence claim"
+          }
+        ]
+      },
+      {
+        "name": "workflows",
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+          "scripts/task_workflows_smoke.py"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 30036.486,
+        "log": "workflows.log",
+        "log_sha256": "b26b26c432a2b9a4e1beb756260f006ca15a5e20477023e65e195c02daaa0952",
+        "observations": [
+          {
+            "transport": "real HTTP and SQLite",
+            "provider": "mock, zero generative calls",
+            "workflows": [
+              {
+                "template": "direct/v1",
+                "nodes": 1,
+                "status": "generated"
+              },
+              {
+                "template": "rag/v1",
+                "nodes": 1,
+                "status": "generated"
+              },
+              {
+                "template": "tool_loop/v1",
+                "nodes": 1,
+                "status": "generated"
+              },
+              {
+                "template": "pipeline/v1",
+                "nodes": 3,
+                "status": "generated"
+              },
+              {
+                "template": "hub/v1",
+                "nodes": 4,
+                "status": "generated"
+              },
+              {
+                "template": "hierarchy/v1",
+                "nodes": 5,
+                "status": "generated"
+              },
+              {
+                "template": "peer/v1",
+                "nodes": 5,
+                "status": "generated"
+              },
+              {
+                "template": "critique/v1",
+                "nodes": 3,
+                "status": "generated"
+              },
+              {
+                "template": "explore/v1",
+                "nodes": 4,
+                "status": "generated"
+              }
+            ],
+            "duplicate_job_coalesced": true,
+            "subscriber_cancel_isolated": true,
+            "source_correction_invalidated": true,
+            "provider_cost_usd": 0
+          }
+        ]
+      },
+      {
+        "name": "native-stdio",
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+          "scripts/task_native_smoke.py"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 43935.832,
+        "log": "native-stdio.log",
+        "log_sha256": "cd4b84992bba8c6ed730f4ea4dc7319e0444f575e4ecb1036ad5c53aeb287c0e",
+        "observations": [
+          {
+            "transport": "actual native MCP stdio, HTTP owner governance and SQLite",
+            "worker": "mock only; no model weights loaded",
+            "templates": [
+              {
+                "template": "direct/v1",
+                "nodes": 1
+              },
+              {
+                "template": "rag/v1",
+                "nodes": 1
+              },
+              {
+                "template": "tool_loop/v1",
+                "nodes": 1
+              },
+              {
+                "template": "pipeline/v1",
+                "nodes": 3
+              },
+              {
+                "template": "hub/v1",
+                "nodes": 4
+              },
+              {
+                "template": "hierarchy/v1",
+                "nodes": 5
+              },
+              {
+                "template": "peer/v1",
+                "nodes": 5
+              },
+              {
+                "template": "critique/v1",
+                "nodes": 3
+              },
+              {
+                "template": "explore/v1",
+                "nodes": 4
+              }
+            ],
+            "exact_repeat_zero_generation": true,
+            "actor_private": true,
+            "coalesced_subscriber_cancellation": true,
+            "revocation_invalidated": true,
+            "concurrent_owner_update_stale_rejected": true,
+            "restart_did_not_replay": true,
+            "parent_budget_enforced": true,
+            "parent_budget_reservations": 32,
+            "dispatch_reservations_not_inference_proof": 32,
+            "other_company_not_enabled": true,
+            "provider_cost_usd": 0
+          }
+        ]
+      },
+      {
+        "name": "native-sse",
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+          "scripts/task_native_smoke.py",
+          "--sse"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 43733.516,
+        "log": "native-sse.log",
+        "log_sha256": "fb87ad1f2ce436c95ecfca9dba9b68b71cf94068b754af9998dc3c24417b3fa6",
+        "observations": [
+          {
+            "transport": "actual native MCP sse, HTTP owner governance and SQLite",
+            "worker": "mock only; no model weights loaded",
+            "templates": [
+              {
+                "template": "direct/v1",
+                "nodes": 1
+              },
+              {
+                "template": "rag/v1",
+                "nodes": 1
+              },
+              {
+                "template": "tool_loop/v1",
+                "nodes": 1
+              },
+              {
+                "template": "pipeline/v1",
+                "nodes": 3
+              },
+              {
+                "template": "hub/v1",
+                "nodes": 4
+              },
+              {
+                "template": "hierarchy/v1",
+                "nodes": 5
+              },
+              {
+                "template": "peer/v1",
+                "nodes": 5
+              },
+              {
+                "template": "critique/v1",
+                "nodes": 3
+              },
+              {
+                "template": "explore/v1",
+                "nodes": 4
+              }
+            ],
+            "exact_repeat_zero_generation": true,
+            "actor_private": true,
+            "coalesced_subscriber_cancellation": true,
+            "revocation_invalidated": true,
+            "concurrent_owner_update_stale_rejected": true,
+            "restart_did_not_replay": true,
+            "parent_budget_enforced": true,
+            "parent_budget_reservations": 32,
+            "dispatch_reservations_not_inference_proof": 32,
+            "other_company_not_enabled": true,
+            "provider_cost_usd": 0
+          }
+        ]
+      },
+      {
+        "name": "screens",
+        "command": [
+          "node",
+          "--test",
+          "scripts/office-activity.test.mjs",
+          "scripts/task-activity.test.mjs",
+          "scripts/room-activity.test.mjs",
+          "scripts/ceo-execution.test.mjs"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 97.83,
+        "log": "screens.log",
+        "log_sha256": "feed67c3d3a76c16aa4837382d93c08e41d9e84a7b98511e07fdc2bc1f50e4dc",
+        "observations": []
+      }
+    ],
+    "harness_sha256": "513c8e6c32f476f9f7f007f6106819e2f8adaf7ec5476a10261fd2ec4c809500",
+    "elapsed_ms": 127289.177,
+    "passed": true,
+    "private_raw_report": "data/local-evaluation/133f4dc9-3f21-4067-817b-fa2056779f5f/report.json",
+    "raw_report_sha256": "6002104361bef619256986c92834cc70ea02fb2f1473ee14cc06c7b822d2e80c"
+  },
+  "real_model": {
+    "private_report": "data/task-engine-live/5631f2dc-f2c3-4875-bd25-cfbf57950e06/report.json",
+    "report_sha256": "c9266141c1ca5b02e4f30e8abe906dd88d0fa9af921f347ef49c27235d172c31",
+    "private_criteria": "data/task-engine-live/5631f2dc-f2c3-4875-bd25-cfbf57950e06/criteria.json",
+    "criteria_sha256": "cae0fc5207792aa50420c32a2d49bb460b82eec4ed9a50c08fe159ad602f0f36",
+    "harness_sha256": "513c8e6c32f476f9f7f007f6106819e2f8adaf7ec5476a10261fd2ec4c809500",
+    "model_path": "models/qwen3-4b-instruct/Qwen3-4B-Q4_K_M.gguf",
+    "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+    "supervised_command": {
+      "name": "existing-gguf-rag",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+        "scripts/task_engine_live.py"
+      ],
+      "passed": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_ms": 11662.234,
+      "log": "existing-gguf-rag.log",
+      "log_sha256": "20669dc78dbabc372761f4cabaa52017dcbaff69dfc9bed5d9123a42d8d1e542",
+      "observations": [
+        {
+          "report": "/Users/rmonzingo/repo-applications/gents-rust-lab/data/task-engine-live/5631f2dc-f2c3-4875-bd25-cfbf57950e06/report.json",
+          "rag_status": "generated",
+          "rag_answer": "Gerald Ford",
+          "rag_verification": "citations_checked_answer_unverified",
+          "rag_measurements": {
+            "elapsed_micros": 8813317,
+            "embedding_calls": 0,
+            "generative_model_calls": 1,
+            "input_tokens": 661,
+            "memory_bytes": 3934797824,
+            "output_tokens": 304,
+            "provider_cost_usd": 0,
+            "tool_calls": 0
+          },
+          "exact_repeat_calls": 0,
+          "provider_cost_usd": 0
+        }
+      ],
+      "private_raw_report": "data/local-evaluation/real-model-b11c12e5-1424-4a1f-9591-4835de1459bf/report.json",
+      "report_sha256": "b7aea40822be05c76e1a270e7c8a8ed6e64f95b899241b685ced84fa4fc6852c"
+    },
+    "frozen_criteria": {
+      "accepted_answer_forms": [
+        "gerald ford",
+        "gerald r. ford",
+        "gerald r ford"
+      ],
+      "deadline_seconds": 120,
+      "expected_model_calls": 1,
+      "expected_status": "generated",
+      "harness_sha256": "513c8e6c32f476f9f7f007f6106819e2f8adaf7ec5476a10261fd2ec4c809500",
+      "input": {
+        "original_ask": "Who was US president in 1976? Return only the full name.",
+        "output": {
+          "format": "text",
+          "language": "en"
+        },
+        "temporal_scope": "1976"
+      },
+      "max_calls": 1,
+      "max_generation_tokens": 1024,
+      "max_retries": 0,
+      "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+      "production_profile_admission": false,
+      "source": {
+        "domain": "history",
+        "language": "en",
+        "lookups": [],
+        "observed_at_ms": 1795258252495,
+        "revision": "2026-11-18-trial-v1",
+        "source_id": "ford-library-paraphrase",
+        "text": "Gerald Ford held the US presidency from August 9, 1974 until January 20, 1977, following election loss to Jimmy Carter.",
+        "title": "Ford Library facts page; bounded paraphrase; https://www.fordlibrarymuseum.gov/the-fords/gerald-r-ford/facts-and-favorites",
+        "valid_until_ms": 1795258852495
+      }
+    },
+    "fixed_oracle_passed": true,
+    "sample_count": 1,
+    "runtime_status": "generated",
+    "runtime_verification": "citations_checked_answer_unverified",
+    "measurements": {
+      "elapsed_micros": 8813317,
+      "embedding_calls": 0,
+      "generative_model_calls": 1,
+      "input_tokens": 661,
+      "memory_bytes": 3934797824,
+      "output_tokens": 304,
+      "provider_cost_usd": 0,
+      "tool_calls": 0
+    },
+    "configured_context_tokens": 8192,
+    "observed_slot_context_tokens": 8192,
+    "memory_scope": "Native backend RSS observed at reply, not peak/GPU allocation",
+    "call_receipts": [
+      {
+        "kind": "task_model_dispatch",
+        "body": {
+          "call_id": "d4ce4186-4b33-4762-bf97-80481fd8f424",
+          "identity": "local/Qwen3-4B existing bounded RAG trial@7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+          "model": "trial",
+          "native_dispatch_receipt": false,
+          "node_id": "answer",
+          "phase": "worker",
+          "reserved_tokens": 1024
+        }
+      },
+      {
+        "kind": "task_model_return",
+        "body": {
+          "call_id": "d4ce4186-4b33-4762-bf97-80481fd8f424",
+          "fixture": false,
+          "input_tokens": 661,
+          "local_execution": {
+            "backend_pid": 2362,
+            "dispatched_at_ms": 1795258257807,
+            "finish_reason": "stop",
+            "generation_budget": {
+              "final_tokens_reserved": 512,
+              "reasoning_tokens": 512,
+              "total_generation_tokens": 1024
+            },
+            "launch_policy": {
+              "configured_context_tokens": 8192,
+              "fit_margin_mib": 4096,
+              "requested_gpu_layers": "auto"
+            },
+            "observed_context_tokens": 8192,
+            "port": 52295,
+            "received_at_ms": 1795258261314,
+            "resident_kib": 3842576,
+            "separated_reasoning_observed": true,
+            "task_input_sha256": "36b5e2163f800b25510631e319cca4472f673d64287d80123d89f63abe0fab00"
+          },
+          "model": "trial",
+          "native_dispatch_receipt": true,
+          "node_id": "answer",
+          "output_tokens": 304
+        }
+      }
+    ],
+    "exact_cache": {
+      "requests": 2,
+      "hits": 1,
+      "ratio": 0.5,
+      "first_elapsed_micros": 356,
+      "repeat_elapsed_micros": 259,
+      "repeat_model_calls": 0,
+      "generated_draft_cached_as_verified": false
+    },
+    "paid_calls": 0,
+    "actual_provider_cost_usd": 0,
+    "estimated_total_cost_usd": null,
+    "production_profile_admission": false,
+    "quality_scope": "One source-grounded historical question against the existing fixed oracle; no general expert or routing quality claim.",
+    "processes_after_trial": "No harness or native backend remaining in process inspection; production company was not restarted"
+  },
+  "remaining_unknown": [
+    "general task competence and held-out routing quality",
+    "peak backend and GPU memory",
+    "total hardware/electricity/development costs",
+    "grounded vs RAG lifecycle parity and full executor retirement",
+    "Open WebUI deployment/model ownership"
+  ],
+  "not_run": [
+    "full platform-dependent scripts/check.sh",
+    "new browser visual trial in this slice; no UI source changed"
+  ]
+}

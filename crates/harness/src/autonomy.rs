@@ -2,7 +2,7 @@
 //! action; write-ahead intents prevent side-effect replay after interruption.
 use crate::contracts::{EmbeddedContracts, ToolContracts};
 use crate::document_review::{ArtifactEvidenceSource, WorkspaceEvidence};
-use crate::evidence::{EvidenceProjection, Ledger};
+use crate::evidence::Ledger;
 use crate::{company, judges, provider::Model, App};
 use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};
@@ -925,7 +925,7 @@ fn load(root: &Path, company: &str, id: Uuid) -> Result<Checkpoint> {
     }
     let mut state: Checkpoint = serde_json::from_slice(&std::fs::read(path)?)?;
     if let Some(question) = state.attention.as_mut().filter(|q| q["answer"].is_null()) {
-        use crate::operator_answers::{AnswerRepository, FileAnswers};
+        use crate::operator_answers::FileAnswers;
         if let Some(receipt) = (FileAnswers {
             root,
             company,
@@ -967,7 +967,7 @@ pub fn answer(root: &Path, company: &str, id: Uuid, owner: &str, input: &Value) 
     if answer.is_empty() || answer.len() > 10000 {
         bail!("answer must contain 1..10000 bytes; configure secrets in .env.company, never in answers");
     }
-    use crate::operator_answers::{AnswerRepository, FileAnswers};
+    use crate::operator_answers::FileAnswers;
     (FileAnswers {
         root,
         company,

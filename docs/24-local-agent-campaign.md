@@ -391,8 +391,8 @@ all future runs will pass. Failed approaches and their traces remain intact.
 
 ## Durable dependency execution
 
-`workflow::WorkflowRepository` separates scheduling state from model execution.
-Its SQLite adapter stores an immutable, task-digest-bound graph with up to 64
+`workflow::SqliteWorkflows` separates scheduling state from model execution.
+It stores an immutable, task-digest-bound graph with up to 64
 nodes, weight fingerprints, runtime actor identities, dependencies, bounded
 attempts and expiring leases. Only read-only local computation is supported;
 automatic replay of email, transfers or other uncertain external effects is
@@ -625,7 +625,7 @@ and adversarial coverage, and remaining scoped assurance evidence are open.
 ## Protected semantic-memory increment
 
 `semantic_memory.rs` now separates source authorization, derived storage,
-bounded local generation and retrieval through `SummaryRepository`. Canonical
+bounded local generation and retrieval through `SqliteMemos`. Canonical
 context is not replaced by summaries. Explicit configuration selects an existing
 local generator and per-actor version budget. Summary inference has no tools,
 uses recipient-scoped sources, and neither stages itself as canonical model

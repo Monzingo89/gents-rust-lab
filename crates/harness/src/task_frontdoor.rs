@@ -82,6 +82,7 @@ pub enum Operation {
         task_id: Uuid,
     },
     InspectCache,
+    Usage,
     InvalidateCache,
     Capabilities,
 }
@@ -244,6 +245,13 @@ pub fn operation(
     runtime_revision: &str,
     operation: Operation,
 ) -> Result<Value> {
+    if matches!(operation, Operation::Usage) {
+        let mut db = company::connect_readonly(root, tenant, subject)?;
+        let tx = db.transaction_with_behavior(TransactionBehavior::Deferred)?;
+        let usage = crate::task_usage::read(&tx, tenant, now_ms())?;
+        tx.commit()?;
+        return Ok(usage);
+    }
     let mut db = company::connect(root, tenant, subject, false)?;
     let tx = db.transaction_with_behavior(TransactionBehavior::Immediate)?;
     let repo = Repository::new(&tx)?;
@@ -289,6 +297,7 @@ pub fn operation(
             anyhow::bail!("cancellation requires the async task service")
         }
         Operation::InspectCache => repo.inspect_cache(&scope)?,
+        Operation::Usage => unreachable!("handled before source access"),
         Operation::InvalidateCache => {
             json!({"schema_version":VERSION,"deleted":repo.invalidate_cache(&scope)?})
         }

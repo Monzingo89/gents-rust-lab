@@ -304,6 +304,81 @@ struct Job {
 fn job_owner<'a>(subject: &'a str, native: Option<&'a native::Custody>) -> &'a str {
     native.map_or(subject, |n| n.scope.owner.as_str())
 }
+/// Host lifecycle bookkeeping after custody expires. This path may only
+/// replace an exact running checkpoint with redacted terminal metadata; it
+/// cannot read sources, publish a reply, grant authority or dispatch work.
+fn settle_invalidated_native(
+    db: &rusqlite::Connection,
+    tenant: &str,
+    subject: &str,
+    id: Uuid,
+    job: &Job,
+) -> Result<()> {
+    ensure!(
+        !db.is_autocommit(),
+        "terminal cleanup requires a transaction"
+    );
+    let custody = job.native.as_ref().context("native custody missing")?;
+    ensure!(
+        custody.scope.company == tenant && native::subject(&custody.scope) == subject,
+        "terminal cleanup scope mismatch"
+    );
+    let (body, hash): (String, String) = db.query_row(
+        "SELECT body,sha256 FROM task_workflow_jobs_v1 WHERE tenant=?1 AND subject=?2 AND id=?3 AND state='running'",
+        params![tenant, subject, id.to_string()],
+        |r| Ok((r.get(0)?, r.get(1)?)),
+    )?;
+    ensure!(
+        gents_local_mcp::digest(body.as_bytes()) == hash
+            && serde_json::to_value(serde_json::from_str::<Job>(&body)?)?
+                == serde_json::to_value(job)?,
+        "terminal cleanup checkpoint changed; no replay"
+    );
+    let mut result = job.base.clone();
+    result.status = "evidence_invalidated".into();
+    result.verification_state = "not_verified".into();
+    result.answer = None;
+    result.evidence.clear();
+    result.artifacts.clear();
+    result.acceptance_checks.clear();
+    result.validation_receipts.clear();
+    result.progress = None;
+    result.plan = None;
+    result.analysis = None;
+    result.assumptions.clear();
+    result.clarification_questions.clear();
+    result.blockers = vec!["Native custody changed before checkpoint; owned execution stopped. No reply delivered or automatically replayed.".into()];
+    result.measurements.generative_model_calls = None;
+    result.measurements.input_tokens = None;
+    result.measurements.output_tokens = None;
+    result.measurements.memory_bytes = None;
+    result.measurements.elapsed_micros = None;
+    // The existing local-only admission establishes zero provider charges;
+    // reservations and unresolved dispatches do not establish token usage.
+    result.measurements.provider_cost_usd = Some(0);
+    let encoded = serde_json::to_string(&result)?;
+    ensure!(db.execute("UPDATE task_workflow_jobs_v1 SET state='completed',result=?4,expires=?5 WHERE tenant=?1 AND subject=?2 AND id=?3 AND state='running'",params![tenant,subject,id.to_string(),encoded,(crate::now_ms()+1000) as i64])? == 1,"terminal cleanup checkpoint missing");
+    let subscribers: Vec<(String, bool)> = db.prepare("SELECT task,cancelled FROM task_workflow_subscribers_v1 WHERE tenant=?1 AND subject=?2 AND job=?3")?.query_map(params![tenant,subject,id.to_string()], |r| Ok((r.get(0)?,r.get(1)?)))?.collect::<rusqlite::Result<_>>()?;
+    for (task, cancelled) in subscribers {
+        let mut redacted = result.clone();
+        redacted.task_id = Uuid::parse_str(&task)?;
+        if cancelled {
+            redacted.status = "cancelled".into();
+        }
+        // Exact subscriber identities came from the bound host checkpoint.
+        // No current data-access scope is fabricated for this metadata write.
+        ensure!(
+            db.execute(
+                "UPDATE task_records_v1 SET result=?4 WHERE tenant=?1 AND subject=?2 AND id=?3",
+                params![tenant, subject, task, serde_json::to_string(&redacted)?]
+            )? == 1,
+            "terminal subscriber missing"
+        );
+        db.execute("UPDATE task_native_queue_v1 SET state=?5 WHERE tenant=?1 AND subject=?2 AND task=?3 AND job=?4",params![tenant,subject,task,id.to_string(),redacted.status])?;
+    }
+    db.execute("INSERT INTO audit(run_id,kind,body,created) VALUES(?1,'task_workflow_finished',?2,?3)",params![id.to_string(),json!({"result":result,"receipts":[],"custody_invalidated":true,"model_reservations_are_not_proof_of_dispatch":true}).to_string(),crate::now_ms() as i64])?;
+    Ok(())
+}
 #[allow(clippy::too_many_arguments)]
 fn execution_scope(
     repo: &Repository<'_>,
@@ -586,58 +661,14 @@ impl Service {
             return Ok(json!({"request":intake.request,"result":base}));
         }
         let profile = intake.analysis.domain.as_deref().unwrap_or("general");
-        let selected = settings
-            .models
-            .iter()
-            .filter(|(_, m)| {
-                m.evaluated_profiles.contains(profile)
-                    && m.memory_estimate
-                        .total()
-                        .is_ok_and(|n| n <= settings.resident_budget_bytes)
-            })
-            .min_by_key(|(id, m)| {
-                (
-                    m.measured_total_latency_ms.unwrap_or(u64::MAX),
-                    if id.as_str() == settings.default_model {
-                        0
-                    } else {
-                        1
-                    },
-                    m.memory_estimate.weights_bytes,
-                )
-            })
-            .map(|(id, _)| id.clone())
-            .or_else(|| {
-                settings
-                    .adaptive
-                    .as_ref()
-                    .and_then(|a| a.intake.as_ref())
-                    .map(|_| settings.default_model.clone())
-            })
-            .context("no evaluated feasible worker; discovery alone cannot admit a model")?;
-        let model = &settings.models[&selected];
-        ensure!(
-            model.evaluated_profiles.contains(profile)
-                || settings
-                    .adaptive
-                    .as_ref()
-                    .is_some_and(|a| a.intake.is_some()),
-            "default model has no admitted evaluation for requested profile"
-        );
         let mut plan = routing::factory_with_profiles(
             &intake.request,
             &intake.proposed_plan.template,
             profile,
-            Some(&selected),
+            None,
             registry.entries(),
         )?;
-        plan.routing_justification=format!("Selected {selected} from host-admitted profile evaluations and explicit memory reservations; full-path latency measurement {:?}. No optimality claim.",model.measured_total_latency_ms);
         plan.evidence_required = intake.analysis.evidence_required || plan.evidence_required;
-        plan.resolved_models = settings
-            .models
-            .iter()
-            .map(|(id, s)| (id.clone(), worker_identity(s)))
-            .collect();
         let evidence: Vec<_> = repo
             .search(&policy.scope, &intake.request.original_ask, None, 8192, now)?
             .into_iter()
@@ -683,6 +714,86 @@ impl Service {
         }
         execution_tools(&settings, &mut policy, &tx, &root, &tenant, native)?;
         routing::configure_tools(&mut plan, &policy, registry.entries())?;
+        // Size the exact known root packets using the executor's factory.
+        // Later dependency/tool growth and native tokenizer fit remain checked
+        // at each dispatch; an initial fit is not a completion guarantee.
+        let required_input_bytes = {
+            plan.nodes
+                .iter()
+                .filter(|n| n.dependencies.is_empty())
+                .map(|node| {
+                    serde_json::to_vec(&StageInput::for_node(
+                        &intake.request,
+                        node,
+                        &registry.entries()[&node.profile],
+                        &evidence,
+                        BTreeMap::new(),
+                        plan.evidence_required,
+                    ))
+                    .map(|v| v.len())
+                })
+                .collect::<std::result::Result<Vec<_>, _>>()?
+                .into_iter()
+                .max()
+                .context("registered plan has no root")?
+        };
+        let resolved = settings.resolved_models();
+        let feasible = |id: &str, worker: &WorkerSettings| {
+            worker
+                .memory_estimate
+                .total()
+                .is_ok_and(|n| n <= settings.resident_budget_bytes)
+                && (analysis_only || resolved[id].context_bytes >= required_input_bytes)
+        };
+        let selected = settings
+            .models
+            .iter()
+            .filter(|(id, m)| {
+                m.evaluated_profiles.contains(profile) && feasible(id,m)
+            })
+            .min_by_key(|(id, m)| {
+                (
+                    m.measured_total_latency_ms.unwrap_or(u64::MAX),
+                    if id.as_str() == settings.default_model {
+                        0
+                    } else {
+                        1
+                    },
+                    m.memory_estimate.weights_bytes,
+                )
+            })
+            .map(|(id, _)| id.clone())
+            .or_else(|| {
+                settings
+                    .adaptive
+                    .as_ref()
+                    .and_then(|a| a.intake.as_ref())
+                    .filter(|_| feasible(&settings.default_model,&settings.models[&settings.default_model]))
+                    .map(|_| settings.default_model.clone())
+            })
+            .context("no evaluated feasible worker for initial context and memory; discovery alone cannot admit a model")?;
+        let model = &settings.models[&selected];
+        ensure!(
+            model.evaluated_profiles.contains(profile)
+                || settings
+                    .adaptive
+                    .as_ref()
+                    .is_some_and(|a| a.intake.is_some()),
+            "default model has no admitted evaluation for requested profile"
+        );
+        for node in &mut plan.nodes {
+            node.provider_model = Some(selected.clone());
+        }
+        plan.resolved_models = resolved
+            .iter()
+            .map(|(id, model)| (id.clone(), model.identity.clone()))
+            .collect();
+        let context_reason = if analysis_only {
+            "worker context check deferred for analysis-only plan".to_owned()
+        } else {
+            format!("initial root packet {required_input_bytes} bytes fits the host input ceiling")
+        };
+        plan.routing_justification=format!("Selected {selected} from host-admitted profile evaluations and explicit memory reservations; {context_reason}; owner-configured full-path latency {:?} ms. Comparability and optimality are not established by this value.",model.measured_total_latency_ms);
         let validation_bindings = validation_bindings(&tx, &root, native, &plan)?;
         let key = gents_local_mcp::digest(&serde_json::to_vec(
             &json!({"input":intake.request.input,"hints":hints,"validation_bindings":validation_bindings,"analysis_only":analysis_only,"skip_model_intake":skip_model_intake,"template":plan.template,"nodes":plan.nodes,"resolved_models":plan.resolved_models,"evidence_required":intake.analysis.evidence_required,"scope":policy.scope,"runtime":runtime,"corpus":snapshot(&repo,&policy.scope,now)?}),
@@ -836,7 +947,11 @@ impl Service {
         if launch {
             let cancel = Arc::new(AtomicBool::new(false));
             active.insert(id, cancel.clone());
-            tokio::spawn(run(app, root, tenant, subject, id, job, settings, cancel));
+            let foreground = app.office.foreground();
+            tokio::spawn(async move {
+                let _foreground = foreground;
+                run(app, root, tenant, subject, id, job, settings, cancel).await;
+            });
         }
         Ok(json!({"request":intake.request,"result":result,"job_id":id}))
     }
@@ -911,6 +1026,7 @@ impl Service {
             result.evidence.clear();
             repo.replace_result(&scope, &result)?;
         }
+        gents_local_mcp::task_engine::progress::attach(&tx, &scope, &mut result, crate::now_ms())?;
         tx.commit()?;
         Ok(Some(serde_json::to_value(result)?))
     }
@@ -942,6 +1058,7 @@ impl Worker for Adapter {
                 &serde_json::to_string(input)?,
                 tokens,
                 cancel,
+                Some(&input.node_id),
             )
             .await
         })
@@ -962,6 +1079,7 @@ impl intake::IntakeWorker for Adapter {
                 &serde_json::to_string(packet)?,
                 tokens,
                 cancel,
+                None,
             )
             .await
         })
@@ -975,17 +1093,9 @@ impl Adapter {
         prompt: &str,
         tokens: u32,
         cancel: &AtomicBool,
+        node_id: Option<&str>,
     ) -> Result<ModelOutput> {
         let settings = &self.settings.models[id];
-        let pin = crate::task_answers::Settings {
-            model: settings.model.clone(),
-            model_sha256: settings.sha256.clone(),
-            adapter_sha256: settings.adapter_sha256.clone(),
-            final_tokens: tokens,
-            deadline_seconds: self.settings.deadline_seconds,
-            draft_ttl_seconds: 60,
-            max_pending_jobs: 1,
-        };
         if settings.model.provider == "mlx" {
             let package = crate::model_package::snapshot(
                 &self.root,
@@ -1021,8 +1131,14 @@ impl Adapter {
             );
         }
         self.app
-            .task_answers
-            .verify_pin(&self.root, &pin, &self.tenant)
+            .model_pins
+            .verify(
+                &self.root,
+                &settings.model,
+                settings.sha256.as_deref(),
+                settings.adapter_sha256.as_deref(),
+                &self.tenant,
+            )
             .await?;
         let final_tokens =
             tokens.saturating_sub(settings.model.local_reasoning_tokens.unwrap_or(0));
@@ -1051,7 +1167,7 @@ impl Adapter {
             })?
             .context("native parent call allowance disappeared")?;
         }
-        self.checkpoint("task_model_dispatch",json!({"call_id":call_id,"model":id,"identity":self.frozen.plan.resolved_models[id],"phase":if instruction.starts_with("LOCAL_TASK_INTAKE:"){"intake"}else{"worker"},"reserved_tokens":tokens,"native_dispatch_receipt":false}),None)?;
+        self.checkpoint("task_model_dispatch",json!({"call_id":call_id,"node_id":node_id,"model":id,"identity":self.frozen.plan.resolved_models[id],"phase":if instruction.starts_with("LOCAL_TASK_INTAKE:"){"intake"}else{"worker"},"reserved_tokens":tokens,"native_dispatch_receipt":false}),None)?;
         let reply = if settings.model.provider == "mock" {
             self.app
                 .gateway
@@ -1084,7 +1200,7 @@ impl Adapter {
                     }
                 })?
         };
-        self.checkpoint("task_model_return",json!({"call_id":call_id,"model":id,"native_dispatch_receipt":reply.local_execution.is_some(),"local_execution":reply.local_execution,"input_tokens":reply.usage.input,"output_tokens":reply.usage.output,"fixture":settings.model.provider=="mock"}),None)?;
+        self.checkpoint("task_model_return",json!({"call_id":call_id,"node_id":node_id,"model":id,"native_dispatch_receipt":reply.local_execution.is_some(),"local_execution":reply.local_execution,"input_tokens":reply.usage.input,"output_tokens":reply.usage.output,"provider_cost_usd":reply.usage.cost_usd,"latency_ms":reply.latency_ms,"fixture":settings.model.provider=="mock"}),None)?;
         ensure!(
             reply
                 .local_execution
@@ -1093,8 +1209,14 @@ impl Adapter {
             "generation truncated; no partial acceptance"
         );
         self.app
-            .task_answers
-            .verify_pin(&self.root, &pin, &self.tenant)
+            .model_pins
+            .verify(
+                &self.root,
+                &settings.model,
+                settings.sha256.as_deref(),
+                settings.adapter_sha256.as_deref(),
+                &self.tenant,
+            )
             .await?;
         Ok(ModelOutput {
             generative_model_calls: if settings.model.provider == "mock" {
@@ -1712,6 +1834,15 @@ async fn run(
             )
         });
         let tx = db.transaction_with_behavior(TransactionBehavior::Immediate)?;
+        if job
+            .native
+            .as_ref()
+            .is_some_and(|n| native::authorize(&tx, n, crate::now_ms()).is_err())
+        {
+            settle_invalidated_native(&tx, &tenant, &subject, id, &job)?;
+            tx.commit()?;
+            return Ok(());
+        }
         let repo = Repository::new(&tx)?;
         let scope = execution_scope(
             &repo,
@@ -1925,6 +2056,133 @@ async fn run(
         );
     }
     app.task_workflows.active.lock().await.remove(&id);
+}
+
+#[cfg(test)]
+mod terminal_cleanup_tests {
+    use super::*;
+    #[test]
+    fn invalidated_cleanup_is_exact_redacted_and_preserves_cancelled_subscribers() {
+        let db = rusqlite::Connection::open_in_memory().unwrap();
+        db.execute_batch(
+            "BEGIN IMMEDIATE; CREATE TABLE audit(run_id TEXT,kind TEXT,body TEXT,created INTEGER);",
+        )
+        .unwrap();
+        install(&db).unwrap();
+        native::install(&db).unwrap();
+        let repo = Repository::new(&db).unwrap();
+        let custody: native::Custody = serde_json::from_value(json!({"scope":{"company":"one","owner":"owner","run":Uuid::new_v4(),"actor":"Worker","phase":"worker","expected_revision":1},"action":"execute_task","policy_sha256":"frozen","approval_sha256":"frozen","worker_instance":Uuid::new_v4(),"runtime":"frozen","deadline_ms":1000})).unwrap();
+        let subject = native::subject(&custody.scope);
+        let scope = AccessScope {
+            tenant: "one".into(),
+            subject: subject.clone(),
+            effective_access_sha256: "frozen".into(),
+            policy_revision: "1".into(),
+            profile_revision: "1".into(),
+            runtime_revision: "frozen".into(),
+            conversation_sha256: "none".into(),
+            allowed_sources: Default::default(),
+        };
+        let request = TaskRequest::from_input(
+            serde_json::from_value(json!({"original_ask":"Synthetic bounded terminal cleanup"}))
+                .unwrap(),
+        )
+        .unwrap();
+        let mut base = repo
+            .execute(&request, &ExecutionPolicy::read_only(scope, 1), 1)
+            .unwrap();
+        base.answer = Some("PRIVATE_UNDELIVERED_DRAFT".into());
+        let plan = routing::factory(&request, "pipeline/v1", "general", Some("fixture")).unwrap();
+        let job = Job {
+            validation_bindings: vec![],
+            request: request.clone(),
+            plan,
+            evidence: vec![],
+            scope_hash: "frozen".into(),
+            corpus_hash: "frozen".into(),
+            runtime: "frozen".into(),
+            deadline_ms: 1000,
+            base,
+            caller_hints: Hints::default(),
+            analysis_only: false,
+            skip_model_intake: false,
+            workspace_relative_root: None,
+            native: Some(custody),
+        };
+        let id = Uuid::new_v4();
+        let body = serde_json::to_string(&job).unwrap();
+        db.execute("INSERT INTO task_workflow_jobs_v1 VALUES('one',?1,'key',?2,?3,?4,'running',NULL,1000,2000)",params![subject,id.to_string(),body,gents_local_mcp::digest(body.as_bytes())]).unwrap();
+        let cancelled = Uuid::new_v4();
+        for (task, is_cancelled) in [(request.task_id, false), (cancelled, true)] {
+            db.execute(
+                "INSERT INTO task_workflow_subscribers_v1 VALUES('one',?1,?2,?3,?4)",
+                params![subject, task.to_string(), id.to_string(), is_cancelled],
+            )
+            .unwrap();
+            if is_cancelled {
+                db.execute(
+                    "INSERT INTO task_records_v1 VALUES('one',?1,?2,'{}','{}',1)",
+                    params![subject, task.to_string()],
+                )
+                .unwrap();
+            }
+        }
+        // A different subject can have the same request UUID; it is untouched.
+        db.execute(
+            "INSERT INTO task_records_v1 VALUES('one','other',?1,'{}','PRIVATE_OTHER',1)",
+            [request.task_id.to_string()],
+        )
+        .unwrap();
+        assert!(settle_invalidated_native(&db, "two", &subject, id, &job).is_err());
+        assert!(settle_invalidated_native(&db, "one", "other", id, &job).is_err());
+        db.execute("UPDATE task_workflow_jobs_v1 SET sha256='tampered'", [])
+            .unwrap();
+        assert!(settle_invalidated_native(&db, "one", &subject, id, &job).is_err());
+        let state: String = db
+            .query_row("SELECT state FROM task_workflow_jobs_v1", [], |r| r.get(0))
+            .unwrap();
+        assert_eq!(state, "running");
+        db.execute(
+            "UPDATE task_workflow_jobs_v1 SET sha256=?1",
+            [gents_local_mcp::digest(body.as_bytes())],
+        )
+        .unwrap();
+        settle_invalidated_native(&db, "one", &subject, id, &job).unwrap();
+        for (task, status) in [
+            (request.task_id, "evidence_invalidated"),
+            (cancelled, "cancelled"),
+        ] {
+            let encoded: String = db
+                .query_row(
+                    "SELECT result FROM task_records_v1 WHERE subject=?1 AND id=?2",
+                    params![subject, task.to_string()],
+                    |r| r.get(0),
+                )
+                .unwrap();
+            let result: TaskResult = serde_json::from_str(&encoded).unwrap();
+            assert_eq!(result.status, status);
+            assert!(result.answer.is_none() && result.plan.is_none() && result.evidence.is_empty());
+            assert!(result.measurements.generative_model_calls.is_none());
+            assert!(!encoded.contains("PRIVATE_UNDELIVERED_DRAFT"));
+        }
+        let other: String = db
+            .query_row(
+                "SELECT result FROM task_records_v1 WHERE subject='other'",
+                [],
+                |r| r.get(0),
+            )
+            .unwrap();
+        assert_eq!(other, "PRIVATE_OTHER");
+        assert!(settle_invalidated_native(&db, "one", &subject, id, &job).is_err());
+        let events: i64 = db
+            .query_row("SELECT count(*) FROM audit", [], |r| r.get(0))
+            .unwrap();
+        assert_eq!(
+            events, 1,
+            "terminal cleanup cannot duplicate events or dispatch inference"
+        );
+        db.execute_batch("ROLLBACK").unwrap();
+    }
 }
 
 #[cfg(test)]

@@ -1,0 +1,356 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-21",
+  "scope": "Shared authorized owner/native status projection and selected-task building monitor; mock workers, no model competence claim",
+  "starting_head": "28a8da823231b792030eff5b6172dba29768442f",
+  "changed_source_sha256": {
+    "mcp/src/task_engine/progress.rs": "213b3fe1cc442c52807bfa30e1c8feb3073aafd29d0eebd5f9ee887a766ad566",
+    "mcp/src/task_engine/contracts.rs": "732655c3f6086079274d0692140746918ece55c593c8cd4f6eb9832dafdbbe42",
+    "mcp/src/task_engine/mod.rs": "95a28536b93879122a498ef34d28da9a4741faa13012475295e6cb760d2c1089",
+    "mcp/src/task_engine/native.rs": "d17e3a52fc7ec7b5d2522d30c58e7dd7878e66e12b92811a38ffe3830cbf7164",
+    "mcp/src/task_engine/repository.rs": "d8e2d47015ffe519e5605eace4ce4077ce851ff033e4c07b363687517471c2b4",
+    "mcp/tests/task_progress.rs": "24dba427a4d09b6c31420e7d2b260de01135922443a9c6491ec05585aa58a1fe",
+    "crates/harness/src/task_workflows.rs": "36f0ee9973281ca6fb7aa32cb75df4b0731de3a0bea9ae3786d7e88c0b09e81e",
+    "config/schemas/task-engine-v1.json": "2ace6d5b8467ba79265c04543fdec6ae25824faa8ac7cc86a3e64a63e85a9c60",
+    "web/app.js": "528371c7b68798837cb08bdfdb93bfdffb2e381767bc72a2f1546a20ed88d419",
+    "web/assets/task-activity.js": "d033ed7fb000e0d0d32f2d18d63ac23898a2898e7f4c096ac3259cd3594401f8",
+    "web/assets/task-workbench.js": "5fdafa13b8cfbfc2c0444a64bb226536c15ef30f54a7e87aeb669345044fe261",
+    "web/assets/office-dashboards.js": "c3527cd84d37497ff24aae16994535af8e6e8fa5dd524cab70fc8b1ff704987b",
+    "scripts/task-activity.test.mjs": "d9128e6c3bdbe6f648b76ff8d9dacaaf47f3680189dcb1252dc4b503cf730166",
+    "scripts/task_workflows_browser.mjs": "8b159678ca1997881529e0c8bfd22fd98d36cba11e5a8b0424b7b5c9bb47b7ab",
+    "scripts/task_workflows_smoke.py": "20766601e219f43009499589ebf2583da60a80597875936abfb4fd1d7ecae640",
+    "scripts/task_native_smoke.py": "514cd4adda0a8c4c89d0e13a199aa81d146f506fe4f7dd0ca8514fc2f0ef1cec",
+    "scripts/company_tools.py": "36fc2e01a598bbc5313f8c3c6c02ee42e9a800fbf874baa22283a9813dd876db",
+    "scripts/test_company_tools.py": "199e96bc505100263b8bd25db5a273df16b8ed050df29227125fb356ffc82f4f",
+    "scripts/local_evaluate.py": "9690cce15fa5e50a5b1e94eebf8d9e8473236020af0109341fb44bf64ae5ef03",
+    "scripts/check.sh": "4e16f1a12bdb8f6b0e78b1dcc6ed3bbb8b0be950b0bdba254da2870a8ef11746",
+    ".github/workflows/ci.yml": "c8d1cc44997afcbde1a65ee746af7dd08da9e12092752b7a4437fc62f6d38669",
+    ".agents/skills/building-interactions/SKILL.md": "f10192f5bede43abfa6d33375c195b6832fbd9859484044430e820d6b9bde9b6",
+    "docs/162-local-execution-baseline.md": "95f00e68049dd4ed9a8e435a79e64e1d694ba3f12fb78a96d75cad7acd2c641e",
+    "docs/164-scoped-task-progress.md": "7271db80904b8e2cc7ef7e21844a5a11ffcc0290f74eecc9f5bb0fc497dc87da"
+  },
+  "suite": {
+    "passed": true,
+    "elapsed_ms": 136399.086,
+    "private_raw_report": "data/local-evaluation/c97cf38b-43b7-4c02-8049-e77b33029040/report.json",
+    "harness_sha256": "0449f8bcaa4a855db9a77dcdd0ed5d7c24f807f5d48f8d91b9d50e25e91d2eb7",
+    "checks": [
+      {
+        "name": "build",
+        "passed": true,
+        "elapsed_ms": 104.914,
+        "log_sha256": "59639588a6f1826f129cbcd121edc07279dab94786f5fa5bde6b3439b2e845cc",
+        "observations": []
+      },
+      {
+        "name": "lifecycle",
+        "passed": true,
+        "elapsed_ms": 5535.092,
+        "log_sha256": "3329fadebf5d93d1dffdc5ff19919b78a2eba3fddf7e65341a78ff507e5269c9",
+        "observations": []
+      },
+      {
+        "name": "rust-lifecycle",
+        "passed": true,
+        "elapsed_ms": 3642.705,
+        "log_sha256": "ef8e38e6a047729ac33b8ea0f1b3223a21bc61a877209a0af571d541fe542775",
+        "observations": [
+          {
+            "fixture": "actual-rust-lifecycle",
+            "passed": true,
+            "instance_binding": true,
+            "sealed_bundle_verified": true,
+            "graceful_shutdown": true,
+            "listener_closed": true,
+            "harness_sha256": "0449f8bcaa4a855db9a77dcdd0ed5d7c24f807f5d48f8d91b9d50e25e91d2eb7",
+            "measurements": {
+              "startup_ms": 2518.013,
+              "shutdown_ms": 709.433,
+              "resident_bytes": 29753344,
+              "resident_scope": "single idle harness RSS sample, not model/peak/GPU memory",
+              "generative_model_calls": 0,
+              "paid_calls": 0,
+              "actual_provider_cost_usd": 0,
+              "verified_real_tasks": null,
+              "model_context_tokens": null,
+              "estimated_total_cost_usd": null
+            }
+          }
+        ]
+      },
+      {
+        "name": "frontdoor",
+        "passed": true,
+        "elapsed_ms": 1750.638,
+        "log_sha256": "124086400061d6479ab33b2fc068af32411a36f521fcdcae9f71be11a8c2c5ba",
+        "observations": [
+          {
+            "fixture": "exact-cache-and-ceo",
+            "checks_passed": true,
+            "measurements": {
+              "elapsed_ms": 974.825,
+              "startup_through_concurrent_cache_ms": 905.873,
+              "resident_bytes": 33538048,
+              "resident_scope": "single harness RSS sample before shutdown; not peak or model memory",
+              "generative_model_calls": 0,
+              "model_context_tokens": 0,
+              "request_json_bytes": 123,
+              "cache_requests": 8,
+              "cache_hits": 7,
+              "cache_misses": 1,
+              "cache_hit_ratio": 0.875,
+              "paid_calls": 0,
+              "actual_provider_cost_usd": 0,
+              "estimated_total_cost_usd": null
+            },
+            "completion_scope": "synthetic source/cache fixture only; no model competence claim"
+          }
+        ]
+      },
+      {
+        "name": "workflows",
+        "passed": true,
+        "elapsed_ms": 29980.964,
+        "log_sha256": "b26b26c432a2b9a4e1beb756260f006ca15a5e20477023e65e195c02daaa0952",
+        "observations": [
+          {
+            "transport": "real HTTP and SQLite",
+            "provider": "mock, zero generative calls",
+            "workflows": [
+              {
+                "template": "direct/v1",
+                "nodes": 1,
+                "status": "generated"
+              },
+              {
+                "template": "rag/v1",
+                "nodes": 1,
+                "status": "generated"
+              },
+              {
+                "template": "tool_loop/v1",
+                "nodes": 1,
+                "status": "generated"
+              },
+              {
+                "template": "pipeline/v1",
+                "nodes": 3,
+                "status": "generated"
+              },
+              {
+                "template": "hub/v1",
+                "nodes": 4,
+                "status": "generated"
+              },
+              {
+                "template": "hierarchy/v1",
+                "nodes": 5,
+                "status": "generated"
+              },
+              {
+                "template": "peer/v1",
+                "nodes": 5,
+                "status": "generated"
+              },
+              {
+                "template": "critique/v1",
+                "nodes": 3,
+                "status": "generated"
+              },
+              {
+                "template": "explore/v1",
+                "nodes": 4,
+                "status": "generated"
+              }
+            ],
+            "duplicate_job_coalesced": true,
+            "subscriber_cancel_isolated": true,
+            "source_correction_invalidated": true,
+            "provider_cost_usd": 0
+          }
+        ]
+      },
+      {
+        "name": "native-stdio",
+        "passed": true,
+        "elapsed_ms": 43939.021,
+        "log_sha256": "cd4b84992bba8c6ed730f4ea4dc7319e0444f575e4ecb1036ad5c53aeb287c0e",
+        "observations": [
+          {
+            "transport": "actual native MCP stdio, HTTP owner governance and SQLite",
+            "worker": "mock only; no model weights loaded",
+            "templates": [
+              {
+                "template": "direct/v1",
+                "nodes": 1
+              },
+              {
+                "template": "rag/v1",
+                "nodes": 1
+              },
+              {
+                "template": "tool_loop/v1",
+                "nodes": 1
+              },
+              {
+                "template": "pipeline/v1",
+                "nodes": 3
+              },
+              {
+                "template": "hub/v1",
+                "nodes": 4
+              },
+              {
+                "template": "hierarchy/v1",
+                "nodes": 5
+              },
+              {
+                "template": "peer/v1",
+                "nodes": 5
+              },
+              {
+                "template": "critique/v1",
+                "nodes": 3
+              },
+              {
+                "template": "explore/v1",
+                "nodes": 4
+              }
+            ],
+            "exact_repeat_zero_generation": true,
+            "actor_private": true,
+            "coalesced_subscriber_cancellation": true,
+            "revocation_invalidated": true,
+            "concurrent_owner_update_stale_rejected": true,
+            "restart_did_not_replay": true,
+            "parent_budget_enforced": true,
+            "parent_budget_reservations": 32,
+            "dispatch_reservations_not_inference_proof": 32,
+            "other_company_not_enabled": true,
+            "provider_cost_usd": 0
+          }
+        ]
+      },
+      {
+        "name": "native-sse",
+        "passed": true,
+        "elapsed_ms": 51315.04,
+        "log_sha256": "fb87ad1f2ce436c95ecfca9dba9b68b71cf94068b754af9998dc3c24417b3fa6",
+        "observations": [
+          {
+            "transport": "actual native MCP sse, HTTP owner governance and SQLite",
+            "worker": "mock only; no model weights loaded",
+            "templates": [
+              {
+                "template": "direct/v1",
+                "nodes": 1
+              },
+              {
+                "template": "rag/v1",
+                "nodes": 1
+              },
+              {
+                "template": "tool_loop/v1",
+                "nodes": 1
+              },
+              {
+                "template": "pipeline/v1",
+                "nodes": 3
+              },
+              {
+                "template": "hub/v1",
+                "nodes": 4
+              },
+              {
+                "template": "hierarchy/v1",
+                "nodes": 5
+              },
+              {
+                "template": "peer/v1",
+                "nodes": 5
+              },
+              {
+                "template": "critique/v1",
+                "nodes": 3
+              },
+              {
+                "template": "explore/v1",
+                "nodes": 4
+              }
+            ],
+            "exact_repeat_zero_generation": true,
+            "actor_private": true,
+            "coalesced_subscriber_cancellation": true,
+            "revocation_invalidated": true,
+            "concurrent_owner_update_stale_rejected": true,
+            "restart_did_not_replay": true,
+            "parent_budget_enforced": true,
+            "parent_budget_reservations": 32,
+            "dispatch_reservations_not_inference_proof": 32,
+            "other_company_not_enabled": true,
+            "provider_cost_usd": 0
+          }
+        ]
+      },
+      {
+        "name": "screens",
+        "passed": true,
+        "elapsed_ms": 100.044,
+        "log_sha256": "d4df96840d93cd770a48ff3a8652bede46ea06448948359e8c4021b85e37b4e2",
+        "observations": []
+      }
+    ]
+  },
+  "checks": {
+    "workspace_rust": {
+      "status": "passed",
+      "passed": 700,
+      "failed": 0,
+      "ignored": 33,
+      "log_sha256": "cf83a41442c4b002e843f9f23d9f89499085821c8cc491110343912ab4369070",
+      "command": "cargo test --workspace --offline --locked",
+      "supplemental_projection_suite": "Four current projection regressions were rerun with workspace features after the final fixture update."
+    },
+    "strict_offline_clippy": "passed",
+    "projection_rust_tests_passed": 4,
+    "focused_node_tests_passed": 19,
+    "source_governance_python_tests_passed": 32,
+    "vite_build": "passed",
+    "browser": {
+      "status": "passed",
+      "method": "Installed Chrome, real loopback HTTP/SQLite, unchanged original browser acceptance plus pending/finished monitor and synchronous company reset assertions",
+      "log_sha256": "96a0198029d49473216d38f72237c6cb68a01d98ceaea8aa4d81d794a7612836",
+      "screenshot": "data/task-architecture-verification/task-runtime-pending.png",
+      "screenshot_sha256": "e357de864cb4402713f833050352d06d4798fdd9094031e2b4fc76fb5a3ed5b3",
+      "screenshot_visually_inspected": true
+    },
+    "native_sse": "passed; all nine templates plus revocation/cancellation/restart/budget assertions",
+    "format_and_diff": "passed"
+  },
+  "development_failures": [
+    {
+      "observed": "A hidden collapsed crew manifest produced empty innerText in the added browser check.",
+      "correction": "Open the actual manifest before asserting its visible text."
+    },
+    {
+      "observed": "Company switch left a prior task label in the DOM until the next animation frame.",
+      "correction": "Reset task state and update the crew manifest synchronously; keep the immediate-clear assertion."
+    },
+    {
+      "observed": "The generated public-schema equality gate rejected the new status field.",
+      "correction": "Regenerate only the TaskResult schema with the existing --task-schemas command; keep the equality evaluator unchanged."
+    },
+    {
+      "observed": "The new isolated usage regression fixture lacked the job-state column required by repository retention.",
+      "correction": "Include the production job-state field in the fixture; retain the initial-zero usage assertions."
+    }
+  ],
+  "limits": [
+    "Only the selected task is presented; complete cross-store accounting and all-task discovery are not implemented by this slice.",
+    "Legacy grounded-answer status has no synthesized workflow progress.",
+    "Task progress is host journal metadata; dispatch is not measured inference or independent acceptance.",
+    "Real-model task completion, context/peak/GPU/model memory and routing quality remain unknown.",
+    "No production-company restart, new model load or paid runtime calls.",
+    "The broader scripts/check.sh was not run in full."
+  ]
+}

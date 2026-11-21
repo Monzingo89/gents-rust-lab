@@ -59,8 +59,8 @@ snapshot. The previous implementation returned null instead of `Owner Project`.
 The initial failure is retained in this record; increasing the timeout or
 resetting a task was not the repair.
 
-`operator_answers.rs` separates an `AnswerRepository` interface from its file
-adapter. Authenticated API identity is passed by the runtime, not model JSON.
+`operator_answers.rs` provides the concrete `FileAnswers` storage adapter.
+Authenticated API identity is passed by the runtime, not model JSON.
 Receipts bind company, run, question identity/text hash, owner, answer and time.
 They are synced and atomically published without replacing a concurrent winner,
 inside a 0700 directory as 0600 files. Loads merge the canonical receipt into

@@ -43,11 +43,6 @@ impl Record {
     }
 }
 
-pub trait HandoffRepository {
-    fn find(&self, query: &Query<'_>) -> Result<Record>;
-    fn revalidate(&self, binding: &Binding) -> Result<Record>;
-}
-
 /// An authenticated company connection and runtime-bound recipient are required.
 pub struct SqliteHandoffs<'a> {
     pub db: &'a Connection,
@@ -74,9 +69,7 @@ impl SqliteHandoffs<'_> {
         crate::company::semantic_source(self.db, self.run, self.recipient, id, revision)?
             .context("handoff source not currently authorized")
     }
-}
-impl HandoffRepository for SqliteHandoffs<'_> {
-    fn find(&self, query: &Query<'_>) -> Result<Record> {
+    pub fn find(&self, query: &Query<'_>) -> Result<Record> {
         anyhow::ensure!(
             !query.correlation_key.is_empty()
                 && query.correlation_key.len() <= 64
@@ -126,7 +119,7 @@ impl HandoffRepository for SqliteHandoffs<'_> {
         }
         anyhow::bail!("accepted predecessor record unavailable through governed memory")
     }
-    fn revalidate(&self, binding: &Binding) -> Result<Record> {
+    pub fn revalidate(&self, binding: &Binding) -> Result<Record> {
         anyhow::ensure!(
             binding.run_id == self.run
                 && binding.recipient == self.recipient
@@ -206,6 +199,21 @@ mod tests {
         let record = repo.find(&query).unwrap();
         assert_eq!(record.packet()["record"], original);
         assert!(record.packet().get("queue").is_none());
+        // Recovery carries the typed locator, not a trusted copy of the
+        // original. Reopen the company and resolve it through current policy.
+        let packet = record.packet();
+        let checkpoint = root.join("handoff-binding.json");
+        std::fs::write(&checkpoint, serde_json::to_vec(&record.binding).unwrap()).unwrap();
+        drop(db);
+        let binding: Binding = serde_json::from_slice(&std::fs::read(checkpoint).unwrap()).unwrap();
+        let db = crate::company::connect(&root, "one", "alice", false).unwrap();
+        let repo = SqliteHandoffs {
+            db: &db,
+            run,
+            recipient: "Reader",
+        };
+        let record = repo.revalidate(&binding).unwrap();
+        assert_eq!(record.packet(), packet);
         let other = SqliteHandoffs {
             db: &db,
             run,

@@ -1,5 +1,6 @@
 //! Immutable identity for local MLX base/adapter packages. No weight loading,
 //! conversion, downloads or execution of package-supplied code.
+use crate::model_artifact::metadata_identity;
 use anyhow::{ensure, Context, Result};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -67,28 +68,6 @@ fn secure_metadata(path: &Path, owner: &fs::Metadata) -> Result<fs::Metadata> {
         "package special file rejected"
     );
     Ok(meta)
-}
-fn metadata_identity(meta: &fs::Metadata) -> Value {
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::MetadataExt;
-        json!([
-            meta.dev(),
-            meta.ino(),
-            meta.uid(),
-            meta.mode(),
-            meta.nlink(),
-            meta.len(),
-            meta.mtime(),
-            meta.mtime_nsec(),
-            meta.ctime(),
-            meta.ctime_nsec()
-        ])
-    }
-    #[cfg(not(unix))]
-    {
-        json!([meta.len(), format!("{:?}", meta.modified())])
-    }
 }
 fn documentation(name: &str) -> bool {
     name.ends_with(".md")
@@ -411,16 +390,76 @@ mod tests {
         .unwrap();
         let sha = inspect(&root.0, &p, Kind::Model).unwrap().sha256;
         let adapter_sha = inspect(&root.0, adapter, Kind::Adapter).unwrap().sha256;
-        let settings:crate::task_answers::Settings=serde_json::from_value(json!({"model":{"provider":"mlx","model":"synthetic","path":p,"adapter":adapter},"model_sha256":sha,"adapter_sha256":adapter_sha,"final_tokens":128,"deadline_seconds":30,"draft_ttl_seconds":60,"max_pending_jobs":1})).unwrap();
-        settings.validate().unwrap();
-        let service = crate::task_answers::Service::default();
-        service.verify_pin(&root.0, &settings, "one").await.unwrap();
-        assert!(service.verify_pin(&root.0, &settings, "two").await.is_err());
+        let model: crate::provider::Model = serde_json::from_value(
+            json!({"provider":"mlx","model":"synthetic","path":p,"adapter":adapter}),
+        )
+        .unwrap();
+        model.validate().unwrap();
+        let service = crate::model_pins::ModelPins::default();
+        service
+            .verify(
+                &root.0,
+                &model,
+                Some(sha.as_str()),
+                Some(adapter_sha.as_str()),
+                "one",
+            )
+            .await
+            .unwrap();
+        assert!(service
+            .verify(
+                &root.0,
+                &model,
+                Some(sha.as_str()),
+                Some(adapter_sha.as_str()),
+                "two"
+            )
+            .await
+            .is_err());
         fs::write(
             root.0.join(adapter).join("adapters.safetensors"),
             b"changed synthetic adapter",
         )
         .unwrap();
-        assert!(service.verify_pin(&root.0, &settings, "one").await.is_err());
+        assert!(service
+            .verify(
+                &root.0,
+                &model,
+                Some(sha.as_str()),
+                Some(adapter_sha.as_str()),
+                "one"
+            )
+            .await
+            .is_err());
+    }
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn warm_gguf_pin_never_bypasses_changed_root_permissions() {
+        use std::os::unix::fs::PermissionsExt;
+        let root = root();
+        fs::create_dir_all(root.0.join("models/fixture")).unwrap();
+        let bytes = b"Synthetic GGUF identity bytes; not a loaded model";
+        fs::write(root.0.join("models/fixture/model.gguf"), bytes).unwrap();
+        let model: crate::provider::Model = serde_json::from_value(
+            json!({"provider":"local","model":"synthetic","path":"models/fixture/model.gguf"}),
+        )
+        .unwrap();
+        let sha = gents_local_mcp::digest(bytes);
+        let service = crate::model_pins::ModelPins::default();
+        service
+            .verify(&root.0, &model, Some(sha.as_str()), None, "one")
+            .await
+            .unwrap();
+        let original = fs::metadata(&root.0).unwrap().permissions();
+        fs::set_permissions(&root.0, fs::Permissions::from_mode(0o777)).unwrap();
+        let denied = service
+            .verify(&root.0, &model, Some(sha.as_str()), None, "one")
+            .await
+            .is_err();
+        fs::set_permissions(&root.0, original).unwrap();
+        assert!(
+            denied,
+            "a warm pin must recheck its root authorization boundary"
+        );
     }
 }

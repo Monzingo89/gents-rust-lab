@@ -20,11 +20,6 @@ pub struct Answer {
     pub answered_at_ms: u64,
 }
 
-pub trait AnswerRepository {
-    fn get(&self, question: &Value) -> Result<Option<Answer>>;
-    fn record(&self, question: &Value, owner: &str, answer: &str, now: u64) -> Result<()>;
-}
-
 pub struct FileAnswers<'a> {
     pub root: &'a Path,
     pub company: &'a str,
@@ -56,9 +51,7 @@ impl FileAnswers<'_> {
         )?;
         Ok((directory.join(format!("{name}.json")), hash))
     }
-}
-impl AnswerRepository for FileAnswers<'_> {
-    fn get(&self, question: &Value) -> Result<Option<Answer>> {
+    pub fn get(&self, question: &Value) -> Result<Option<Answer>> {
         let (path, hash) = self.key(question)?;
         anyhow::ensure!(!path.is_symlink(), "operator answer symlink rejected");
         if !path.exists() {
@@ -83,7 +76,7 @@ impl AnswerRepository for FileAnswers<'_> {
         );
         Ok(Some(receipt))
     }
-    fn record(&self, question: &Value, owner: &str, answer: &str, now: u64) -> Result<()> {
+    pub fn record(&self, question: &Value, owner: &str, answer: &str, now: u64) -> Result<()> {
         anyhow::ensure!(
             !owner.is_empty()
                 && owner.len() <= 200

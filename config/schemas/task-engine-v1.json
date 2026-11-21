@@ -1451,6 +1451,43 @@
         ],
         "type": "string"
       },
+      "Event": {
+        "additionalProperties": false,
+        "properties": {
+          "at_ms": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "call_id": {
+            "format": "uuid",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "kind": {
+            "type": "string"
+          },
+          "node_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "seq": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "seq",
+          "at_ms",
+          "kind"
+        ],
+        "type": "object"
+      },
       "Evidence": {
         "additionalProperties": false,
         "properties": {
@@ -1779,6 +1816,72 @@
         ],
         "type": "object"
       },
+      "Progress": {
+        "additionalProperties": false,
+        "properties": {
+          "events": {
+            "items": {
+              "$ref": "#/$defs/Event"
+            },
+            "type": "array"
+          },
+          "job_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "model_dispatches": {
+            "format": "uint32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "model_returns": {
+            "format": "uint32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "pending_model_requests": {
+            "format": "uint32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "phase": {
+            "type": "string"
+          },
+          "sampled_at_ms": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "truncated": {
+            "type": "boolean"
+          },
+          "unresolved_model_dispatches": {
+            "format": "uint32",
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "job_id",
+          "sampled_at_ms",
+          "phase",
+          "truncated",
+          "events"
+        ],
+        "type": "object"
+      },
       "Scheduling": {
         "enum": [
           "sequential",
@@ -1968,6 +2071,16 @@
         "anyOf": [
           {
             "$ref": "#/$defs/ExecutionPlan"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "progress": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Progress"
           },
           {
             "type": "null"

@@ -95,21 +95,46 @@ SOURCE_PREFIXES = ("crates/", "scripts/", "web/", "config/", "docs/")
 SOURCE_SUFFIXES = {".rs", ".py", ".js", ".mjs", ".json", ".md", ".css", ".html"}
 # Frozen acceptance, launch/admission code and authority readers are host-owned.
 # New reviewed curriculum helpers inherit this boundary without a filename list.
-PROTECTED_SOURCE_PREFIXES = ("scripts/fixtures/", "scripts/mcp-", "config/company.mcp-")
+PROTECTED_SOURCE_PREFIXES = ("scripts/fixtures/", "scripts/mcp-", "config/company.mcp-",
+                             "crates/harness/src/local_runtime/")
 PROTECTED_SOURCE_FILES = {
     "crates/harness/src/auth.rs",
     "crates/harness/src/security.rs",
     "crates/harness/src/provider.rs",
     "crates/harness/src/escalation.rs",
     "crates/harness/src/main.rs",
+    "crates/harness/src/office_activity.rs",
     "crates/harness/src/task_frontdoor.rs",
+    "crates/harness/src/task_answers.rs",
+    "crates/harness/src/task_workflows.rs",
+    "crates/harness/src/task_usage.rs",
+    "crates/harness/src/task_native.rs",
+    "crates/harness/src/model_pins.rs",
+    "crates/harness/src/model_artifact.rs",
+    "crates/harness/src/model_package.rs",
     "crates/harness/src/ceo_fastpath.rs",
     "crates/harness/src/ceo_planning.rs",
     "crates/harness/src/reasoning_planning.rs",
     "web/assets/ceo-execution.js",
     "scripts/task_frontdoor_smoke.py",
+    "scripts/task_workflows_smoke.py",
+    "scripts/task_native_smoke.py",
+    "scripts/local_evaluate.py",
+    "scripts/test_local_evaluate.py",
+    "scripts/local_trial.py",
+    "scripts/test_local_trial.py",
+    "scripts/rust_candidate_live.py",
+    "scripts/check.sh",
     "scripts/task_frontdoor_browser.mjs",
+    "scripts/task_engine_live.py",
+    "scripts/task_workflows_browser.mjs",
+    "scripts/task-activity.test.mjs",
     "scripts/company-env.mjs",
+    "scripts/company-lifecycle.mjs",
+    "scripts/company-lifecycle.test.mjs",
+    "scripts/company-lifecycle-smoke.mjs",
+    "scripts/start-company.mjs",
+    "scripts/run-company.sh",
     "config/global-pstc.json",
     "scripts/run-harness.mjs",
     "scripts/company_tools.py",
@@ -296,14 +321,17 @@ class PinnedHTTPS(http.client.HTTPSConnection):
         # HTTPSConnection initializes _context itself; assigning it beforehand
         # loses the caller's configured certificate store and mocked transport.
         context = kwargs.pop("context", None)
+        if context is None:
+            context = ssl.create_default_context()
         super().__init__(*args, context=context, **kwargs)
+        self._tls_context = context
 
     def connect(self):
         # Pin the validated address to prevent DNS rebinding between validation/connect.
         sock = socket.create_connection(
             (str(public_address(self.host)), self.port), self.timeout
         )
-        self.sock = self._context.wrap_socket(sock, server_hostname=self.host)
+        self.sock = self._tls_context.wrap_socket(sock, server_hostname=self.host)
 
 
 def web_request(url, method="GET", payload=None, headers=None, limit=2_000_000):

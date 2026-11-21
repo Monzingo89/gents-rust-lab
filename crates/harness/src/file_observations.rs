@@ -160,7 +160,6 @@ mod tests {
     }
     #[test]
     fn ledger_resets_readback_when_a_later_write_changes_the_recorded_bytes() {
-        use crate::evidence::EvidenceProjection;
         let mut ledger = crate::evidence::Ledger::default();
         ledger.observe(&record("write", 1, "body"));
         ledger.observe(&record("read", 2, "body"));

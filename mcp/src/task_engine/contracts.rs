@@ -425,6 +425,8 @@ pub struct TaskResult {
     pub verification_state: String,
     pub cache: CacheProvenance,
     pub measurements: Measurements,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub progress: Option<super::progress::Progress>,
     pub plan: Option<ExecutionPlan>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub analysis: Option<TaskAnalysis>,

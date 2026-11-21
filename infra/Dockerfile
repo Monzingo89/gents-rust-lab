@@ -2,6 +2,11 @@ FROM rust:1-bookworm AS build
 WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
 COPY crates ./crates
+COPY mcp ./mcp
+# Both workspace crates embed configuration, approved skill bodies and this helper.
+COPY config ./config
+COPY docs/companies/we-need-getns-llc/shared-skills ./docs/companies/we-need-getns-llc/shared-skills
+COPY scripts/python_snapshot_check.py ./scripts/python_snapshot_check.py
 RUN cargo build --release -p gents-harness --locked
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*

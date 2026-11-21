@@ -1,0 +1,265 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-21",
+  "head": "28a8da823231b792030eff5b6172dba29768442f",
+  "scope": "Two structural harness API batches; fixture/control-plane checks, not real-model qualification",
+  "simplification": {
+    "removed_traits": 8,
+    "removed_stateless_wrappers": 1,
+    "implementation_line_reduction": 78,
+    "converted_operation_bodies": 18,
+    "projection_bodies": 3,
+    "method_body_comparison": "unchanged except obsolete trait import and trace indentation"
+  },
+  "baseline": {
+    "commands": [
+      "cargo fmt --all -- --check",
+      "cargo clippy --workspace --all-targets --offline --locked -- -D warnings",
+      "cargo test --workspace --offline --locked"
+    ],
+    "passed": true,
+    "tests": {
+      "passed": 712,
+      "failed": 0,
+      "ignored": 34
+    },
+    "test_log_sha256": "6f4130f90ac7e79b7634200d1a1da1b04926f50170e1c118771adfbc9bd644da"
+  },
+  "batch_1": {
+    "commands": [
+      "cargo clippy -p gents-harness --all-targets --offline --locked -- -D warnings",
+      "cargo test -p gents-harness --offline --locked"
+    ],
+    "passed": true,
+    "tests": {
+      "passed": 428,
+      "failed": 0,
+      "ignored": 24
+    }
+  },
+  "final": {
+    "commands": [
+      "cargo fmt --all -- --check",
+      "cargo clippy --workspace --all-targets --offline --locked -- -D warnings",
+      "cargo test --workspace --offline --locked",
+      "python3 scripts/local_evaluate.py",
+      "git diff --check"
+    ],
+    "passed": true,
+    "tests": {
+      "passed": 712,
+      "failed": 0,
+      "ignored": 34
+    },
+    "test_log_sha256": "baf577540a51892b0a55bd01b99ec4364693b2cd4183b6c9fc5e6c8e373f719d",
+    "fixture_report": "data/local-evaluation/aaf1cd51-ff88-4651-91ef-3dbbe1f81c53/report.json",
+    "fixture_report_sha256": "29a1ffd61f0e19e6578b4ff8266118a6c18aa07f03f27406d86b7fa1cb632991",
+    "fixture_checks": [
+      {
+        "name": "build",
+        "passed": true,
+        "elapsed_ms": 11906.489
+      },
+      {
+        "name": "lifecycle",
+        "passed": true,
+        "elapsed_ms": 5600.251
+      },
+      {
+        "name": "probe-lifecycle",
+        "passed": true,
+        "elapsed_ms": 5367.583
+      },
+      {
+        "name": "rust-lifecycle",
+        "passed": true,
+        "elapsed_ms": 1879.459
+      },
+      {
+        "name": "frontdoor",
+        "passed": true,
+        "elapsed_ms": 1064.778
+      },
+      {
+        "name": "grounded",
+        "passed": true,
+        "elapsed_ms": 2982.491
+      },
+      {
+        "name": "routing",
+        "passed": true,
+        "elapsed_ms": 3118.257
+      },
+      {
+        "name": "workflows",
+        "passed": true,
+        "elapsed_ms": 29981.607
+      },
+      {
+        "name": "native-stdio",
+        "passed": true,
+        "elapsed_ms": 43722.935
+      },
+      {
+        "name": "native-sse",
+        "passed": true,
+        "elapsed_ms": 43854.175
+      },
+      {
+        "name": "screens",
+        "passed": true,
+        "elapsed_ms": 97.943
+      }
+    ],
+    "fixture_elapsed_ms": 149603.151,
+    "harness_sha256": "971ea899850e55a4661945257fc8ecb9d2f377ce1d7cdcaca410a2de9d7d1bc0",
+    "fixture_measurements": {
+      "verified_real_tasks": null,
+      "generative_model_calls": 0,
+      "paid_calls": 0,
+      "actual_provider_cost_usd": 0,
+      "estimated_total_cost_usd": null,
+      "resident_bytes": null,
+      "model_context_tokens": null,
+      "cache_hit_ratio": null
+    }
+  },
+  "body_comparisons": [
+    {
+      "file": "crates/harness/src/memory.rs",
+      "method": "latest",
+      "body_sha256": "bd3c74de85fe9e8223b969dc8aec0ce3d146118c8371acc81587bf4adb7aee1e"
+    },
+    {
+      "file": "crates/harness/src/memory.rs",
+      "method": "append",
+      "body_sha256": "ca4d3869b461ebacfd61a31c2d078fa11146aa07f7e04cd479c564911c9bc52e"
+    },
+    {
+      "file": "crates/harness/src/memory_handoff.rs",
+      "method": "find",
+      "body_sha256": "df3b511d95614c5d30c2c737ce87cd2f658ffd10ba3e423cc13f2b1ca689ac6b"
+    },
+    {
+      "file": "crates/harness/src/memory_handoff.rs",
+      "method": "revalidate",
+      "body_sha256": "9a7f305e3da83a02cd906dedb4c9ed09992a82ebb912538145ca52b2bced36e6"
+    },
+    {
+      "file": "crates/harness/src/memory_archive.rs",
+      "method": "archive",
+      "body_sha256": "14d1dd6a0c4e51a14567cb3f7c23bfcd16b209013086a45378408ec0af808aba"
+    },
+    {
+      "file": "crates/harness/src/memory_archive.rs",
+      "method": "recall",
+      "body_sha256": "72b39e37872ea095c488d8716efb56e079bb7609ba70fb43ed298bc89d2d4952"
+    },
+    {
+      "file": "crates/harness/src/semantic_memory.rs",
+      "method": "claim",
+      "body_sha256": "c521c8fa616e4f05fc975633decbe84262f8113638a15448b62f0eec87b9b532"
+    },
+    {
+      "file": "crates/harness/src/semantic_memory.rs",
+      "method": "commit",
+      "body_sha256": "e56b6ebef6e9060f3c1fa6a6008700bbef2db846a1c62081429f2c96c72c0a97"
+    },
+    {
+      "file": "crates/harness/src/semantic_memory.rs",
+      "method": "get",
+      "body_sha256": "1c329edf231fa33ab99b92ca050d5080d8a49589b2845d3314de7c43bfb9309f"
+    },
+    {
+      "file": "crates/harness/src/semantic_memory.rs",
+      "method": "resolve",
+      "body_sha256": "7f0266a93bfe4f306a5143968b83bbd9a0d5c71380bd03e6da3142a3d207542e"
+    },
+    {
+      "file": "crates/harness/src/operator_answers.rs",
+      "method": "get",
+      "body_sha256": "e0978be4b2570100b84f2475d2fe40d79862365785920eb39a0d3c0699b7d304"
+    },
+    {
+      "file": "crates/harness/src/operator_answers.rs",
+      "method": "record",
+      "body_sha256": "8b0079e4be2a4a8caa2460adaff200de4f0160ff0d57ebbe4c9753ae9b1a5e71"
+    },
+    {
+      "file": "crates/harness/src/workflow.rs",
+      "method": "install",
+      "body_sha256": "202cddd9500be0e7a2f19690a39580d4766f1ebe5d28c25c5b8c5979c8dfd21c"
+    },
+    {
+      "file": "crates/harness/src/workflow.rs",
+      "method": "claim",
+      "body_sha256": "fc4e74f261126f6739d474a0b757822750de1fdb481d446ecbbd546d8a226865"
+    },
+    {
+      "file": "crates/harness/src/workflow.rs",
+      "method": "inputs",
+      "body_sha256": "69b6239df6bbd2ecfee99fb9dda89d32554301d0de01ad544b71e4a57eb2698c"
+    },
+    {
+      "file": "crates/harness/src/workflow.rs",
+      "method": "finish",
+      "body_sha256": "6ed0640a771ed3dc0e964113892a93d5f29b617987d7917c4bb111221a7cde80"
+    },
+    {
+      "file": "crates/harness/src/workflow.rs",
+      "method": "fail",
+      "body_sha256": "e9b0a18443a279269b166806a97f3a4dc352c331c17599821dc2e18aa02f6ea4"
+    },
+    {
+      "file": "crates/harness/src/workflow.rs",
+      "method": "snapshot",
+      "body_sha256": "04014359b8a1a8d06fb71494c284e3ed648fd2c30b3e03f27eabc0a49275b110"
+    },
+    {
+      "file": "crates/harness/src/evidence.rs",
+      "method": "observe",
+      "body_sha256": "936f094cddaf4654bd987038a1b8ccd5c8850565d8b322a089876ce8ffadbfa4"
+    },
+    {
+      "file": "crates/harness/src/evidence.rs",
+      "method": "handoff",
+      "body_sha256": "2ffd622e38d362dd6d61406da2779e72d68b97627e468f5732900108b97d5288"
+    },
+    {
+      "file": "crates/harness/src/observability.rs",
+      "method": "project",
+      "body_sha256": "68512b0623fb48d144d09d8eb8216635db7945780c544a56285c7f21537b9c0d",
+      "comparison": "original body unindented one level"
+    }
+  ],
+  "boundaries": {
+    "cargo_manifests_changed": false,
+    "lockfiles_changed": false,
+    "runtime_configuration_changed": false,
+    "public_mcp_implementation_changed": false,
+    "frontend_source_changed": false,
+    "independent_edits_preserved": [
+      "scripts/experiment_loop.py",
+      "scripts/local_evaluate.py"
+    ],
+    "evaluation_script_at_launch_sha256": "788161dbed14c7988e0b9dd485c38aac98c2852d3eb758fad39c8395b143be66",
+    "current_evaluation_script_sha256": "0029ecd3949bed36e4ee25c02b2efffb5671f460a358433604599f86d6bc6158"
+  },
+  "limitations": [
+    "34 opt-in/platform tests ignored",
+    "No actual model generation or real backend switching trial",
+    "No desktop GUI or Linux container validation",
+    "Fixture costs exclude development, electricity and hardware",
+    "No performance improvement claim",
+    "Independent Python edits were not qualified by this Rust API refactor"
+  ],
+  "preservation": {
+    "intentional_existing_file_edits": 22,
+    "new_audit_files": [
+      "docs/175-concrete-harness-apis.md",
+      "docs/evidence/concrete-harness-apis-2026-11-21.json"
+    ],
+    "unchanged_original_files": 1231,
+    "head_preserved": true
+  }
+}

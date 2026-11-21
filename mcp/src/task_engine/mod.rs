@@ -7,6 +7,7 @@ pub mod intake;
 pub mod models;
 pub mod native;
 pub mod optimization;
+pub mod progress;
 pub mod project_metadata;
 pub mod read_tools;
 mod repository;

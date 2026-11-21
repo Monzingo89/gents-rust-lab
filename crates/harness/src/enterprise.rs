@@ -3,7 +3,7 @@
 use crate::{
     banking::{self, Task, ORDER},
     company,
-    workflow::{Claim, ControllerLease, Graph, Node, Output, SqliteWorkflows, WorkflowRepository},
+    workflow::{Claim, ControllerLease, Graph, Node, Output, SqliteWorkflows},
     App, Config,
 };
 use anyhow::{Context, Result};
@@ -285,7 +285,7 @@ fn triage_memory_records(
     task: &Task,
     state: &Value,
 ) -> Result<Vec<crate::memory_handoff::Record>> {
-    use crate::memory_handoff::{record_hash, HandoffRepository, Query, SqliteHandoffs};
+    use crate::memory_handoff::{record_hash, Query, SqliteHandoffs};
     company::acknowledge(root, company, owner, run, "triage")?;
     let mut db = company::connect(root, company, owner, false)?;
     let tx = db.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
@@ -322,7 +322,7 @@ fn revalidate_triage_memory(
     task: &Task,
     state: &Value,
 ) -> Result<()> {
-    use crate::memory_handoff::{record_hash, Binding, HandoffRepository, SqliteHandoffs};
+    use crate::memory_handoff::{record_hash, Binding, SqliteHandoffs};
     anyhow::ensure!(
         state["memory_handoff_protocol"] == banking::TRIAGE_MEMORY_PROTOCOL,
         "cached triage memory protocol changed"

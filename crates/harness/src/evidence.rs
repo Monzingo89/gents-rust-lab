@@ -49,13 +49,8 @@ fn immutable(value: &str) -> bool {
     value.len() == 40 && value.bytes().all(|byte| byte.is_ascii_hexdigit())
 }
 
-pub trait EvidenceProjection {
-    fn observe(&mut self, record: &Value);
-    fn handoff(&self) -> Value;
-}
-
-impl EvidenceProjection for Ledger {
-    fn observe(&mut self, record: &Value) {
+impl Ledger {
+    pub fn observe(&mut self, record: &Value) {
         self.schema_version = SCHEMA_VERSION;
         let (Some(action), Some(step)) = (record["action"].as_str(), record["step"].as_u64())
         else {
@@ -231,7 +226,7 @@ impl EvidenceProjection for Ledger {
         }
     }
 
-    fn handoff(&self) -> Value {
+    pub fn handoff(&self) -> Value {
         let sources = self.datasets.values().take(8).map(|source| json!({
             "repo":source.repo,"revision":source.revision,"discovered_step":source.discovered_step,
             "inspected_step":source.inspected_step,"files":source.files.iter().take(16).collect::<Vec<_>>(),

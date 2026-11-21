@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-21",
+  "scope": "Original requirement audit, exact initial-packet feasibility before owner latency ranking, and bounded TCP fixture correction; no new inference provider or service",
+  "starting_head": "28a8da823231b792030eff5b6172dba29768442f",
+  "changed_source_sha256": {
+    "mcp/src/task_engine/workflows.rs": "b43f3afb11e997db253c875cd10dbbb3dd825651738439008bcf867956b401a3",
+    "crates/harness/src/task_workflows.rs": "6a4f12dd4bc1b0bbae0c2f8d6ee7942e57eb134a15c029e95e72be2c4b92f0a2",
+    "mcp/tests/cosmos_check.rs": "f17d5ea0ef35da8d90c6fab632b1cabb150530014e5e2de448de6a7302d1fa57",
+    "mcp/tests/owned_component_edges.rs": "75d350ab6b95a9e141a9089e21fea2545330e44f34d1b57fe70435d18ca7963e",
+    "scripts/task_workflows_smoke.py": "350aceed1d5387b92902b33ada04bcedcb0ebc4871ead93bc1248bda7836f0cf",
+    "scripts/local_evaluate.py": "f1e5866b04120b4c8024d2c2f22191c560f5c5a728542d6b9bff5eb0e05e6aa8",
+    "scripts/check.sh": "9d2682797e67a74edea2e751ce7aaa3083250c4f78dd1dd84f4116d06947f32f",
+    "scripts/company_tools.py": "fa82acaa024b78493adc5c5182ef0a9087848e1a4dc55d919d4ea76787a18cb9",
+    "scripts/test_company_tools.py": "db8b367dfceb2a8f251e3d59d8dde1255b9ce9c6ad06b0c316629f5c501cfa14",
+    ".agents/skills/harness-routing/SKILL.md": "243133197267b7e6dcb8034cef0c5302c985e1fc5ed17d5acf43d4ddaa827bfa",
+    ".agents/skills/local-evaluate/SKILL.md": "f0dfe177ac6f8fecb60ba341702c4d28e9a14ae59efcb788cf11c616bdfcccf6",
+    "docs/162-local-execution-baseline.md": "e6fad480802b6664609f97118d70482e4ac02c8c1a5bdf89c414b979fc297573",
+    "docs/169-requirement-audit-and-routing.md": "50cf51f0d9aeafab2fe7c405a6db9fa8b639ad80d1fd0d2bfc15fbfce07d5a38"
+  },
+  "behavior": {
+    "construction": "StageInput::for_node shared by admission sizing and executor; existing serialized fields preserved",
+    "selection": "Configure registered root nodes/tool intersections first, then filter evaluated profile, resident memory and actual known packet byte ceiling before owner-configured latency ranking",
+    "fallback": "Existing adaptive default fallback also requires initial context and memory fit",
+    "analysis_only": "Worker byte check deferred; no worker dispatch for analysis-only proposal",
+    "later_checks": "Dependent/tool-expanded packets, native tokenizer context, actual model pins/fit, current policy, sources and shared budgets remain checked",
+    "latency_provenance": "Owner-configured scalar labelled as such; no runtime claim that workloads are comparable or measured values prove optimality",
+    "cosmos_fixture": "Accepted stream explicitly blocking with original two-second read timeout; accept deadline and all production/privacy/result oracles unchanged",
+    "native_failure_diagnostic": "Existing produced value added to one assertion message; expected output unchanged"
+  },
+  "routing_observation": {
+    "analysis_only_worker_dispatches": 0,
+    "transport": "real HTTP and SQLite",
+    "provider": "mock only",
+    "routing_inputs": "Owner-configured synthetic latency values; no benchmark speed claim",
+    "selections": [
+      {
+        "supplied_context_json_bytes": 4012,
+        "selected": "fixture",
+        "routing_justification": "Selected fixture from host-admitted profile evaluations and explicit memory reservations; initial root packet 5230 bytes fits the host input ceiling; owner-configured full-path latency Some(50) ms. Comparability and optimality are not established by this value."
+      },
+      {
+        "supplied_context_json_bytes": 2,
+        "selected": "fast",
+        "routing_justification": "Selected fast from host-admitted profile evaluations and explicit memory reservations; initial root packet 1221 bytes fits the host input ceiling; owner-configured full-path latency Some(1) ms. Comparability and optimality are not established by this value."
+      }
+    ],
+    "profile_and_memory_filters_preserved": true,
+    "infeasible_request_dispatches": 0,
+    "fixture_dispatches": 2,
+    "generative_model_calls": 0,
+    "provider_cost_usd": 0
+  },
+  "checks": {
+    "workspace": {
+      "passed": 712,
+      "failed": 0,
+      "ignored": 33
+    },
+    "strict_clippy": "passed in isolated full repository check",
+    "full_repository": {
+      "command": [
+        "bash",
+        "scripts/check.sh"
+      ],
+      "passed": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "elapsed_ms": 802455.05,
+      "log_sha256": "c87fc3da97d8b9cfda9bf893f83f0c358b806fbbfa46cb3e3aa743f3a9dc1319"
+    },
+    "private_full_repository_report": "data/local-evaluation/repository-check-bed34229-843f-4a58-9616-de95d34420c2/report.json",
+    "full_repository_report_sha256": "e72a872fa6cb0403fd74642541ee85c3c0fa580b82761ea9c0f679b1f1730ac2",
+    "full_repository_environment": "Sanitized inherited environment; CARGO_NET_OFFLINE, HF_HUB_OFFLINE, TRANSFORMERS_OFFLINE, GENTS_LOCAL_ONLY enabled; office/scheduler disabled; owned process group and 1800 second bound",
+    "cosmos_fixture": {
+      "path": "/tmp/gents-cosmos-fixture-green.log",
+      "sha256": "3e5307626285aa16b0d2a4a446e431f6de26ed273872f6ccb070bd6a4bb3a47c",
+      "passed": 10,
+      "ignored": 1
+    },
+    "isolated_native_recheck": {
+      "path": "/tmp/gents-owned-edges-recheck.log",
+      "sha256": "5d76afa5c907d6ca42ff644fed5b7d713b578ba4ce7ca1ab6b897614863ecba6",
+      "passed": 12
+    },
+    "skills": "Edited frontmatter validated and Canonical/Claude/Kimi/CodeGPT links verified; no chat invocation",
+    "diff": "git diff --check passed"
+  },
+  "bounded_suite": {
+    "private_report": "data/local-evaluation/97b6a15a-d268-49fa-8986-b5439e788a9a/report.json",
+    "report_sha256": "ea8804e8b3f070f94d29358499d6e81ea1b5283c6c4c6abf02c1091ce4df7dc8",
+    "passed": true,
+    "elapsed_ms": 185034.434,
+    "harness_sha256": "b200663e543ab81b972b192ba7a85e84794c0ad06f73d03761bfb2ebb20ca424",
+    "checks": [
+      {
+        "name": "build",
+        "passed": true,
+        "elapsed_ms": 42551.704,
+        "log_sha256": "3d7f9d6a57f7092d111c27d899ba5d7ba8695036ebe2860d7063ad8c13e5d514"
+      },
+      {
+        "name": "lifecycle",
+        "passed": true,
+        "elapsed_ms": 5687.55,
+        "log_sha256": "317dc33ed5d56fa7345a9024050147ed91f6cf9074d0dab48397b0aa062fbe03"
+      },
+      {
+        "name": "rust-lifecycle",
+        "passed": true,
+        "elapsed_ms": 7272.964,
+        "log_sha256": "f645df251e8021bcd02d392c8dceb185ba88ea0a8a27188b38ac7caf7909b198"
+      },
+      {
+        "name": "frontdoor",
+        "passed": true,
+        "elapsed_ms": 1543.492,
+        "log_sha256": "e869bb9e7d5a2d8a3fa6c986b2412d98bf6b83c378f37927802c71e3dd9adff6"
+      },
+      {
+        "name": "grounded",
+        "passed": true,
+        "elapsed_ms": 2979.85,
+        "log_sha256": "f5f72bc15a3a25554e045d04ceee408b83beb6b390776aa5cf6506519d2f0b14"
+      },
+      {
+        "name": "routing",
+        "passed": true,
+        "elapsed_ms": 3130.852,
+        "log_sha256": "6dd253485b99d325a3311c9e7d2aad15fec753e1f6c7d619f069f7d502253b21"
+      },
+      {
+        "name": "workflows",
+        "passed": true,
+        "elapsed_ms": 29939.01,
+        "log_sha256": "d59a3ece0984f9da2307337d8f85e9dd8791669b2e8cd19065a143fda4cbc76f"
+      },
+      {
+        "name": "native-stdio",
+        "passed": true,
+        "elapsed_ms": 48001.03,
+        "log_sha256": "6b77d513419e0687c59c769da3ec051419b24f34eb122cd1324dc6a4a0393e9f"
+      },
+      {
+        "name": "native-sse",
+        "passed": true,
+        "elapsed_ms": 43803.356,
+        "log_sha256": "e2d856976c578fc31254797a7e4edab1d57271d0779f57944d1fa9ea69ce2e12"
+      },
+      {
+        "name": "screens",
+        "passed": true,
+        "elapsed_ms": 97.145,
+        "log_sha256": "4444e4540a85933fe66b35414d43b6bcd3a9dddf3f3fe7a54e024b4df1d64031"
+      }
+    ],
+    "timing_scope": "Command wall time includes concurrent build/test contention; no performance comparison claim"
+  },
+  "retained_failures": [
+    {
+      "path": "/tmp/gents-routing-red.log",
+      "sha256": "6681b5ca4ccc15bb6fcc6a3c30df2fa712c86bb4f0aa184c9fc09b0cb5051c6f",
+      "reason": "Initial context-fit regression: faster 2 KiB worker was selected and blocked an input that fit another admitted worker"
+    },
+    {
+      "path": "/tmp/gents-routing-workspace.log",
+      "sha256": "41fe3ded7091f2187265d73151ff4ffd7a6c86a3a16b4ee387b40e2f303273a3",
+      "reason": "Cosmos fixture returned WouldBlock before request bytes; original privacy assertion was not reached"
+    },
+    {
+      "path": "/tmp/gents-cosmos-fixture-red.log",
+      "sha256": "206836e600f6476a5fd62dc889e4a236e00c80ad949ea4e65d008666b75ffef4",
+      "reason": "Deterministic delayed-byte/nonblocking fixture regression reproduced WouldBlock"
+    },
+    {
+      "path": "/tmp/gents-routing-workspace-final.log",
+      "sha256": "70fe6514d4662c81211d96214f171e6bce176c1adb1753068f4aad80fa6616d5",
+      "reason": "Three native harness assertions failed while full native suites overlapped"
+    },
+    {
+      "path": "data/local-evaluation/repository-check-dff98f4c-8265-4ecb-9b9c-ea999520c8f7/report.json",
+      "sha256": "ed64d4596cfbfb8033b9fc8129644a59aadee5c1dfcd924e00ac0f25b2e0e079",
+      "reason": "Native owned-component positive assertions failed during overlapping full-suite activity",
+      "passed": false,
+      "elapsed_ms": 182323.532
+    }
+  ],
+  "measurements": {
+    "verified_real_tasks": null,
+    "generative_model_calls": 0,
+    "paid_calls": 0,
+    "actual_provider_cost_usd": 0,
+    "estimated_total_cost_usd": null,
+    "native_model_latency_ms": null,
+    "resident_bytes": null,
+    "native_model_context_tokens": null,
+    "cache_effectiveness": null,
+    "scope": "This slice uses synthetic control/transport fixtures and actual local compiler/native tools; no real-model speed or quality measurement"
+  },
+  "remaining_required_evidence": [
+    "Comparable native model/routing task evidence beyond the separately recorded one-question trial",
+    "Owner Open WebUI location and actual external boundary"
+  ],
+  "goal_status": "active",
+  "production_services_restarted": false
+}

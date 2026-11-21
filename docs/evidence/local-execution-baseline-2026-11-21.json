@@ -1,0 +1,343 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-21",
+  "starting_head": "28a8da823231b792030eff5b6172dba29768442f",
+  "scope": "synthetic integration fixtures; not real-model task qualification",
+  "harness_sha256": "233663bf9b92020237b207f339d8ec9407ee410fe88e6f026b51176542c7665e",
+  "changed_file_sha256": {
+    ".agents/skill-sources.json": "a1eb1cd8e8e7b29d92179aeeac0e4a70681f28597c9b45d793880ec10ae05eae",
+    ".agents/skills/building-interactions/SKILL.md": "6261c5adef1c42ac65459032508846a0d150ab3d17c30688229e971742a2ea2f",
+    ".agents/skills/context-governance/SKILL.md": "c9e5e0adfeed547f7d17077636113dd0950b349f7052e4cb705123a18bfeb79c",
+    ".agents/skills/harness-routing/SKILL.md": "88dbc61425701b7ae1e297cfaac56875eb65daab3c5de68109c2577db6f3917a",
+    ".agents/skills/local-evaluate/SKILL.md": "6432b2814c009a6e7db5b7ce0dd8f3925e0d353667f68c14d3fc3add641a0a70",
+    ".agents/skills/repo-simplify/SKILL.md": "76523842f96a463adf4f1df791d8c4602259cafdbd2cb0ccd3a5762f6e0377f6",
+    ".claude/skills/building-interactions": "d93564225f52796a5233bd6518042ac5941b5797f2bac9caab8dec80392df03f",
+    ".claude/skills/context-governance": "c038bccc797c2de9b92fc3e76e4a9dfa9ba85f315a51a09e9e81b47b3344bf6a",
+    ".claude/skills/harness-routing": "592565c653a3afb376916fe8766fdeb93f5eabda31671f5907670c477953085b",
+    ".claude/skills/local-evaluate": "d32695b39e4434e2db326e8da0b812ff3544cd7e171dbe92d8310a023b1378c4",
+    ".claude/skills/repo-simplify": "b2548cc1adbca89733b955f2eb4ecb1d4418bb2782140e8bdec3f9944f79431a",
+    ".github/workflows/ci.yml": "a661de395c05b543887ebbd5dcdfe36386a397703fd695ec495198dded2f9d38",
+    "AGENTS.md": "d86587de71ea550b86942699ccbba202c2cfb1d26a3aff5e9ac1101a75cdfb48",
+    "README.md": "17eb36da8e6539087f5dd884b176effaa804a481bb1cbad606aba3636f649abf",
+    "crates/harness/src/office_activity.rs": "6b7a040de2291d085e5230126065c88b761c3030085d9bf929fc8b13c054d0d2",
+    "docs/162-local-execution-baseline.md": "f16b3152f46af7b91bf291f7df1d62ab95f808c17c7eec0f22953d4ae621a4c0",
+    "scripts/check.sh": "9e3763d32b97278a7efac6bb2ae4554758a71ae4bcb9746e38d9ad46fe8da168",
+    "scripts/local_evaluate.py": "88681c6ca9b95d14d0f9833df831ef889cf24a9e8cfcd1f2e72684989c17bd64",
+    "scripts/office-activity.test.mjs": "3cb7d3fdfdb551beb28f14ffde2e8e7418ebb36e088b732c2d44cd566be6e1db",
+    "scripts/repo-skills.mjs": "dd54aee17eb6d7ae2832911df74bb0393e911bf7e7fdc9739542468a5ccdf48d",
+    "scripts/task_frontdoor_smoke.py": "043619ba37a01adf9fe6198646ffea98a1d4c591908ce0f9dff0d2afafece53d",
+    "scripts/test_local_evaluate.py": "120a9b60be3404b4b6cb25c52f4946d84430db82ae8aef8074aa076214159798",
+    "web/assets/office-dashboards.js": "af332692b3bf15830548b005cd3c35ddbce9509866eb2b75af1f3cd932078c7b"
+  },
+  "suite_elapsed_ms": 128931.263,
+  "passed": true,
+  "checks": [
+    {
+      "name": "build",
+      "passed": true,
+      "elapsed_ms": 9007.046,
+      "log_sha256": "36bd4f6bb0b61f78966475113345c824dbb107eac0b6f2a1affcb5dfa64e678c",
+      "observations": []
+    },
+    {
+      "name": "frontdoor",
+      "passed": true,
+      "elapsed_ms": 2094.433,
+      "log_sha256": "b81c7f03b4b9aaf85c28421ef2eae7bf907dbf68cc380cfc650b6b10d9175143",
+      "observations": [
+        {
+          "fixture": "exact-cache-and-ceo",
+          "checks_passed": true,
+          "measurements": {
+            "elapsed_ms": 1332.727,
+            "startup_through_concurrent_cache_ms": 1270.511,
+            "resident_bytes": 33570816,
+            "resident_scope": "single harness RSS sample before shutdown; not peak or model memory",
+            "generative_model_calls": 0,
+            "model_context_tokens": 0,
+            "request_json_bytes": 123,
+            "cache_requests": 8,
+            "cache_hits": 7,
+            "cache_misses": 1,
+            "cache_hit_ratio": 0.875,
+            "paid_calls": 0,
+            "actual_provider_cost_usd": 0,
+            "estimated_total_cost_usd": null
+          },
+          "completion_scope": "synthetic source/cache fixture only; no model competence claim"
+        }
+      ]
+    },
+    {
+      "name": "workflows",
+      "passed": true,
+      "elapsed_ms": 29991.506,
+      "log_sha256": "b26b26c432a2b9a4e1beb756260f006ca15a5e20477023e65e195c02daaa0952",
+      "observations": [
+        {
+          "transport": "real HTTP and SQLite",
+          "provider": "mock, zero generative calls",
+          "workflows": [
+            {
+              "template": "direct/v1",
+              "nodes": 1,
+              "status": "generated"
+            },
+            {
+              "template": "rag/v1",
+              "nodes": 1,
+              "status": "generated"
+            },
+            {
+              "template": "tool_loop/v1",
+              "nodes": 1,
+              "status": "generated"
+            },
+            {
+              "template": "pipeline/v1",
+              "nodes": 3,
+              "status": "generated"
+            },
+            {
+              "template": "hub/v1",
+              "nodes": 4,
+              "status": "generated"
+            },
+            {
+              "template": "hierarchy/v1",
+              "nodes": 5,
+              "status": "generated"
+            },
+            {
+              "template": "peer/v1",
+              "nodes": 5,
+              "status": "generated"
+            },
+            {
+              "template": "critique/v1",
+              "nodes": 3,
+              "status": "generated"
+            },
+            {
+              "template": "explore/v1",
+              "nodes": 4,
+              "status": "generated"
+            }
+          ],
+          "duplicate_job_coalesced": true,
+          "subscriber_cancel_isolated": true,
+          "source_correction_invalidated": true,
+          "provider_cost_usd": 0
+        }
+      ]
+    },
+    {
+      "name": "native-stdio",
+      "passed": true,
+      "elapsed_ms": 43914.076,
+      "log_sha256": "cd4b84992bba8c6ed730f4ea4dc7319e0444f575e4ecb1036ad5c53aeb287c0e",
+      "observations": [
+        {
+          "transport": "actual native MCP stdio, HTTP owner governance and SQLite",
+          "worker": "mock only; no model weights loaded",
+          "templates": [
+            {
+              "template": "direct/v1",
+              "nodes": 1
+            },
+            {
+              "template": "rag/v1",
+              "nodes": 1
+            },
+            {
+              "template": "tool_loop/v1",
+              "nodes": 1
+            },
+            {
+              "template": "pipeline/v1",
+              "nodes": 3
+            },
+            {
+              "template": "hub/v1",
+              "nodes": 4
+            },
+            {
+              "template": "hierarchy/v1",
+              "nodes": 5
+            },
+            {
+              "template": "peer/v1",
+              "nodes": 5
+            },
+            {
+              "template": "critique/v1",
+              "nodes": 3
+            },
+            {
+              "template": "explore/v1",
+              "nodes": 4
+            }
+          ],
+          "exact_repeat_zero_generation": true,
+          "actor_private": true,
+          "coalesced_subscriber_cancellation": true,
+          "revocation_invalidated": true,
+          "concurrent_owner_update_stale_rejected": true,
+          "restart_did_not_replay": true,
+          "parent_budget_enforced": true,
+          "parent_budget_reservations": 32,
+          "dispatch_reservations_not_inference_proof": 32,
+          "other_company_not_enabled": true,
+          "provider_cost_usd": 0
+        }
+      ]
+    },
+    {
+      "name": "native-sse",
+      "passed": true,
+      "elapsed_ms": 43798.395,
+      "log_sha256": "fb87ad1f2ce436c95ecfca9dba9b68b71cf94068b754af9998dc3c24417b3fa6",
+      "observations": [
+        {
+          "transport": "actual native MCP sse, HTTP owner governance and SQLite",
+          "worker": "mock only; no model weights loaded",
+          "templates": [
+            {
+              "template": "direct/v1",
+              "nodes": 1
+            },
+            {
+              "template": "rag/v1",
+              "nodes": 1
+            },
+            {
+              "template": "tool_loop/v1",
+              "nodes": 1
+            },
+            {
+              "template": "pipeline/v1",
+              "nodes": 3
+            },
+            {
+              "template": "hub/v1",
+              "nodes": 4
+            },
+            {
+              "template": "hierarchy/v1",
+              "nodes": 5
+            },
+            {
+              "template": "peer/v1",
+              "nodes": 5
+            },
+            {
+              "template": "critique/v1",
+              "nodes": 3
+            },
+            {
+              "template": "explore/v1",
+              "nodes": 4
+            }
+          ],
+          "exact_repeat_zero_generation": true,
+          "actor_private": true,
+          "coalesced_subscriber_cancellation": true,
+          "revocation_invalidated": true,
+          "concurrent_owner_update_stale_rejected": true,
+          "restart_did_not_replay": true,
+          "parent_budget_enforced": true,
+          "parent_budget_reservations": 32,
+          "dispatch_reservations_not_inference_proof": 32,
+          "other_company_not_enabled": true,
+          "provider_cost_usd": 0
+        }
+      ]
+    },
+    {
+      "name": "screens",
+      "passed": true,
+      "elapsed_ms": 98.675,
+      "log_sha256": "4485b87aecaee7ef98481263e81e96695f6d5676d472beb6f06c72f9e7922ae8",
+      "observations": []
+    }
+  ],
+  "workspace_rust": {
+    "passed": 697,
+    "failed": 0,
+    "ignored": 33
+  },
+  "other_checks": {
+    "offline_strict_clippy": "passed",
+    "format": "passed",
+    "focused_node_tests_passed": 16,
+    "evaluator_tests_passed": 2,
+    "vite_build": "passed",
+    "full_check_sh": "not_run",
+    "visual_browser": "not_run"
+  },
+  "discovery": {
+    "kimi": {
+      "extension": "Kimi Code 0.9.0",
+      "bundle_sha256": "7492b4055ed8dcd601e3df2e982df44eb5822eaadf16ccbc476eb582ce35c343",
+      "names": [
+        "building-interactions",
+        "context-governance",
+        "harness-routing",
+        "local-evaluate",
+        "repo-simplify"
+      ],
+      "method": "installed root resolver, parser and discovery functions; filesystem, YAML loader and error class supplied; no extension activation or model call"
+    },
+    "codegpt": {
+      "extension": "CodeGPT 3.24.84",
+      "scanner_sha256": "d3dd436d88ce00e1c97df726a2f63ed50a84c8c608246c82555316772886beeb",
+      "enabled": [
+        "building-interactions",
+        "context-governance",
+        "harness-routing",
+        "local-evaluate",
+        "repo-simplify"
+      ],
+      "method": "installed scanner source with host/config imports supplied; no extension activation or model call",
+      "discovered": [
+        {
+          "id": "building-interactions",
+          "source": "codegpt"
+        },
+        {
+          "id": "context-governance",
+          "source": "codegpt"
+        },
+        {
+          "id": "harness-routing",
+          "source": "codegpt"
+        },
+        {
+          "id": "local-evaluate",
+          "source": "codegpt"
+        },
+        {
+          "id": "repo-simplify",
+          "source": "codegpt"
+        }
+      ]
+    },
+    "claude": {
+      "project_symlinks_resolved": 5,
+      "frontmatter_validation_passed": 5,
+      "live_chat_invocation": null
+    }
+  },
+  "measurements": {
+    "verified_real_tasks": null,
+    "generative_model_calls": 0,
+    "paid_calls": 0,
+    "actual_provider_cost_usd": 0,
+    "estimated_total_cost_usd": null,
+    "resident_bytes": null,
+    "model_context_tokens": null,
+    "cache_hit_ratio": null
+  },
+  "private_raw_report": "data/local-evaluation/ef9e0c49-4526-4880-93e9-448b8652c942/report.json",
+  "remaining_scope": "See docs/162-local-execution-baseline.md; goal remains active."
+}

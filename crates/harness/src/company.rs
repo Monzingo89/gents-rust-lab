@@ -37,6 +37,31 @@ pub fn directory(root: &Path, company: &str) -> Result<PathBuf> {
     Ok(path)
 }
 
+/// Owner-authenticated observation without schema/archive/index maintenance.
+/// Existing writer connections remain responsible for normal initialization.
+pub(crate) fn connect_readonly(root: &Path, company: &str, owner: &str) -> Result<Connection> {
+    // The trusted workspace may itself use an OS alias (e.g. macOS /var).
+    // Match the existing read-only catalog boundary, then reject symlinks
+    // inside the company path and at the final SQLite open.
+    let file = directory(&root.canonicalize()?, company)?.join("brain.sqlite3");
+    let meta = std::fs::symlink_metadata(&file).context("company is not registered")?;
+    anyhow::ensure!(
+        meta.is_file() && !meta.is_symlink(),
+        "company database rejected"
+    );
+    let db = Connection::open_with_flags(
+        file,
+        rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY
+            | rusqlite::OpenFlags::SQLITE_OPEN_NO_MUTEX
+            | rusqlite::OpenFlags::SQLITE_OPEN_NOFOLLOW,
+    )?;
+    db.busy_timeout(std::time::Duration::from_secs(5))?;
+    db.execute_batch("PRAGMA trusted_schema=OFF; PRAGMA query_only=ON;")?;
+    let existing: String = db.query_row("SELECT owner FROM company LIMIT 1", [], |r| r.get(0))?;
+    anyhow::ensure!(existing == owner, "company is unavailable to this identity");
+    Ok(db)
+}
+
 pub(crate) fn connect(root: &Path, company: &str, owner: &str, create: bool) -> Result<Connection> {
     let path = directory(root, company)?;
     if !create && !path.join("brain.sqlite3").is_file() {
@@ -1410,7 +1435,6 @@ fn capture_snapshot(
     policy: u64,
     now: u64,
 ) -> Result<Value> {
-    use crate::memory::SnapshotRepository;
     let SnapshotScope {
         company,
         run,
@@ -1444,7 +1468,6 @@ pub fn memory_context(
     agent: &str,
     query: &str,
 ) -> Result<Value> {
-    use crate::memory::SnapshotRepository;
     let mut db = connect(root, company, owner, false)?;
     let tx = db.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
     let policy = crate::governance::load(&tx, &run.to_string())?
@@ -1490,7 +1513,6 @@ pub fn flush_memory(
     runs: &[Uuid],
     now: u64,
 ) -> Result<MemoryFlush> {
-    use crate::memory::SnapshotRepository;
     let mut db = connect(root, company, owner, false)?;
     let tx = db.transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)?;
     let clock = crate::memory::clock(&tx)?;
@@ -2014,7 +2036,6 @@ mod tests {
     }
     #[test]
     fn snapshot_cache_revocation_is_immediate_and_raw_records_are_retained() {
-        use crate::memory::SnapshotRepository;
         let root = std::env::temp_dir().join(format!("gents-memory-{}", Uuid::new_v4()));
         std::fs::create_dir_all(&root).unwrap();
         let run = Uuid::new_v4();
@@ -2100,7 +2121,6 @@ mod tests {
 
     #[test]
     fn snapshot_debounce_flush_is_durable_and_does_not_delete_original_context() {
-        use crate::memory::SnapshotRepository;
         let root = std::env::temp_dir().join(format!("gents-debounce-{}", Uuid::new_v4()));
         std::fs::create_dir_all(&root).unwrap();
         let run = Uuid::new_v4();

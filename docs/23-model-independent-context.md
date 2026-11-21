@@ -4,7 +4,7 @@ Completion/archive storage now has a separate local adapter, atomic per-agent ch
 
 The harness retains its existing Rust provider adapters. All calls use a shared role/content message format and a versioned envelope carrying the frozen task, acceptance criteria, role capabilities, and a run-scoped verified handoff. This is a portable application contract, not a promise that different models have interchangeable tokenizers or inference caches.
 
-`memory::SnapshotRepository` now stores versioned reference-only indexes in
+`memory::SqliteSnapshots` stores versioned reference-only indexes in
 private company SQLite. Raw context and dirty-generation updates commit
 atomically; housekeeping flushes after 30 seconds of quiet with a 120-second
 maximum dirty interval. These bounds depend on host scheduling. Source IDs,
@@ -18,7 +18,7 @@ is not yet semantic summarization, distributed revocation, encryption, or
 transitive information-flow tracking. See the campaign document for tested
 boundaries and remaining enterprise gates.
 
-`evidence::EvidenceProjection` separates executed facts from plans and advisory text. Its ledger records discovered dataset IDs and immutable revisions, inspected file inventories, downloaded file hashes, written-but-unverified artifacts, recent tool failures, and PDF inspection receipts. The checkpoint stores the full ledger privately under the run; numbered tool journals retain the full original results. A bounded projection goes to each model. Startup rebuilds older checkpoints from their journals. Switching models discards inference cache without discarding task evidence.
+`evidence::Ledger` separates executed facts from plans and advisory text. It records discovered dataset IDs and immutable revisions, inspected file inventories, downloaded file hashes, written-but-unverified artifacts, recent tool failures, and PDF inspection receipts. The checkpoint stores the full ledger privately under the run; numbered tool journals retain the full original results. A bounded projection goes to each model. Startup rebuilds older checkpoints from their journals. Switching models discards inference cache without discarding task evidence.
 
 `hf_dataset_files` searches and pages an already inspected source inventory from the original local tool journal. It returns exact observed paths, immutable revision, original inspection step, total matches, and a continuation offset. It makes no network request. Large inventories therefore remain available without placing thousands of filenames in every model's prompt.
 
@@ -26,7 +26,7 @@ Source validation requires an observed repository/revision and inspected exact f
 
 Recovery queues missing source inspections from verified IDs before another speculative worker turn. Failed read-only observations are deduplicated by their capability implementation revision, allowing bounded retry after a backend/security repair. Successful reads and all writes retain their deduplication across revisions. Answering a stall question resets its no-progress counter. A shell process with a nonzero exit code is a failed action, even when the broker itself ran successfully.
 
-`context::compact` removes optional retrieved history before dispatch and preserves the frozen task, acceptance criteria, exact requested action, and verified handoff. The owned llama.cpp runtime applies the selected model's native chat template and tokenizer before inference and reserves output capacity. If required context cannot fit, it reports the problem instead of truncating the mission. MLX and remote adapters share the envelope and byte compaction; they do not yet have the native tokenizer preflight. This is a known limit, not a claim of universal provider compatibility.
+`context::compact` removes optional retrieved history before dispatch and preserves the frozen task, acceptance criteria, exact requested action, and verified handoff. The owned llama.cpp runtime applies the selected model's native chat template and tokenizer before inference and reserves output capacity. If required context cannot fit, it reports the problem instead of truncating the mission. MLX also uses the installed offline tokenizer helper for scoped tasks or an explicit context limit, reserving generation capacity before inference. Remote adapters retain envelope and byte compaction; this is not a claim of universal tokenizer compatibility.
 
 The constrained local decoder derives its actions from the same approved tool catalog used by the broker and role capability repository. Adding a tool no longer requires editing a second hardcoded decoder list. Planner and worker visibility remains role-scoped; execution still requires authorization of the exact next action.
 

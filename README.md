@@ -67,6 +67,7 @@ The implementation references the publisher's public [chapter 4 preview of *AI A
 
 ## Architecture and recipes
 
+- [Verified monorepo ownership, workspace boundaries and container source inputs](docs/174-monorepo-architecture.md)
 - [Metivolve first-task journey and hardware-check boundaries](docs/125-metivolve-onboarding.md)
 - [Instant setup answers and public-request limits](docs/126-fast-answers-and-abuse-limits.md)
 - [Local image generation, speech and automatic output routing](mcp/media/README.md)
@@ -96,6 +97,8 @@ The implementation references the publisher's public [chapter 4 preview of *AI A
 The native cookbook covers the current registry; legacy broker tools are a separate path. The labeled real-task replay is available. The broader capability benchmark and release asset/dependency review remain in progress. Use exact tool descriptors and current grants; the building's rooms visualize permissions, while native policy enforces them.
 
 ## Check changes locally
+
+For the bounded offline execution baseline and architecture map, see [local execution checks and backlog](docs/162-local-execution-baseline.md). Run `python3 scripts/local_evaluate.py` to build current binaries and check caching, workflows, native MCP lifecycle and building screens with explicit mock workers. This writes private measurement/log evidence without loading models or using paid inference. Repository development skills are canonical in `.agents/skills`; run `node scripts/repo-skills.mjs` to check discovery links.
 
 With the documented dependencies already installed:
 

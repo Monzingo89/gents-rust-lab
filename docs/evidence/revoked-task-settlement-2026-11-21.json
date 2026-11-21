@@ -1,0 +1,462 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-21",
+  "scope": "Expired native custody settles only exact redacted metadata; actual native transports with mock workers and reopened governed memory binding",
+  "starting_head": "28a8da823231b792030eff5b6172dba29768442f",
+  "changed_source_sha256": {
+    "crates/harness/src/task_workflows.rs": "bdd476896829e29d3f1d211b222cc90bbce1ad020fe65866c341a03723967ca9",
+    "crates/harness/src/memory_handoff.rs": "302efd766c78fb5f2145842d5c6ee8a4823c3919ad6e45628661a79b0c4002ec",
+    "scripts/task_native_smoke.py": "54f2d4675f3ac7a9deee6699bb4a30b160971ae8d26dbe8bf0d5705816a2ab34",
+    ".agents/skills/context-governance/SKILL.md": "a2cafc761409f245421528b207293b65fe17be50a92b1b9160ce312229b10068",
+    "docs/162-local-execution-baseline.md": "52bd77cc085500db93a3c2195cbf92d03d01b374c9cd1051b587d7e5b597d00e",
+    "docs/166-revoked-task-settlement.md": "ec3a96f5bb5b1d6e481155357e1b2164e1f91203f372577a6edc5dddcbcc6c6d"
+  },
+  "regression": {
+    "before": "After dispatch and epoch change, executor stop could not persist terminal state; stronger smoke failed revoked executor did not settle",
+    "after": "Exact frozen checkpoint finalized without source-access scope or new output; stale task remains invalid after regrant",
+    "red_log_sha256": "fa75e9d48797a1974ac9dffd68b00bae7894363f6fbf2750e4670aad8ac1433f",
+    "failure_retained": "/tmp/gents-midcall-stdio.log"
+  },
+  "checks": {
+    "rust_workspace": {
+      "passed": 705,
+      "failed": 0,
+      "ignored": 33
+    },
+    "clippy": "cargo clippy --workspace --all-targets --offline --locked -- -D warnings passed",
+    "governance_tests": 32,
+    "evaluator_failure_timeout_tests": 2,
+    "formatting": "cargo fmt --all -- --check passed",
+    "diff": "git diff --check passed",
+    "discovery": "node scripts/repo-skills.mjs --codegpt passed; no live assistant chat",
+    "edited_skill_frontmatter": "quick_validate.py passed",
+    "raw_logs": {
+      "before_pending_dispatch_regression": {
+        "path": "/tmp/gents-midcall-stdio.log",
+        "sha256": "fa75e9d48797a1974ac9dffd68b00bae7894363f6fbf2750e4670aad8ac1433f"
+      },
+      "terminal_unit": {
+        "path": "/tmp/gents-midcall-unit.log",
+        "sha256": "bfe408b8f10e2a381c3c4cc11f1737861d6f63a76f4c7d3b85d4132c65603ba9"
+      },
+      "handoff_reopen": {
+        "path": "/tmp/gents-handoff-reopen.log",
+        "sha256": "d3d4a56b4a0e98241d1dc354e9cd81bce05f22d51d12916b5de16ba01f6163d5"
+      },
+      "workspace": {
+        "path": "/tmp/gents-midcall-workspace.log",
+        "sha256": "1f83bd96f23c6ab5228cca48255f2b6c02748cd695278d2cc810eb6e3bdc020e"
+      },
+      "clippy": {
+        "path": "/tmp/gents-midcall-clippy.log",
+        "sha256": "48ad9689b581033ec6b849a97947381444acad2db983e407fae6346991cc1221"
+      },
+      "governance": {
+        "path": "/tmp/gents-midcall-governance.log",
+        "sha256": "055786e2067f4ec8781c079189b1d422cfe6b155d9e11c6a0f118039ab4fb8de"
+      },
+      "evaluator_unit": {
+        "path": "/tmp/gents-midcall-evaluator-unit.log",
+        "sha256": "6745558e6ded2bb2dc402101cac307a4bdf00f16c5255c6cd09c39a4edeea57c"
+      }
+    }
+  },
+  "suite": {
+    "schema_version": 1,
+    "scope": "synthetic integration fixtures; not real-model task qualification",
+    "head": "28a8da823231b792030eff5b6172dba29768442f",
+    "git_status": " M .github/workflows/ci.yml\n M README.md\n M config/schemas/task-engine-v1.json\n M crates/harness/src/main.rs\n M crates/harness/src/memory_handoff.rs\n M crates/harness/src/model_artifact.rs\n M crates/harness/src/model_package.rs\n M crates/harness/src/office_activity.rs\n M crates/harness/src/task_answers.rs\n M crates/harness/src/task_workflows.rs\n M mcp/src/task_engine/contracts.rs\n M mcp/src/task_engine/mod.rs\n M mcp/src/task_engine/native.rs\n M mcp/src/task_engine/repository.rs\n M scripts/check.sh\n M scripts/company-env.mjs\n M scripts/company-env.test.mjs\n M scripts/company_tools.py\n M scripts/office-activity.test.mjs\n M scripts/run-harness.mjs\n M scripts/start-company.mjs\n M scripts/task_engine_live.py\n M scripts/task_frontdoor_smoke.py\n M scripts/task_native_smoke.py\n M scripts/task_workflows_browser.mjs\n M scripts/task_workflows_smoke.py\n M scripts/test_company_tools.py\n M web/app.js\n M web/assets/office-dashboards.js\n M web/assets/task-workbench.js\n?? .agents/\n?? .claude/\n?? AGENTS.md\n?? crates/harness/src/model_pins.rs\n?? docs/162-local-execution-baseline.md\n?? docs/163-company-lifecycle.md\n?? docs/164-scoped-task-progress.md\n?? docs/165-shared-model-pins.md\n?? docs/evidence/company-lifecycle-2026-11-21.json\n?? docs/evidence/local-execution-baseline-2026-11-21.json\n?? docs/evidence/scoped-task-progress-2026-11-21.json\n?? docs/evidence/shared-model-pins-2026-11-21.json\n?? mcp/src/task_engine/progress.rs\n?? mcp/tests/task_progress.rs\n?? scripts/company-lifecycle-smoke.mjs\n?? scripts/company-lifecycle.mjs\n?? scripts/company-lifecycle.test.mjs\n?? scripts/fixtures/company-lifecycle.mjs\n?? scripts/local_evaluate.py\n?? scripts/repo-skills.mjs\n?? scripts/task-activity.test.mjs\n?? scripts/test_local_evaluate.py\n?? web/assets/task-activity.js\n",
+    "measurements": {
+      "verified_real_tasks": null,
+      "generative_model_calls": 0,
+      "paid_calls": 0,
+      "actual_provider_cost_usd": 0,
+      "estimated_total_cost_usd": null,
+      "resident_bytes": null,
+      "model_context_tokens": null,
+      "cache_hit_ratio": null
+    },
+    "checks": [
+      {
+        "name": "build",
+        "command": [
+          "cargo",
+          "build",
+          "--workspace",
+          "--offline",
+          "--locked"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 3740.509,
+        "log": "build.log",
+        "log_sha256": "8f3062e487266e1fab353347cae4ef93e462a475d163903eddfdd3cd08181375",
+        "observations": []
+      },
+      {
+        "name": "lifecycle",
+        "command": [
+          "node",
+          "--test",
+          "scripts/company-lifecycle.test.mjs"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 5645.838,
+        "log": "lifecycle.log",
+        "log_sha256": "b34ef16b09692f429adc2a36f163d797226bb62778f9947dc34d98f0606f7503",
+        "observations": []
+      },
+      {
+        "name": "rust-lifecycle",
+        "command": [
+          "node",
+          "scripts/company-lifecycle-smoke.mjs"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 1984.283,
+        "log": "rust-lifecycle.log",
+        "log_sha256": "dc1590bd0fa03ef9984b532b450067a433a01048fef3b4354beb07fd2d1dfd0a",
+        "observations": [
+          {
+            "fixture": "actual-rust-lifecycle",
+            "passed": true,
+            "instance_binding": true,
+            "sealed_bundle_verified": true,
+            "graceful_shutdown": true,
+            "listener_closed": true,
+            "harness_sha256": "05bc8fff7fd112a9ff09c0d1e28c8f64004e750c719cca5ed020228e7382a720",
+            "measurements": {
+              "startup_ms": 878.542,
+              "shutdown_ms": 726.615,
+              "resident_bytes": 30031872,
+              "resident_scope": "single idle harness RSS sample, not model/peak/GPU memory",
+              "generative_model_calls": 0,
+              "paid_calls": 0,
+              "actual_provider_cost_usd": 0,
+              "verified_real_tasks": null,
+              "model_context_tokens": null,
+              "estimated_total_cost_usd": null
+            }
+          }
+        ]
+      },
+      {
+        "name": "frontdoor",
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+          "scripts/task_frontdoor_smoke.py"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 1440.178,
+        "log": "frontdoor.log",
+        "log_sha256": "dbd274035435d62408efd7ad522868f80f916a0bd5e1db292beea3b2a9c62c27",
+        "observations": [
+          {
+            "fixture": "exact-cache-and-ceo",
+            "checks_passed": true,
+            "measurements": {
+              "elapsed_ms": 684.64,
+              "startup_through_concurrent_cache_ms": 630.831,
+              "resident_bytes": 33931264,
+              "resident_scope": "single harness RSS sample before shutdown; not peak or model memory",
+              "generative_model_calls": 0,
+              "model_context_tokens": 0,
+              "request_json_bytes": 123,
+              "cache_requests": 8,
+              "cache_hits": 7,
+              "cache_misses": 1,
+              "cache_hit_ratio": 0.875,
+              "paid_calls": 0,
+              "actual_provider_cost_usd": 0,
+              "estimated_total_cost_usd": null
+            },
+            "completion_scope": "synthetic source/cache fixture only; no model competence claim"
+          }
+        ]
+      },
+      {
+        "name": "workflows",
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+          "scripts/task_workflows_smoke.py"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 29987.506,
+        "log": "workflows.log",
+        "log_sha256": "b26b26c432a2b9a4e1beb756260f006ca15a5e20477023e65e195c02daaa0952",
+        "observations": [
+          {
+            "transport": "real HTTP and SQLite",
+            "provider": "mock, zero generative calls",
+            "workflows": [
+              {
+                "template": "direct/v1",
+                "nodes": 1,
+                "status": "generated"
+              },
+              {
+                "template": "rag/v1",
+                "nodes": 1,
+                "status": "generated"
+              },
+              {
+                "template": "tool_loop/v1",
+                "nodes": 1,
+                "status": "generated"
+              },
+              {
+                "template": "pipeline/v1",
+                "nodes": 3,
+                "status": "generated"
+              },
+              {
+                "template": "hub/v1",
+                "nodes": 4,
+                "status": "generated"
+              },
+              {
+                "template": "hierarchy/v1",
+                "nodes": 5,
+                "status": "generated"
+              },
+              {
+                "template": "peer/v1",
+                "nodes": 5,
+                "status": "generated"
+              },
+              {
+                "template": "critique/v1",
+                "nodes": 3,
+                "status": "generated"
+              },
+              {
+                "template": "explore/v1",
+                "nodes": 4,
+                "status": "generated"
+              }
+            ],
+            "duplicate_job_coalesced": true,
+            "subscriber_cancel_isolated": true,
+            "source_correction_invalidated": true,
+            "provider_cost_usd": 0
+          }
+        ]
+      },
+      {
+        "name": "native-stdio",
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+          "scripts/task_native_smoke.py"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 43755.819,
+        "log": "native-stdio.log",
+        "log_sha256": "ed6ff316daba7de41804161ef74df0542717613169e5ec4dcf196be03fc5e633",
+        "observations": [
+          {
+            "transport": "actual native MCP stdio, HTTP owner governance and SQLite",
+            "worker": "mock only; no model weights loaded",
+            "templates": [
+              {
+                "template": "direct/v1",
+                "nodes": 1
+              },
+              {
+                "template": "rag/v1",
+                "nodes": 1
+              },
+              {
+                "template": "tool_loop/v1",
+                "nodes": 1
+              },
+              {
+                "template": "pipeline/v1",
+                "nodes": 3
+              },
+              {
+                "template": "hub/v1",
+                "nodes": 4
+              },
+              {
+                "template": "hierarchy/v1",
+                "nodes": 5
+              },
+              {
+                "template": "peer/v1",
+                "nodes": 5
+              },
+              {
+                "template": "critique/v1",
+                "nodes": 3
+              },
+              {
+                "template": "explore/v1",
+                "nodes": 4
+              }
+            ],
+            "exact_repeat_zero_generation": true,
+            "actor_private": true,
+            "coalesced_subscriber_cancellation": true,
+            "revocation_invalidated": true,
+            "revocation_after_dispatch": true,
+            "revoked_call_id": "c1907e02-9745-4c61-8bd9-1ca705f05b0e",
+            "revoked_job_dispatches": 1,
+            "revoked_job_returns": 0,
+            "revoked_executor_settled": true,
+            "regrant_did_not_revive": true,
+            "concurrent_owner_update_stale_rejected": true,
+            "restart_did_not_replay": true,
+            "parent_budget_enforced": true,
+            "parent_budget_reservations": 33,
+            "dispatch_reservations_not_inference_proof": 33,
+            "other_company_not_enabled": true,
+            "provider_cost_usd": 0
+          }
+        ]
+      },
+      {
+        "name": "native-sse",
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+          "scripts/task_native_smoke.py",
+          "--sse"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 43806.857,
+        "log": "native-sse.log",
+        "log_sha256": "7f346416f2ef2c6bbe986143bafd80d7692dae4d820666b4c326bcd74e3aa403",
+        "observations": [
+          {
+            "transport": "actual native MCP sse, HTTP owner governance and SQLite",
+            "worker": "mock only; no model weights loaded",
+            "templates": [
+              {
+                "template": "direct/v1",
+                "nodes": 1
+              },
+              {
+                "template": "rag/v1",
+                "nodes": 1
+              },
+              {
+                "template": "tool_loop/v1",
+                "nodes": 1
+              },
+              {
+                "template": "pipeline/v1",
+                "nodes": 3
+              },
+              {
+                "template": "hub/v1",
+                "nodes": 4
+              },
+              {
+                "template": "hierarchy/v1",
+                "nodes": 5
+              },
+              {
+                "template": "peer/v1",
+                "nodes": 5
+              },
+              {
+                "template": "critique/v1",
+                "nodes": 3
+              },
+              {
+                "template": "explore/v1",
+                "nodes": 4
+              }
+            ],
+            "exact_repeat_zero_generation": true,
+            "actor_private": true,
+            "coalesced_subscriber_cancellation": true,
+            "revocation_invalidated": true,
+            "revocation_after_dispatch": true,
+            "revoked_call_id": "6b408eeb-ed26-487a-9fb7-3ff9f40f1152",
+            "revoked_job_dispatches": 1,
+            "revoked_job_returns": 0,
+            "revoked_executor_settled": true,
+            "regrant_did_not_revive": true,
+            "concurrent_owner_update_stale_rejected": true,
+            "restart_did_not_replay": true,
+            "parent_budget_enforced": true,
+            "parent_budget_reservations": 33,
+            "dispatch_reservations_not_inference_proof": 33,
+            "other_company_not_enabled": true,
+            "provider_cost_usd": 0
+          }
+        ]
+      },
+      {
+        "name": "screens",
+        "command": [
+          "node",
+          "--test",
+          "scripts/office-activity.test.mjs",
+          "scripts/task-activity.test.mjs",
+          "scripts/room-activity.test.mjs",
+          "scripts/ceo-execution.test.mjs"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 96.671,
+        "log": "screens.log",
+        "log_sha256": "f37a6a3c882cf96aad76303cb4365b32870bf62e9bb915b166b1db576e6f3d43",
+        "observations": []
+      }
+    ],
+    "harness_sha256": "05bc8fff7fd112a9ff09c0d1e28c8f64004e750c719cca5ed020228e7382a720",
+    "elapsed_ms": 130488.61,
+    "passed": true,
+    "private_raw_report": "data/local-evaluation/99e30f4f-e75e-4b32-ae7d-eede825fb187/report.json",
+    "raw_report_sha256": "13cd48d28be0978f8aae951b393e348e0699a487cb980736eb07cdfe03f67d11"
+  },
+  "handoff_recovery": {
+    "format": "existing memory_handoff::Binding",
+    "serialized_checkpoint": true,
+    "company_connection_closed_and_reopened": true,
+    "source_retrieved_through_current_policy": true,
+    "forgery_source_tamper_other_owner_run_recipient_revocation_regrant_denials_retained": true,
+    "semantic_recall_quality": null
+  },
+  "measurements": {
+    "scope": "fixture controls, not model competence",
+    "verified_real_tasks": null,
+    "generative_model_calls": 0,
+    "paid_calls": 0,
+    "actual_provider_cost_usd": 0,
+    "estimated_total_cost_usd": null,
+    "real_model_context_tokens": null,
+    "real_model_resident_bytes": null,
+    "revoked_request_generative_usage": null,
+    "revoked_request_tokens": null,
+    "revocation_settlement_latency_ms": null
+  },
+  "not_run": [
+    "revocation during actual native backend inference",
+    "full platform-dependent scripts/check.sh",
+    "new visual browser session"
+  ],
+  "remaining": [
+    "wider executor handoff/recovery cases",
+    "general crash/source-I/O reconciliation",
+    "deduplicated accounting across stores",
+    "broader real-model qualification",
+    "Open WebUI boundary"
+  ],
+  "production_services_restarted": false
+}

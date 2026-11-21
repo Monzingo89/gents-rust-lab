@@ -27,6 +27,12 @@ jobs:
           cargo +1.99.1 build --workspace --locked
       - name: Exercise execution and recovery without cloud credentials
         run: |
+          node scripts/repo-skills.mjs
+          node --test scripts/company-lifecycle.test.mjs
+          node --test scripts/task-activity.test.mjs
+          node scripts/company-lifecycle-smoke.mjs
+          python3 -m unittest discover -s scripts -p 'test_local_evaluate.py'
+          python3 -m unittest discover -s scripts -p 'test_local_trial.py'
           python3 scripts/smoke.py
           python3 scripts/reliability_smoke.py
           python3 scripts/company_factory_smoke.py

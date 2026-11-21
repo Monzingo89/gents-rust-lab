@@ -17,8 +17,8 @@ checks without pretending that summary prose is entailed by its sources.
 
 ## Interfaces and boundaries
 
-`memory_handoff.rs` defines a domain-independent `HandoffRepository` interface
-with `find` and `revalidate`. Its SQLite adapter uses an authenticated company
+`memory_handoff.rs` provides domain-independent `SqliteHandoffs` methods
+`find` and `revalidate`. This adapter uses an authenticated company
 connection and a runtime-bound recipient. A query identifies the sender,
 correlation key/value and normalized hash of an already accepted predecessor
 record. Only source identifiers are enumerated before the existing governed

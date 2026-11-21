@@ -43,6 +43,7 @@ mod memory_handoff;
 mod mlx_prompt;
 mod model_artifact;
 mod model_package;
+mod model_pins;
 #[cfg(all(test, unix))]
 #[path = "../../../mcp/tests/support/mod.rs"]
 mod native_fixture;
@@ -90,6 +91,7 @@ mod store;
 mod task_answers;
 mod task_frontdoor;
 mod task_native;
+mod task_usage;
 mod task_workflows;
 mod verification_attempts;
 mod worker_packet;
@@ -331,6 +333,7 @@ struct App {
     training_cancels: Mutex<HashMap<String, Arc<AtomicBool>>>,
     office: office_activity::Service,
     task_answers: task_answers::Service,
+    model_pins: model_pins::ModelPins,
     task_workflows: task_workflows::Service,
 }
 type Shared = Arc<App>;
@@ -862,7 +865,6 @@ async fn observability_snapshot(
     h: HeaderMap,
     Path(id): Path<Uuid>,
 ) -> std::result::Result<Json<Value>, ApiError> {
-    use observability::TraceProjector;
     let who = owner(&s, &h).await?;
     let runs = s.runs.lock().await;
     let run = runs
@@ -874,7 +876,7 @@ async fn observability_snapshot(
         .iter()
         .map(|event| serde_json::to_value(event).unwrap_or(Value::Null))
         .collect::<Vec<_>>();
-    Ok(Json(observability::LocalTraceProjector.project(
+    Ok(Json(observability::project(
         &id.to_string(),
         &run.status,
         &serde_json::to_value(&run.data_classification).unwrap_or(Value::Null),
@@ -947,7 +949,7 @@ async fn resume_run(
         .ok_or((StatusCode::BAD_REQUEST, "company run required".into()))?;
     let checkpoint_exists = if s.config.enterprise.is_some() {
         workflow::SqliteWorkflows::open(&root, &company, &who, id)
-            .and_then(|store| workflow::WorkflowRepository::snapshot(&store))
+            .and_then(|store| store.snapshot())
             .is_ok()
     } else {
         autonomy::exists(&root, &company, id)
@@ -1767,6 +1769,7 @@ async fn main() -> Result<()> {
         training_cancels: Mutex::new(HashMap::new()),
         office: office_activity::Service::new(std::env::current_dir()?)?,
         task_answers: task_answers::Service::default(),
+        model_pins: model_pins::ModelPins::default(),
         task_workflows: task_workflows::Service::default(),
         gateway: Gateway {
             client: reqwest::Client::builder()
@@ -1799,7 +1802,7 @@ async fn main() -> Result<()> {
                     let root = std::env::current_dir()?;
                     let valid = if s.config.enterprise.is_some() {
                         workflow::SqliteWorkflows::open(&root, company, &run.owner, *id)
-                            .and_then(|store| workflow::WorkflowRepository::snapshot(&store))
+                            .and_then(|store| store.snapshot())
                             .is_ok()
                     } else {
                         autonomy::exists(&root, company, *id)
@@ -1958,7 +1961,7 @@ async fn main() -> Result<()> {
                 let _ = tokio::signal::ctrl_c().await;
             }
             s.shutting_down.store(true,Ordering::Relaxed);
-            s.office.cancel.store(true,Ordering::Relaxed);
+            s.office.shutdown();
             {
                 let runs = s.runs.lock().await;
                 for run in runs.values() {
@@ -1986,7 +1989,7 @@ async fn main() -> Result<()> {
 
 async fn public_config(State(s): State<Shared>) -> Json<Value> {
     Json(
-        json!({"local_only":std::env::var("GENTS_LOCAL_ONLY").as_deref()!=Ok("0"),"company_mode":s.config.company_mode,"owned_selection_drafts":s.config.company_mode&&s.config.company_tools,"company_tools":s.config.company_tools,"admin_judge":s.config.admin_judge.as_ref().map(|m|m.model.clone()),"planning_model_policy":s.config.planning_model_policy.as_ref().map(planning_models::Policy::public_view),"tools":if s.config.company_tools {serde_json::from_str::<Value>(include_str!("../../../config/company-tools.json")).unwrap()}else{Value::Null},"task_evidence_version":1,"company_name":"The Gents Office Co.","grounded_answers_enabled":s.config.task_answers.is_some(),
+        json!({"startup_id":std::env::var("GENTS_STARTUP_ID").ok(),"local_only":std::env::var("GENTS_LOCAL_ONLY").as_deref()!=Ok("0"),"company_mode":s.config.company_mode,"owned_selection_drafts":s.config.company_mode&&s.config.company_tools,"company_tools":s.config.company_tools,"admin_judge":s.config.admin_judge.as_ref().map(|m|m.model.clone()),"planning_model_policy":s.config.planning_model_policy.as_ref().map(planning_models::Policy::public_view),"tools":if s.config.company_tools {serde_json::from_str::<Value>(include_str!("../../../config/company-tools.json")).unwrap()}else{Value::Null},"task_evidence_version":1,"company_name":"The Gents Office Co.","grounded_answers_enabled":s.config.task_answers.is_some(),
         "agents":s.config.agents.iter().map(|a|json!({"id":a.id,"specialty":a.assignment,"planner_provider":a.planner.provider,"planner_model":a.planner.model,"worker_provider":a.worker.provider,"worker_model":a.worker.model})).collect::<Vec<_>>(),
         "catalog_providers":s.config.judges.as_ref().map(|j|j.models.values().map(|c|c.model.provider.clone()).collect::<std::collections::BTreeSet<_>>()).unwrap_or_default(),
         "judges":s.config.judges.as_ref().map(|j|json!({"router_provider":j.router.provider,"router_model":j.router.model,"completion_provider":j.completion.provider,"completion_model":j.completion.model,"max_rounds":j.max_rounds,"max_calls":j.max_calls})),

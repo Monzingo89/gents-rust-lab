@@ -70,23 +70,11 @@ pub fn clock(db: &Connection) -> Result<Clock> {
 
 /// The access-controlled company adapter supplies the projection. This store
 /// cannot query another agent's context or grant memory access itself.
-pub trait SnapshotRepository {
-    fn latest(&self, run: &str, agent: &str) -> Result<Option<Value>>;
-    fn append(
-        &self,
-        run: &str,
-        agent: &str,
-        generation: i64,
-        policy: u64,
-        manifest: &Value,
-        now: u64,
-    ) -> Result<Value>;
-}
 pub struct SqliteSnapshots<'a> {
     pub db: &'a Connection,
 }
-impl SnapshotRepository for SqliteSnapshots<'_> {
-    fn latest(&self, run: &str, agent: &str) -> Result<Option<Value>> {
+impl SqliteSnapshots<'_> {
+    pub fn latest(&self, run: &str, agent: &str) -> Result<Option<Value>> {
         let row:Option<(String,String,i64,i64,i64,i64)>=self.db.query_row(
             "SELECT manifest,sha256,revision,generation,policy_revision,created FROM memory_snapshots WHERE run_id=?1 AND agent=?2 ORDER BY revision DESC LIMIT 1",
             params![run,agent],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?,r.get(5)?))).optional()?;
@@ -111,7 +99,7 @@ impl SnapshotRepository for SqliteSnapshots<'_> {
         })
         .transpose()
     }
-    fn append(
+    pub fn append(
         &self,
         run: &str,
         agent: &str,

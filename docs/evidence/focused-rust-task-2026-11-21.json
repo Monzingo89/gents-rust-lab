@@ -1,0 +1,636 @@
+{
+  "date": "2026-11-21",
+  "slice": "Focused source context and one independently accepted native Rust task",
+  "head": "28a8da823231b792030eff5b6172dba29768442f",
+  "trials": [
+    {
+      "id": "721b63ce61f849a78516",
+      "report": "data/local-evaluation/rust-live-721b63ce61f849a78516/report.json",
+      "report_sha256": "460deaa2f84f94e4d570c212ad389375d36aae6432745985f7f6758ad1ff9adc",
+      "criteria": "data/local-evaluation/rust-live-721b63ce61f849a78516/criteria.json",
+      "criteria_sha256": "90d08c6fa6d59b29b0da3973fc65e04fe9e975b8a0a4affdf2df0ff3429e9c60",
+      "probe_snapshot": null,
+      "probe_sha256": null,
+      "model_path": "models/qwen3-4b-instruct/Qwen3-4B-Q4_K_M.gguf",
+      "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+      "harness_sha256": "b200663e543ab81b972b192ba7a85e84794c0ad06f73d03761bfb2ebb20ca424",
+      "prompt_profile": "full",
+      "task_sha256": "5fc9084423e76ee8021b21aa8075f523bfed191898722fdd557bf94442853bc6",
+      "criteria_values": [
+        "Submit a quarantined candidate with exact native readback; independent host review is required before execution or promotion."
+      ],
+      "tools": [
+        "files:read",
+        "files:write"
+      ],
+      "per_trial_call_ceiling": 1,
+      "actual_task_input_sha256": "67746dfd0451bdd55ec4916902dadc60d2b33aa1c481928c50db95b52304f5b5",
+      "generation_budget": {
+        "final_tokens_reserved": 2048,
+        "reasoning_tokens": 512,
+        "total_generation_tokens": 2560
+      },
+      "verified_task_completion": false,
+      "evaluation": {
+        "custody": {
+          "intake_sha256": "b7465367e0e6f9a2587be808330119abff312b88991fa25cdf4df538d9e6b289",
+          "native_audit_sequences": [
+            8,
+            9
+          ],
+          "policy_revision": 1,
+          "source_sha256": "cba01009962bc392395cb4fdb113139fbde054311a5d01d188d4f0b06fbd826f"
+        },
+        "kind": "rust_acceptance",
+        "native_result": {
+          "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\n",
+          "diagnostics": {
+            "exit_code": 101,
+            "limit": null,
+            "passed": false,
+            "signal": null,
+            "stderr": "",
+            "stdout": "\nrunning 1 test\ntest exhaustive_unicode_offsets_limits_and_overflow_match_fixed_contract ... FAILED\n\nfailures:\n\n---- exhaustive_unicode_offsets_limits_and_overflow_match_fixed_contract stdout ----\n\nthread 'exhaustive_unicode_offsets_limits_and_overflow_match_fixed_contract' (5355234) panicked at acceptance.rs:13:5:\nassertion `left == right` failed: text=\"\",offset=0,limit=1\n  left: None\n right: Some(0)\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\n\nfailures:\n    exhaustive_unicode_offsets_limits_and_overflow_match_fixed_contract\n\ntest result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n"
+          },
+          "isolation": "macOS Seatbelt deny-default; separate compiler/runtime profiles; no network, home data, external writes or runtime subprocesses",
+          "limits": {
+            "compile_wall_seconds": 30,
+            "output_bytes_per_stream": 16384,
+            "source_bytes": 8192,
+            "test_cpu_seconds": 2,
+            "test_rss_kib_observation_limit": 262144,
+            "test_wall_seconds": 5
+          },
+          "passed": false,
+          "promotion_authorized": false,
+          "provider_cost_usd": 0,
+          "source_sha256": "cba01009962bc392395cb4fdb113139fbde054311a5d01d188d4f0b06fbd826f",
+          "stage": "acceptance",
+          "tests_count": 1,
+          "tests_sha256": "94f2bb5de1a1197070e971dea1348e23f25daafe9e6c0bdd520a771aed23b3ba"
+        },
+        "passed": false,
+        "promotion_authorized": false,
+        "runtime": {
+          "adapter": {
+            "path": "/Users/rmonzingo/repo-applications/gents-rust-lab/target/debug/gents-rust-component",
+            "sha256": "0dded0414e8265a4c91d899a1e381a5d6eaf998a1d43c6f7919c34fcf91de1f0"
+          },
+          "compiler": {
+            "path": "/Users/rmonzingo/.rustup/toolchains/stable-aarch64-apple-darwin/bin/rustc",
+            "sha256": "1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1"
+          }
+        },
+        "scope": "Exact submitted pure Rust bytes against the frozen owner suite; not general correctness, native run acceptance or source promotion",
+        "tests_sha256": "94f2bb5de1a1197070e971dea1348e23f25daafe9e6c0bdd520a771aed23b3ba"
+      },
+      "input_tokens": 2262,
+      "output_tokens": 800,
+      "reasoning_tokens_separately_reported": null,
+      "task_elapsed_seconds": 12.098734125000192,
+      "model_latency_ms": 10285,
+      "rss_bytes_at_reply": 3901931520,
+      "context_tokens": 8192,
+      "actual_model_calls": 1,
+      "durable_reservations": 1,
+      "paid_calls": 0,
+      "actual_provider_cost_usd": 0.0,
+      "harness_exit_code": 0
+    },
+    {
+      "id": "5d4e71e0b23d4a23b5b3",
+      "report": "data/local-evaluation/rust-live-5d4e71e0b23d4a23b5b3/report.json",
+      "report_sha256": "4572202e6f599bcfcd2156b0de97c933e52e485c5493028ce1f44a9b23cde58a",
+      "criteria": "data/local-evaluation/rust-live-5d4e71e0b23d4a23b5b3/criteria.json",
+      "criteria_sha256": "21a1efaeafde9f259dbc2bed6e4131688b997da8b86892b893a58fcf5fb156fe",
+      "probe_snapshot": null,
+      "probe_sha256": null,
+      "model_path": "models/qwen3-8b/Qwen3-8B-Q4_K_M.gguf",
+      "model_sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+      "harness_sha256": "b200663e543ab81b972b192ba7a85e84794c0ad06f73d03761bfb2ebb20ca424",
+      "prompt_profile": "full",
+      "task_sha256": "5fc9084423e76ee8021b21aa8075f523bfed191898722fdd557bf94442853bc6",
+      "criteria_values": [
+        "Submit a quarantined candidate with exact native readback; independent host review is required before execution or promotion."
+      ],
+      "tools": [
+        "files:read",
+        "files:write"
+      ],
+      "per_trial_call_ceiling": 1,
+      "actual_task_input_sha256": "67746dfd0451bdd55ec4916902dadc60d2b33aa1c481928c50db95b52304f5b5",
+      "generation_budget": {
+        "final_tokens_reserved": 2048,
+        "reasoning_tokens": 512,
+        "total_generation_tokens": 2560
+      },
+      "verified_task_completion": false,
+      "evaluation": {
+        "custody": {
+          "intake_sha256": "b7465367e0e6f9a2587be808330119abff312b88991fa25cdf4df538d9e6b289",
+          "native_audit_sequences": [
+            8,
+            9
+          ],
+          "policy_revision": 1,
+          "source_sha256": "615aff833111cf9d2ddd1252aaa43a8b4e13db647c5e04958ffebe32dde579ea"
+        },
+        "kind": "rust_acceptance",
+        "native_result": {
+          "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\n",
+          "diagnostics": {
+            "exit_code": 1,
+            "limit": null,
+            "passed": false,
+            "signal": null,
+            "stderr": "error: variable does not need to be mutable\n  --> candidate.rs:14:9\n   |\n14 |     let mut current = 0;\n   |         ----^^^^^^^\n   |         |\n   |         help: remove this `mut`\n   |\n   = note: `-D unused-mut` implied by `-D warnings`\n   = help: to override `-D warnings` add `#[allow(unused_mut)]`\n\nerror: unused variable: `current`\n  --> candidate.rs:14:9\n   |\n14 |     let mut current = 0;\n   |         ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_current`\n   |\n   = note: `-D unused-variables` implied by `-D warnings`\n   = help: to override `-D warnings` add `#[allow(unused_variables)]`\n\nerror: unused variable: `byte`\n  --> candidate.rs:16:14\n   |\n16 |     for (i, &byte) in text_bytes.iter().enumerate() {\n   |              ^^^^ help: if this is intentional, prefix it with an underscore: `_byte`\n\nerror: aborting due to 3 previous errors\n\n",
+            "stdout": ""
+          },
+          "passed": false,
+          "promotion_authorized": false,
+          "provider_cost_usd": 0,
+          "source_sha256": "615aff833111cf9d2ddd1252aaa43a8b4e13db647c5e04958ffebe32dde579ea",
+          "stage": "compile_candidate",
+          "tests_sha256": "94f2bb5de1a1197070e971dea1348e23f25daafe9e6c0bdd520a771aed23b3ba"
+        },
+        "passed": false,
+        "promotion_authorized": false,
+        "runtime": {
+          "adapter": {
+            "path": "/Users/rmonzingo/repo-applications/gents-rust-lab/target/debug/gents-rust-component",
+            "sha256": "0dded0414e8265a4c91d899a1e381a5d6eaf998a1d43c6f7919c34fcf91de1f0"
+          },
+          "compiler": {
+            "path": "/Users/rmonzingo/.rustup/toolchains/stable-aarch64-apple-darwin/bin/rustc",
+            "sha256": "1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1"
+          }
+        },
+        "scope": "Exact submitted pure Rust bytes against the frozen owner suite; not general correctness, native run acceptance or source promotion",
+        "tests_sha256": "94f2bb5de1a1197070e971dea1348e23f25daafe9e6c0bdd520a771aed23b3ba"
+      },
+      "input_tokens": 2256,
+      "output_tokens": 927,
+      "reasoning_tokens_separately_reported": null,
+      "task_elapsed_seconds": 19.813499084004434,
+      "model_latency_ms": 18354,
+      "rss_bytes_at_reply": 6448381952,
+      "context_tokens": 8192,
+      "actual_model_calls": 1,
+      "durable_reservations": 1,
+      "paid_calls": 0,
+      "actual_provider_cost_usd": 0.0,
+      "harness_exit_code": 0
+    },
+    {
+      "id": "914c7a0c01a140e1bb49",
+      "report": "data/local-evaluation/rust-live-914c7a0c01a140e1bb49/report.json",
+      "report_sha256": "6289dd2d05eec538619eebffc8a7b2277a4fe06bde59f779f15b71bfa204e994",
+      "criteria": "data/local-evaluation/rust-live-914c7a0c01a140e1bb49/criteria.json",
+      "criteria_sha256": "297dae0881a1badfbfa95c9d80c17a4fc64b5090dde6c88f94a527c0eecc8b56",
+      "probe_snapshot": "data/local-evaluation/rust-live-914c7a0c01a140e1bb49/probe-source.py",
+      "probe_sha256": "d4ca93f2b2c95a193186f7fc93ef2f766a87624676d5c906945f58c516bf720b",
+      "model_path": "models/qwen3-4b-instruct/Qwen3-4B-Q4_K_M.gguf",
+      "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+      "harness_sha256": "b200663e543ab81b972b192ba7a85e84794c0ad06f73d03761bfb2ebb20ca424",
+      "prompt_profile": "focused",
+      "task_sha256": "5fc9084423e76ee8021b21aa8075f523bfed191898722fdd557bf94442853bc6",
+      "criteria_values": [
+        "Submit a quarantined candidate with exact native readback; independent host review is required before execution or promotion."
+      ],
+      "tools": [
+        "files:read",
+        "files:write"
+      ],
+      "per_trial_call_ceiling": 1,
+      "actual_task_input_sha256": "67746dfd0451bdd55ec4916902dadc60d2b33aa1c481928c50db95b52304f5b5",
+      "generation_budget": {
+        "final_tokens_reserved": 2048,
+        "reasoning_tokens": 512,
+        "total_generation_tokens": 2560
+      },
+      "verified_task_completion": false,
+      "evaluation": {
+        "custody": {
+          "intake_sha256": "d2bb97dfab69a533489c056f94a7756563528ad501ceb499e40bae564e523578",
+          "native_audit_sequences": [
+            7,
+            8
+          ],
+          "policy_revision": 1,
+          "source_sha256": "7cc0f993034179d4d0019b40fba99a36a02c1f2dbbf718e7d6731fde7373ecff"
+        },
+        "kind": "rust_acceptance",
+        "native_result": {
+          "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\n",
+          "diagnostics": {
+            "exit_code": 1,
+            "limit": null,
+            "passed": false,
+            "signal": null,
+            "stderr": "error: unnecessary parentheses around `if` condition\n  --> candidate.rs:31:12\n   |\n31 |         if (pos > 0 && bytes[pos - 1] & 0b11000000 != 0b10000000) {\n   |            ^                                                    ^\n   |\n   = note: `-D unused-parens` implied by `-D warnings`\n   = help: to override `-D warnings` add `#[allow(unused_parens)]`\nhelp: remove these parentheses\n   |\n31 -         if (pos > 0 && bytes[pos - 1] & 0b11000000 != 0b10000000) {\n31 +         if pos > 0 && bytes[pos - 1] & 0b11000000 != 0b10000000 {\n   |\n\nerror: aborting due to 1 previous error\n\n",
+            "stdout": ""
+          },
+          "passed": false,
+          "promotion_authorized": false,
+          "provider_cost_usd": 0,
+          "source_sha256": "7cc0f993034179d4d0019b40fba99a36a02c1f2dbbf718e7d6731fde7373ecff",
+          "stage": "compile_candidate",
+          "tests_sha256": "94f2bb5de1a1197070e971dea1348e23f25daafe9e6c0bdd520a771aed23b3ba"
+        },
+        "passed": false,
+        "promotion_authorized": false,
+        "runtime": {
+          "adapter": {
+            "path": "/Users/rmonzingo/repo-applications/gents-rust-lab/target/debug/gents-rust-component",
+            "sha256": "0dded0414e8265a4c91d899a1e381a5d6eaf998a1d43c6f7919c34fcf91de1f0"
+          },
+          "compiler": {
+            "path": "/Users/rmonzingo/.rustup/toolchains/stable-aarch64-apple-darwin/bin/rustc",
+            "sha256": "1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1"
+          }
+        },
+        "scope": "Exact submitted pure Rust bytes against the frozen owner suite; not general correctness, native run acceptance or source promotion",
+        "tests_sha256": "94f2bb5de1a1197070e971dea1348e23f25daafe9e6c0bdd520a771aed23b3ba"
+      },
+      "input_tokens": 488,
+      "output_tokens": 957,
+      "reasoning_tokens_separately_reported": null,
+      "task_elapsed_seconds": 10.35133066700655,
+      "model_latency_ms": 9604,
+      "rss_bytes_at_reply": 3894378496,
+      "context_tokens": 8192,
+      "actual_model_calls": 1,
+      "durable_reservations": 1,
+      "paid_calls": 0,
+      "actual_provider_cost_usd": 0.0,
+      "harness_exit_code": 0
+    },
+    {
+      "id": "a6a33362066f41c6b05d",
+      "report": "data/local-evaluation/rust-live-a6a33362066f41c6b05d/report.json",
+      "report_sha256": "a45d0f70e602b8cb9b61de216510a72c4c9250af7e1311491b83feed62c68697",
+      "criteria": "data/local-evaluation/rust-live-a6a33362066f41c6b05d/criteria.json",
+      "criteria_sha256": "70646d4db58830c5bdc5b518ce2263961dee96562c1c2859059eb901a19b477b",
+      "probe_snapshot": "data/local-evaluation/rust-live-a6a33362066f41c6b05d/probe-source.py",
+      "probe_sha256": "67aa61f5cc7b9509bf1c5ef1a5f6aa326d12e4351c8c4b50001c30019f62fa0c",
+      "model_path": "models/qwen3.8-27b-planner-judge/Qwen3.8-27B-UD-Q4_K_M.gguf",
+      "model_sha256": "322e194ff79741c7baa497c240f677f54b201b0efab44ca8e50f122b39123482",
+      "harness_sha256": "b200663e543ab81b972b192ba7a85e84794c0ad06f73d03761bfb2ebb20ca424",
+      "prompt_profile": "focused",
+      "task_sha256": "5fc9084423e76ee8021b21aa8075f523bfed191898722fdd557bf94442853bc6",
+      "criteria_values": [
+        "Submit a quarantined candidate with exact native readback; independent host review is required before execution or promotion."
+      ],
+      "tools": [
+        "files:read",
+        "files:write"
+      ],
+      "per_trial_call_ceiling": 1,
+      "actual_task_input_sha256": "67746dfd0451bdd55ec4916902dadc60d2b33aa1c481928c50db95b52304f5b5",
+      "generation_budget": {
+        "final_tokens_reserved": 2048,
+        "reasoning_tokens": 512,
+        "total_generation_tokens": 2560
+      },
+      "verified_task_completion": true,
+      "evaluation": {
+        "custody": {
+          "intake_sha256": "d2bb97dfab69a533489c056f94a7756563528ad501ceb499e40bae564e523578",
+          "native_audit_sequences": [
+            8,
+            9
+          ],
+          "policy_revision": 1,
+          "source_sha256": "9345d9ae6f0622701f0f1b37fdcbc0e6e9d34956ffae01d0a9e1c5b4b97f28dd"
+        },
+        "kind": "rust_acceptance",
+        "native_result": {
+          "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\n",
+          "diagnostics": {
+            "exit_code": 0,
+            "limit": null,
+            "passed": true,
+            "signal": null,
+            "stderr": "",
+            "stdout": "\nrunning 1 test\ntest exhaustive_unicode_offsets_limits_and_overflow_match_fixed_contract ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n"
+          },
+          "isolation": "macOS Seatbelt deny-default; separate compiler/runtime profiles; no network, home data, external writes or runtime subprocesses",
+          "limits": {
+            "compile_wall_seconds": 30,
+            "output_bytes_per_stream": 16384,
+            "source_bytes": 8192,
+            "test_cpu_seconds": 2,
+            "test_rss_kib_observation_limit": 262144,
+            "test_wall_seconds": 5
+          },
+          "passed": true,
+          "promotion_authorized": false,
+          "provider_cost_usd": 0,
+          "source_sha256": "9345d9ae6f0622701f0f1b37fdcbc0e6e9d34956ffae01d0a9e1c5b4b97f28dd",
+          "stage": "acceptance",
+          "tests_count": 1,
+          "tests_sha256": "94f2bb5de1a1197070e971dea1348e23f25daafe9e6c0bdd520a771aed23b3ba"
+        },
+        "passed": true,
+        "promotion_authorized": false,
+        "runtime": {
+          "adapter": {
+            "path": "/Users/rmonzingo/repo-applications/gents-rust-lab/target/debug/gents-rust-component",
+            "sha256": "0dded0414e8265a4c91d899a1e381a5d6eaf998a1d43c6f7919c34fcf91de1f0"
+          },
+          "compiler": {
+            "path": "/Users/rmonzingo/.rustup/toolchains/stable-aarch64-apple-darwin/bin/rustc",
+            "sha256": "1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1"
+          }
+        },
+        "scope": "Exact submitted pure Rust bytes against the frozen owner suite; not general correctness, native run acceptance or source promotion",
+        "tests_sha256": "94f2bb5de1a1197070e971dea1348e23f25daafe9e6c0bdd520a771aed23b3ba"
+      },
+      "input_tokens": 527,
+      "output_tokens": 814,
+      "reasoning_tokens_separately_reported": null,
+      "task_elapsed_seconds": 59.96209541600547,
+      "model_latency_ms": 46342,
+      "rss_bytes_at_reply": 8716320768,
+      "context_tokens": 8192,
+      "actual_model_calls": 1,
+      "durable_reservations": 1,
+      "paid_calls": 0,
+      "actual_provider_cost_usd": 0.0,
+      "harness_exit_code": 0
+    }
+  ],
+  "new_trials": 2,
+  "new_trial_model_calls": 2,
+  "new_trial_paid_calls": 0,
+  "new_trial_provider_cost_usd": 0,
+  "ledger_verified_tasks": 1,
+  "ledger_task_trials": 4,
+  "ledger_scope": "One frozen function task across different models/context modes; not a general success-rate estimate",
+  "same_task_fingerprint": "67746dfd0451bdd55ec4916902dadc60d2b33aa1c481928c50db95b52304f5b5",
+  "same_request_criteria_tools_and_generation_bounds": true,
+  "observed_4b_input_reduction_percent": 78.42617152961981,
+  "context_comparison_limit": "One ordered pair, full versus focused; native task fingerprint and frozen criteria match. Labels/order/cache/loading can differ; no statistical speed/quality claim. Both 4B candidates failed.",
+  "candidate": {
+    "path": "docs/evidence/focused-rust-candidate-2026-11-21.rs",
+    "sha256": "9345d9ae6f0622701f0f1b37fdcbc0e6e9d34956ffae01d0a9e1c5b4b97f28dd",
+    "custody_revalidated_before_copy": true,
+    "source_modified_before_copy": false,
+    "adopted_into_runtime": false
+  },
+  "host_capacity_observation": {
+    "total_bytes": 38654705664,
+    "memory_pressure_reported_free_percent": 87,
+    "model_file_bytes": 16464440224,
+    "existing_owner_policy_floor_mib": 24576,
+    "floor_source": "config/company.mcp-development-adaptive-planner.json",
+    "floor_is_estimate": true,
+    "scope": "Read-only observation before 27B trial; not GPU memory, fit guarantee or measured task peak"
+  },
+  "unknown_measurements": {
+    "peak_or_gpu_memory_bytes": null,
+    "estimated_total_cost_usd": null,
+    "answer_cache_hit_ratio": null,
+    "separate_reasoning_token_counts": null
+  },
+  "validation": [
+    {
+      "path": "data/local-evaluation/rust-focused-supervised-179a183771f346f3aefa73cb3fd31112/report.json",
+      "sha256": "73bfd19be17d03fc267796729169a66cb9b79da7c9871e69294d33e1086b19a0",
+      "result": {
+        "name": "rust-focused",
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+          "scripts/rust_candidate_live.py",
+          "--model",
+          "qwen3-4b",
+          "--prompt-profile",
+          "focused"
+        ],
+        "passed": false,
+        "exit_code": 1,
+        "timed_out": false,
+        "elapsed_ms": 13136.697,
+        "log": "rust-focused.log",
+        "log_sha256": "f0e8b1a22d386643164bc5ca6f08d8f87a7b10f8ca85db7cfc019d690d3f111b",
+        "observations": [
+          {
+            "report": "/Users/rmonzingo/repo-applications/gents-rust-lab/data/local-evaluation/rust-live-914c7a0c01a140e1bb49/report.json",
+            "verified_task_completion": false
+          }
+        ]
+      }
+    },
+    {
+      "path": "data/local-evaluation/rust-reasoning-supervised-cc6f0aa416e74306904e2133c780767c/report.json",
+      "sha256": "7c21906d9942bb5198741d6007a068a2420c20917c466a20f8c1a608eaad8541",
+      "result": {
+        "name": "rust-reasoning",
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+          "scripts/rust_candidate_live.py",
+          "--model",
+          "qwen3.8-27b",
+          "--prompt-profile",
+          "focused"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 76596.806,
+        "log": "rust-reasoning.log",
+        "log_sha256": "2cd1cc4108b14737b7d8ca1c6d9b5ee401902670c9127b21f46d681e679b183c",
+        "observations": [
+          {
+            "report": "/Users/rmonzingo/repo-applications/gents-rust-lab/data/local-evaluation/rust-live-a6a33362066f41c6b05d/report.json",
+            "verified_task_completion": true
+          }
+        ]
+      }
+    },
+    {
+      "path": "data/local-evaluation/focused-rust-validation-ed841be3118d4a69bcfba91ec195540a/report.json",
+      "sha256": "da9a39cfe4d0233ae2c20f6d381c90a486e63517c02552286eb63740bd396235",
+      "result": {
+        "scope": "No live model calls; unchanged governance and acceptance checks",
+        "checks": [
+          {
+            "name": "proposals",
+            "command": [
+              "cargo",
+              "test",
+              "-p",
+              "gents-local-mcp",
+              "--test",
+              "proposals",
+              "--offline",
+              "--locked"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 8512.841,
+            "log": "proposals.log",
+            "log_sha256": "4dde2fb2fc496c57c7146d55a3e44ace123938e2cae5be87ff08668ed1cc9da1",
+            "observations": []
+          },
+          {
+            "name": "focused-context",
+            "command": [
+              "cargo",
+              "test",
+              "-p",
+              "gents-harness",
+              "focused_candidate",
+              "--offline",
+              "--locked"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 148.028,
+            "log": "focused-context.log",
+            "log_sha256": "3c3b0f700e10dc667e486ec679f101a804fc0d4064848cf42c1172431c4850be",
+            "observations": []
+          },
+          {
+            "name": "evaluator",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "scripts",
+              "-p",
+              "test_experiment_evaluation.py"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 581.582,
+            "log": "evaluator.log",
+            "log_sha256": "f23a148eb8be03cb9b2e76be2dc583b53bdf6802066ec53ffe34af47c229ed51",
+            "observations": []
+          },
+          {
+            "name": "syntax",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "-m",
+              "py_compile",
+              "scripts/rust_candidate_live.py"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 28.588,
+            "log": "syntax.log",
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "observations": []
+          }
+        ],
+        "passed": true
+      }
+    },
+    {
+      "path": "data/local-evaluation/focused-rust-final-a55c2a37edec4a1187d73b8bfd9b0282/report.json",
+      "sha256": "b269304610c43b03df3f5dfd40862b3e7ca066282d916a852b8f6b0eefb37735",
+      "result": {
+        "checks": [
+          {
+            "name": "syntax",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "-m",
+              "py_compile",
+              "scripts/rust_candidate_live.py"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 27.884,
+            "log": "syntax.log",
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "observations": []
+          },
+          {
+            "name": "discovery",
+            "command": [
+              "node",
+              "scripts/repo-skills.mjs",
+              "--codegpt"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 26.185,
+            "log": "discovery.log",
+            "log_sha256": "fa6010c72d1c9b94e10ae3d375862ae307ecf90e524eb6edab774fae73791477",
+            "observations": [
+              {
+                "canonical": [
+                  "repo-simplify",
+                  "harness-routing",
+                  "context-governance",
+                  "building-interactions",
+                  "local-evaluate"
+                ],
+                "claude": "five resolved project links",
+                "kimi": "native .agents/skills root; no duplicate adapter",
+                "codegpt": "five resolved user catalog links; existing toggles preserved",
+                "live_chat_invocation": "not performed; no model calls"
+              }
+            ]
+          },
+          {
+            "name": "metadata",
+            "command": [
+              "/Users/rmonzingo/repo-applications/gents-rust-lab/.venv/bin/python",
+              "/Users/rmonzingo/.codex/skills/.system/skill-creator/scripts/quick_validate.py",
+              "/Users/rmonzingo/repo-applications/gents-rust-lab/.agents/skills/local-evaluate"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 26.225,
+            "log": "metadata.log",
+            "log_sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0",
+            "observations": []
+          },
+          {
+            "name": "diff",
+            "command": [
+              "git",
+              "diff",
+              "--check"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 38.391,
+            "log": "diff.log",
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "observations": []
+          }
+        ],
+        "passed": true
+      }
+    }
+  ],
+  "production_profile_admission": false,
+  "promotion_authorized": false,
+  "remaining": [
+    "Useful held-out task set and comparable production routing qualification",
+    "Combined owner HTTP/native cancellation latency in one real trial",
+    "Actual Open WebUI deployment/accounting/concurrency boundary"
+  ],
+  "files": {
+    "scripts/rust_candidate_live.py": "67aa61f5cc7b9509bf1c5ef1a5f6aa326d12e4351c8c4b50001c30019f62fa0c",
+    ".agents/skills/local-evaluate/SKILL.md": "4998064acf537603b7692942728049b19bb61994c0288cdc414e677a806328ba",
+    "docs/172-focused-rust-task-evidence.md": "1eafcce097002c173f85916f53d32c98dcbbde8796bdcdb82a587844047892ba",
+    "docs/162-local-execution-baseline.md": "c8916e6a784542fe7638e5485c040e659a4bcd495c1a8e0d27e6b188f3ef97e4",
+    "docs/169-requirement-audit-and-routing.md": "e7d08a2855266fc517d6dd2d146a3b80ee58c4975a18003859febd90f63b9180",
+    "docs/evidence/focused-rust-candidate-2026-11-21.rs": "9345d9ae6f0622701f0f1b37fdcbc0e6e9d34956ffae01d0a9e1c5b4b97f28dd"
+  }
+}

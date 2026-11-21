@@ -96,7 +96,6 @@ impl Settings {
 #[derive(Default)]
 pub struct Service {
     active: Mutex<HashMap<Uuid, Arc<AtomicBool>>>,
-    pins: Mutex<HashMap<String, Value>>,
 }
 
 fn scoped(
@@ -112,134 +111,6 @@ fn scoped(
     Ok(scope)
 }
 impl Service {
-    pub(super) async fn verify_pin(
-        &self,
-        root: &Path,
-        settings: &Settings,
-        company: &str,
-    ) -> Result<()> {
-        if settings.model.provider == "mock" {
-            return Ok(());
-        }
-        if settings.model.provider == "mlx" {
-            let relative = settings.model.path.as_deref().context("MLX path missing")?;
-            ensure!(
-                relative.starts_with("models/") && crate::model_package::safe_relative(relative),
-                "confined MLX package required"
-            );
-            self.verify_package(
-                root,
-                relative,
-                crate::model_package::Kind::Model,
-                settings
-                    .model_sha256
-                    .as_deref()
-                    .context("MLX model pin missing")?,
-            )
-            .await?;
-            if let Some(adapter) = &settings.model.adapter {
-                crate::company::identifier(company)?;
-                ensure!(
-                    crate::model_package::safe_relative(adapter)
-                        && adapter.starts_with(&format!("data/companies/{company}/training/runs/")),
-                    "adapter outside this company's training root"
-                );
-                self.verify_package(
-                    root,
-                    adapter,
-                    crate::model_package::Kind::Adapter,
-                    settings
-                        .adapter_sha256
-                        .as_deref()
-                        .context("adapter pin missing")?,
-                )
-                .await?;
-            }
-            return Ok(());
-        }
-        let relative = settings
-            .model
-            .path
-            .as_deref()
-            .context("native model path absent")?;
-        ensure!(
-            crate::model_artifact::relative_path(relative),
-            "grounded model requires a confined models/ GGUF path"
-        );
-        let fingerprint = || -> Result<Value> {
-            let mut path = root.to_path_buf();
-            let mut parts = vec![];
-            for part in std::path::Path::new(relative).components() {
-                path.push(part);
-                let info = std::fs::symlink_metadata(&path)?;
-                ensure!(!info.is_symlink(), "model symlink rejected");
-                #[cfg(unix)]
-                {
-                    use std::os::unix::fs::MetadataExt;
-                    parts.push(json!([
-                        info.dev(),
-                        info.ino(),
-                        info.uid(),
-                        info.mode(),
-                        info.nlink(),
-                        info.len(),
-                        info.mtime(),
-                        info.mtime_nsec(),
-                        info.ctime(),
-                        info.ctime_nsec()
-                    ]));
-                }
-                #[cfg(not(unix))]
-                {
-                    parts.push(json!([info.len(), format!("{:?}", info.modified()?)]));
-                }
-            }
-            Ok(json!(parts))
-        };
-        let key = format!("{}:{}", relative, settings.model_sha256.as_deref().unwrap());
-        let mut pins = self.pins.lock().await;
-        let observed = fingerprint()?;
-        if pins.get(&key) == Some(&observed) {
-            return Ok(());
-        }
-        let (root, path, hash) = (
-            root.to_path_buf(),
-            relative.to_owned(),
-            settings.model_sha256.clone().unwrap(),
-        );
-        tokio::task::spawn_blocking(move || {
-            crate::model_artifact::verify(&root, &path, &hash).map_err(anyhow::Error::msg)
-        })
-        .await??;
-        pins.insert(key, fingerprint()?);
-        Ok(())
-    }
-    async fn verify_package(
-        &self,
-        root: &Path,
-        relative: &str,
-        kind: crate::model_package::Kind,
-        expected: &str,
-    ) -> Result<()> {
-        let before = crate::model_package::snapshot(root, relative, kind)?;
-        let key = format!("package/v1/{kind:?}/{relative}/{expected}");
-        let mut pins = self.pins.lock().await;
-        if pins.get(&key) == Some(&before.fingerprint) {
-            return Ok(());
-        }
-        let (root, relative, expected) =
-            (root.to_path_buf(), relative.to_owned(), expected.to_owned());
-        let verified = tokio::task::spawn_blocking(move || {
-            crate::model_package::verify(&root, &relative, kind, &expected)
-        })
-        .await??;
-        ensure!(
-            verified.fingerprint == before.fingerprint,
-            "package changed during pin admission"
-        );
-        pins.insert(key, verified.fingerprint);
-        Ok(())
-    }
     #[allow(clippy::too_many_arguments)]
     pub async fn start(
         &self,
@@ -255,7 +126,15 @@ impl Service {
             return Ok(base);
         };
         settings.validate()?;
-        self.verify_pin(&root, &settings, &tenant).await?;
+        app.model_pins
+            .verify(
+                &root,
+                &settings.model,
+                settings.model_sha256.as_deref(),
+                settings.adapter_sha256.as_deref(),
+                &tenant,
+            )
+            .await?;
         let runtime = gents_local_mcp::digest(&serde_json::to_vec(&app.config)?);
         // Hold only admission, never inference, under this lock. Status cannot
         // misidentify a just-claimed local job before its active handle exists.
@@ -293,9 +172,14 @@ impl Service {
         if admitted.launch {
             let cancel = Arc::new(AtomicBool::new(false));
             active.insert(admitted.job_id, cancel.clone());
-            tokio::spawn(run(
-                app, root, tenant, subject, runtime, settings, admitted, cancel,
-            ));
+            let foreground = app.office.foreground();
+            tokio::spawn(async move {
+                let _foreground = foreground;
+                run(
+                    app, root, tenant, subject, runtime, settings, admitted, cancel,
+                )
+                .await;
+            });
         }
         Ok(result)
     }
@@ -393,8 +277,14 @@ async fn run(
         0,
     );
     let call = async {
-        app.task_answers
-            .verify_pin(&root, &settings, &tenant)
+        app.model_pins
+            .verify(
+                &root,
+                &settings.model,
+                settings.model_sha256.as_deref(),
+                settings.adapter_sha256.as_deref(),
+                &tenant,
+            )
             .await?;
         if settings.model.provider == "mock" {
             app.gateway
@@ -451,13 +341,19 @@ async fn run(
     };
     let call_evidence = match &reply {
         Ok(r) => {
-            json!({"usage":r.usage,"local_execution":r.local_execution,"latency_ms":r.latency_ms})
+            json!({"usage":r.usage,"local_execution":r.local_execution,"latency_ms":r.latency_ms,"fixture":settings.model.provider=="mock"})
         }
         Err(error) => json!({"inference_failure":crate::local_generation::planning_failure(error)}),
     };
     let pin_current = app
-        .task_answers
-        .verify_pin(&root, &settings, &tenant)
+        .model_pins
+        .verify(
+            &root,
+            &settings.model,
+            settings.model_sha256.as_deref(),
+            settings.adapter_sha256.as_deref(),
+            &tenant,
+        )
         .await
         .is_ok();
     let (job_id, root2, tenant2, subject2) = (

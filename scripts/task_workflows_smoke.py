@@ -15,7 +15,7 @@ import uuid
 ROOT=Path(__file__).resolve().parents[1]
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument("--adaptive",action="store_true");parser.add_argument("--workspace",action="store_true");parser.add_argument("--workspace-denied",action="store_true");parser.add_argument("--browser",action="store_true");args=parser.parse_args();assert sum([args.adaptive,args.workspace,args.workspace_denied,args.browser])<=1
+    parser=argparse.ArgumentParser();parser.add_argument("--adaptive",action="store_true");parser.add_argument("--workspace",action="store_true");parser.add_argument("--workspace-denied",action="store_true");parser.add_argument("--browser",action="store_true");parser.add_argument("--grounded",action="store_true");parser.add_argument("--routing",action="store_true");args=parser.parse_args();assert sum([args.adaptive,args.workspace,args.workspace_denied,args.browser,args.grounded,args.routing])<=1
     with tempfile.TemporaryDirectory(prefix='gents-workflow-') as temporary:
         folder=Path(temporary)
         if args.browser:(folder/'web').symlink_to(ROOT/'web',target_is_directory=True)
@@ -42,6 +42,15 @@ def main():
             settings['adaptive']={'intake':{'model':'fixture','tokens':128,'max_repairs':1},'max_replans':1,'rules':[{'on':'evidence_insufficient','template':'tool_loop/v1','model':None}]}
         config={'company_mode':True,'company_tools':True,'admin_judge':model,'agents':[{'id':'Fixture','assignment':'protocol test','planner':model,'worker':model}],
                 'max_steps':1,'max_tokens':512,'max_run_seconds':60,'task_workflows':settings}
+        if args.routing:
+            worker=settings['models']['fixture'];worker['max_input_bytes']=16384;worker['measured_total_latency_ms']=50
+            fast=json.loads(json.dumps(worker));fast['max_input_bytes']=2048;fast['measured_total_latency_ms']=1
+            unqualified=json.loads(json.dumps(worker));unqualified['evaluated_profiles']=['history'];unqualified['measured_total_latency_ms']=0
+            oversized=json.loads(json.dumps(worker));oversized['memory_estimate']['weights_bytes']=settings['resident_budget_bytes']+1;oversized['measured_total_latency_ms']=0
+            settings['models'].update(fast=fast,unqualified=unqualified,oversized=oversized)
+        if args.grounded:
+            config.pop('task_workflows')
+            config['task_answers']={'model':{'provider':'mock','model':'mock-grounded'},'final_tokens':128,'deadline_seconds':10,'draft_ttl_seconds':60,'max_pending_jobs':4}
         (folder/'config.json').write_text(json.dumps(config))
         with socket.socket() as listener:
             listener.bind(('127.0.0.1',0));port=listener.getsockname()[1]
@@ -130,6 +139,70 @@ def main():
                         if time.monotonic()>deadline:
                             raise AssertionError('workflow deadline')
                         time.sleep(.05)
+                def wait_foreground(expected):
+                    deadline=time.monotonic()+5
+                    while True:
+                        value=req('/api/office/activity')['foreground']['async_task_jobs']
+                        if value==expected:return
+                        assert time.monotonic()<deadline,(value,expected)
+                        time.sleep(.01)
+                if args.routing:
+                    import sqlite3
+                    selections=[]
+                    for context,expected in [({'case':'x'*4000},'fixture'),({},'fast')]:
+                        started=req(route,{'op':'execute_workflow','input':{'original_ask':'Describe reference chronology evidence for bounded routing','supplied_context':context},'hints':{'template':'direct/v1','domain':'general','evidence_required':False}})
+                        result=wait(started['request']['task_id'])
+                        assert result['status']=='generated',(expected,result)
+                        chosen=result['plan']['nodes'][0]['provider_model'];assert chosen==expected,(chosen,expected)
+                        assert result['measurements']['generative_model_calls']==0,result
+                        selections.append({'supplied_context_json_bytes':len(json.dumps(context)),'selected':chosen,'routing_justification':result['plan']['routing_justification']})
+                    store=folder/'data/companies/one/brain.sqlite3'
+                    with sqlite3.connect(store) as db:before=db.execute("select count(*) from audit where kind='task_model_dispatch'").fetchone()[0]
+                    try:
+                        req(route,{'op':'execute_workflow','input':{'original_ask':'Describe reference chronology evidence for a context that fits no admitted worker','supplied_context':{'one':'x'*8000,'two':'y'*8000}},'hints':{'template':'direct/v1','domain':'general','evidence_required':False}})
+                    except urllib.error.HTTPError as error:
+                        assert error.code==400 and 'feasible worker' in error.read().decode(),error
+                    else:raise AssertionError('no feasible worker must fail before dispatch')
+                    with sqlite3.connect(store) as db:after=db.execute("select count(*) from audit where kind='task_model_dispatch'").fetchone()[0]
+                    assert before==after==2,(before,after)
+                    # Analysis-only proposals do not execute a worker and keep
+                    # their existing deferred worker-context contract.
+                    proposal=req(route,{'op':'destructure_task','input':{'original_ask':'Analyze reference chronology evidence without executing the oversized worker packet','supplied_context':{'one':'x'*8000,'two':'y'*8000}},'hints':{'domain':'general','evidence_required':False}})
+                    analyzed=req(route,{'op':'execute_structured','request':proposal['request'],'analysis_only':True})
+                    analysis=wait(analyzed['request']['task_id'])
+                    assert analysis['status']=='analyzed' and analysis['verification_state']=='proposed_not_executed',analysis
+                    with sqlite3.connect(store) as db:assert db.execute("select count(*) from audit where kind='task_model_dispatch'").fetchone()[0]==after
+                    print(json.dumps({'analysis_only_worker_dispatches':0,'transport':'real HTTP and SQLite','provider':'mock only','routing_inputs':'Owner-configured synthetic latency values; no benchmark speed claim','selections':selections,'profile_and_memory_filters_preserved':True,'infeasible_request_dispatches':0,'fixture_dispatches':after,'generative_model_calls':0,'provider_cost_usd':0}))
+                    return
+                if args.grounded:
+                    import sqlite3
+                    operation={'op':'execute','input':{'original_ask':'Describe reference chronology evidence in the original grounded executor'}}
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+                        launched=list(pool.map(lambda _:req(route,operation),range(2)))
+                    first,second=[v['request']['task_id'] for v in launched]
+                    with sqlite3.connect(folder/'data/companies/one/brain.sqlite3') as db:
+                        jobs=[v[0] for v in db.execute('select job_id from task_grounded_subscribers_v1 where task_id in (?,?)',(first,second))]
+                    assert len(jobs)==2 and jobs[0]==jobs[1],jobs
+                    wait_foreground(1)
+                    assert req(route,{'op':'cancel_task','task_id':first})['result']['status']=='cancelled'
+                    result=wait(second)
+                    assert result['status']=='generated_unverified' and result['verification_state']=='citations_checked_answer_unverified',result
+                    assert result['measurements']['generative_model_calls']==0,result
+                    assert status(first)['status']=='cancelled'
+                    wait_foreground(0)
+                    usage=req(route,{'op':'usage'})
+                    assert usage['sampled_jobs']==1 and usage['observed_fixture_replies']==1 and usage['generative_model_calls']==0,usage
+                    assert usage['provider_cost_usd']==0 and usage['input_tokens'] is None,usage
+                    operation['input']['original_ask']='Describe chronology evidence before source correction in grounded executor'
+                    changed=req(route,operation)
+                    wait_foreground(1)
+                    source['revision']='v2';source['text']='Corrected reference chronology evidence.'
+                    req(route,{'op':'ingest','source':source})
+                    invalid=wait(changed['request']['task_id'])
+                    assert invalid['status']=='evidence_invalidated' and invalid['answer'] is None,invalid
+                    wait_foreground(0)
+                    print(json.dumps({'transport':'real HTTP and SQLite','provider':'mock only; no model load','executor':'grounded_answer/v1','duplicate_job_coalesced':True,'shared_job_priority_count':1,'subscriber_cancel_isolated':True,'priority_released_after_completion_and_invalidation':True,'source_correction_invalidated':True,'retained_company_usage':usage,'provider_cost_usd':0}))
+                    return
                 task={'original_ask':'Describe reference chronology evidence'}
                 intake=req(route,{'op':'destructure_task','input':task})
                 assert intake['request']['original_ask']==task['original_ask']
@@ -170,6 +243,9 @@ def main():
                     assert result['status']=='generated',(template,result)
                     assert result['measurements']['generative_model_calls']==0 # mock is not live inference
                     assert result['verification_state']!='verified'
+                    assert result['progress']['phase']=='finished'
+                    assert result['progress']['pending_model_requests']==0
+                    assert result['progress']['model_dispatches']==result['progress']['model_returns']>=len(result['plan']['nodes'])
                     if template=='tool_loop/v1':
                         assert result['measurements']['tool_calls']==1
                     records.append({'template':template,'nodes':len(result['plan']['nodes']),'status':result['status']})
@@ -177,20 +253,34 @@ def main():
                 assert custom_intake['analysis']['domain']=='release-specialist'
                 custom_job=req(route,{'op':'execute_workflow','input':{'original_ask':'Draft a release summary'},'hints':{'domain':'release-specialist','template':'direct/v1','evidence_required':False}})
                 assert wait(custom_job['request']['task_id'])['status']=='generated'
+                # Read-only company usage counts executor receipts, not task
+                # result rows (compatible subscribers may share one job).
+                usage=req(route,{'op':'usage'})
+                assert usage['coverage_complete'] and usage['generative_model_calls']==0 and usage['provider_cost_usd']==0,usage
+                assert usage['input_tokens'] is None,'mock token usage is unavailable'
+                import sqlite3
+                with sqlite3.connect(folder/'data/companies/one/brain.sqlite3') as db:
+                    returns=db.execute("select count(*) from audit where kind='task_model_return'").fetchone()[0]
+                assert usage['workflow_return_records']==returns and returns>len(records),usage
                 duplicate={'op':'execute_workflow','input':{'original_ask':'Coalesce reference chronology evidence'},'hints':{'template':'pipeline/v1','evidence_required':False}}
                 with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
                     requests=list(pool.map(lambda _:req(route,duplicate),range(2)))
                 assert requests[0]['job_id']==requests[1]['job_id']
                 first,second=[r['request']['task_id'] for r in requests]
+                wait_foreground(1)
                 assert req(route,{'op':'cancel_task','task_id':first})['status']=='cancelled'
                 completed=wait(second);assert completed['status']=='generated'
                 if completed['cache']['origin_task_id']: assert completed['plan']['task_id']==completed['cache']['origin_task_id']
                 assert status(first)['status']=='cancelled'
+                assert status(first)['progress']['pending_model_requests']==0
+                assert status(second)['progress']['job_id']==status(first)['progress']['job_id']
+                wait_foreground(0)
                 changed=req(route,{'op':'execute_workflow','input':{'original_ask':'Check reference evidence correction'},'hints':{'template':'pipeline/v1','evidence_required':False}})
                 source['revision']='v2';source['text']='Corrected reference source.'
                 req(route,{'op':'ingest','source':source})
                 invalid=wait(changed['request']['task_id'])
                 assert invalid['status']=='evidence_invalidated' and invalid['answer'] is None
+                assert invalid.get('progress') is None
                 req('/api/companies/empty',{'op':'register','name':'Empty retrieval fixture'})
                 empty=req('/api/companies/empty/tasks',{'op':'execute','input':{'original_ask':'No accessible evidence is available'}})
                 deadline=time.monotonic()+5
@@ -215,7 +305,7 @@ def main():
                 assert req(route,{'op':'discover_models'})['artifacts']==[] # isolated fixture has no models
                 if args.browser:
                     subprocess.run(['node','scripts/task_workflows_browser.mjs'],cwd=ROOT,env={**env,'GENTS_TASK_FIXTURE_URL':origin},timeout=90,check=True)
-                print(json.dumps({'transport':'real HTTP and SQLite','provider':'mock, zero generative calls','workflows':records,'duplicate_job_coalesced':True,'subscriber_cancel_isolated':True,'source_correction_invalidated':True,'provider_cost_usd':0}))
+                print(json.dumps({'transport':'real HTTP and SQLite','provider':'mock, zero generative calls','workflows':records,'duplicate_job_coalesced':True,'shared_job_priority_count':1,'priority_released_after_completion':True,'subscriber_cancel_isolated':True,'source_correction_invalidated':True,'retained_company_usage':usage,'provider_cost_usd':0}))
             finally:
                 child.terminate()
                 try:

@@ -1,0 +1,325 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-21",
+  "scope": "Company lifecycle slice; supervisor fixtures and actual idle Rust control plane, not real-model task qualification",
+  "starting_head": "28a8da823231b792030eff5b6172dba29768442f",
+  "changed_source_sha256": {
+    "scripts/company-lifecycle.mjs": "8b0455f571d0585243d80881b7e8103746f984a52079d9d7d340caa6cb27d6ce",
+    "scripts/start-company.mjs": "99f9b9bb34182179d6b138b74a8a0df1cfbc36ae14ef98edb9975e13906d5f9c",
+    "scripts/run-harness.mjs": "29da2012c0d0da11288cfe101a385aa252a76d0a66d5e9dd20480d3166518bd3",
+    "scripts/company-env.mjs": "84009901dbd26cae0fb6f6338b0da8978ebd446d1a9e1d2b1d38d0e9d2835b40",
+    "scripts/company-env.test.mjs": "417711b0788b2f3a570294d61b3e419713904662dff2f53fbf516f765268d5df",
+    "scripts/company-lifecycle.test.mjs": "555388547884bc2518541c1aeaa8d8d9d631608b9991a054ba021b05ed30a7a0",
+    "scripts/company-lifecycle-smoke.mjs": "e7ef5c61fecdd65618c47c64efcabd11d6407e1b31bcb52722d98365a3d38342",
+    "scripts/fixtures/company-lifecycle.mjs": "367756d5582780ffb96d8c1d693e261ea0444bed722a006f6ce4adeb2659c630",
+    "scripts/company_tools.py": "f602016288f3520f66c864d1eb6b62fdf0c1595717a0f75caa21041f718c3514",
+    "scripts/test_company_tools.py": "1b816e21b5fa66b50725999b4f494d8bf016db6d4d225993712fd4ce70d8cffe",
+    "crates/harness/src/main.rs": "ca7267a2d5ee3aae0079e7bdf9381d04b41c48ffb86588ae6214881e4e818e7e",
+    "scripts/local_evaluate.py": "5e08e54e4761818be6bb050ab7bf013334e77d4714c785a6ef0e36fcf038df70",
+    "scripts/check.sh": "ef544cef1c12792590d1c424bedf0f4d9f98e63772b12fe656fa306e9d57ac9b",
+    ".github/workflows/ci.yml": "326c12be13efee2f7c499307428b234c307e645e84c388e4ace877a5ad9f3bd1",
+    ".agents/skills/local-evaluate/SKILL.md": "9037b350afe39dad72682a610d174f879e3926c429ce32348f12a92ebe0a4ef4",
+    "docs/162-local-execution-baseline.md": "5c109e1a3d14267d29d2e3dc3710bdcb2cd49179e6486f54a577fb1fab6a898d",
+    "docs/163-company-lifecycle.md": "d6f7fca6f70520d69a9f00e3b04be6d8c84c3060c18b021cdf3b03bbdbcdd9eb"
+  },
+  "suite": {
+    "passed": true,
+    "elapsed_ms": 126283.641,
+    "private_raw_report": "data/local-evaluation/d49d3d8e-6d6b-43fd-8620-dabd0211731a/report.json",
+    "harness_sha256": "33ef1cd4b3c1be910ab8dab45fb8b0abc901f20136cafe00c6df4587b80e20de",
+    "checks": [
+      {
+        "name": "build",
+        "passed": true,
+        "elapsed_ms": 201.15,
+        "log_sha256": "4f27ac380b22e1d975eee20ce727fa8cbc09061177f6253af0777fd4de7b7506",
+        "observations": []
+      },
+      {
+        "name": "lifecycle",
+        "passed": true,
+        "elapsed_ms": 4866.362,
+        "log_sha256": "032fe5e131e7842e6b7871e479b36a78395a190d237c6476360a44fc9ba3745b",
+        "observations": []
+      },
+      {
+        "name": "rust-lifecycle",
+        "passed": true,
+        "elapsed_ms": 1858.945,
+        "log_sha256": "1a53da72c4e9474f6652660d3bb1bfd6bc9f6c5434e32dc43a33f43d8763cf11",
+        "observations": [
+          {
+            "fixture": "actual-rust-lifecycle",
+            "passed": true,
+            "instance_binding": true,
+            "sealed_bundle_verified": true,
+            "graceful_shutdown": true,
+            "listener_closed": true,
+            "harness_sha256": "33ef1cd4b3c1be910ab8dab45fb8b0abc901f20136cafe00c6df4587b80e20de",
+            "measurements": {
+              "startup_ms": 769.055,
+              "shutdown_ms": 727.4,
+              "resident_bytes": 29196288,
+              "resident_scope": "single idle harness RSS sample, not model/peak/GPU memory",
+              "generative_model_calls": 0,
+              "paid_calls": 0,
+              "actual_provider_cost_usd": 0,
+              "verified_real_tasks": null,
+              "model_context_tokens": null,
+              "estimated_total_cost_usd": null
+            }
+          }
+        ]
+      },
+      {
+        "name": "frontdoor",
+        "passed": true,
+        "elapsed_ms": 1562.22,
+        "log_sha256": "da57ac9f89eae3e2d24719bc197af581b6fa387699ae0a4f584783b661aac39f",
+        "observations": [
+          {
+            "fixture": "exact-cache-and-ceo",
+            "checks_passed": true,
+            "measurements": {
+              "elapsed_ms": 787.134,
+              "startup_through_concurrent_cache_ms": 731.095,
+              "resident_bytes": 32899072,
+              "resident_scope": "single harness RSS sample before shutdown; not peak or model memory",
+              "generative_model_calls": 0,
+              "model_context_tokens": 0,
+              "request_json_bytes": 123,
+              "cache_requests": 8,
+              "cache_hits": 7,
+              "cache_misses": 1,
+              "cache_hit_ratio": 0.875,
+              "paid_calls": 0,
+              "actual_provider_cost_usd": 0,
+              "estimated_total_cost_usd": null
+            },
+            "completion_scope": "synthetic source/cache fixture only; no model competence claim"
+          }
+        ]
+      },
+      {
+        "name": "workflows",
+        "passed": true,
+        "elapsed_ms": 30018.902,
+        "log_sha256": "b26b26c432a2b9a4e1beb756260f006ca15a5e20477023e65e195c02daaa0952",
+        "observations": [
+          {
+            "transport": "real HTTP and SQLite",
+            "provider": "mock, zero generative calls",
+            "workflows": [
+              {
+                "template": "direct/v1",
+                "nodes": 1,
+                "status": "generated"
+              },
+              {
+                "template": "rag/v1",
+                "nodes": 1,
+                "status": "generated"
+              },
+              {
+                "template": "tool_loop/v1",
+                "nodes": 1,
+                "status": "generated"
+              },
+              {
+                "template": "pipeline/v1",
+                "nodes": 3,
+                "status": "generated"
+              },
+              {
+                "template": "hub/v1",
+                "nodes": 4,
+                "status": "generated"
+              },
+              {
+                "template": "hierarchy/v1",
+                "nodes": 5,
+                "status": "generated"
+              },
+              {
+                "template": "peer/v1",
+                "nodes": 5,
+                "status": "generated"
+              },
+              {
+                "template": "critique/v1",
+                "nodes": 3,
+                "status": "generated"
+              },
+              {
+                "template": "explore/v1",
+                "nodes": 4,
+                "status": "generated"
+              }
+            ],
+            "duplicate_job_coalesced": true,
+            "subscriber_cancel_isolated": true,
+            "source_correction_invalidated": true,
+            "provider_cost_usd": 0
+          }
+        ]
+      },
+      {
+        "name": "native-stdio",
+        "passed": true,
+        "elapsed_ms": 43876.48,
+        "log_sha256": "cd4b84992bba8c6ed730f4ea4dc7319e0444f575e4ecb1036ad5c53aeb287c0e",
+        "observations": [
+          {
+            "transport": "actual native MCP stdio, HTTP owner governance and SQLite",
+            "worker": "mock only; no model weights loaded",
+            "templates": [
+              {
+                "template": "direct/v1",
+                "nodes": 1
+              },
+              {
+                "template": "rag/v1",
+                "nodes": 1
+              },
+              {
+                "template": "tool_loop/v1",
+                "nodes": 1
+              },
+              {
+                "template": "pipeline/v1",
+                "nodes": 3
+              },
+              {
+                "template": "hub/v1",
+                "nodes": 4
+              },
+              {
+                "template": "hierarchy/v1",
+                "nodes": 5
+              },
+              {
+                "template": "peer/v1",
+                "nodes": 5
+              },
+              {
+                "template": "critique/v1",
+                "nodes": 3
+              },
+              {
+                "template": "explore/v1",
+                "nodes": 4
+              }
+            ],
+            "exact_repeat_zero_generation": true,
+            "actor_private": true,
+            "coalesced_subscriber_cancellation": true,
+            "revocation_invalidated": true,
+            "concurrent_owner_update_stale_rejected": true,
+            "restart_did_not_replay": true,
+            "parent_budget_enforced": true,
+            "parent_budget_reservations": 32,
+            "dispatch_reservations_not_inference_proof": 32,
+            "other_company_not_enabled": true,
+            "provider_cost_usd": 0
+          }
+        ]
+      },
+      {
+        "name": "native-sse",
+        "passed": true,
+        "elapsed_ms": 43774.736,
+        "log_sha256": "fb87ad1f2ce436c95ecfca9dba9b68b71cf94068b754af9998dc3c24417b3fa6",
+        "observations": [
+          {
+            "transport": "actual native MCP sse, HTTP owner governance and SQLite",
+            "worker": "mock only; no model weights loaded",
+            "templates": [
+              {
+                "template": "direct/v1",
+                "nodes": 1
+              },
+              {
+                "template": "rag/v1",
+                "nodes": 1
+              },
+              {
+                "template": "tool_loop/v1",
+                "nodes": 1
+              },
+              {
+                "template": "pipeline/v1",
+                "nodes": 3
+              },
+              {
+                "template": "hub/v1",
+                "nodes": 4
+              },
+              {
+                "template": "hierarchy/v1",
+                "nodes": 5
+              },
+              {
+                "template": "peer/v1",
+                "nodes": 5
+              },
+              {
+                "template": "critique/v1",
+                "nodes": 3
+              },
+              {
+                "template": "explore/v1",
+                "nodes": 4
+              }
+            ],
+            "exact_repeat_zero_generation": true,
+            "actor_private": true,
+            "coalesced_subscriber_cancellation": true,
+            "revocation_invalidated": true,
+            "concurrent_owner_update_stale_rejected": true,
+            "restart_did_not_replay": true,
+            "parent_budget_enforced": true,
+            "parent_budget_reservations": 32,
+            "dispatch_reservations_not_inference_proof": 32,
+            "other_company_not_enabled": true,
+            "provider_cost_usd": 0
+          }
+        ]
+      },
+      {
+        "name": "screens",
+        "passed": true,
+        "elapsed_ms": 97.908,
+        "log_sha256": "a7a69cc0aaf4ccda3690a0b69e8628f0daca2c97bf535582bc6a569ba15f4cc1",
+        "observations": []
+      }
+    ]
+  },
+  "supplemental_checks": {
+    "node_tests": {
+      "passed": 20,
+      "failed": 0,
+      "scope": "Current lifecycle, environment, scanner and bundle tests, including two supervisor cases added after the suite run",
+      "log_sha256": "74e72fccd5fe64c92768ad1260ba82efd5e60c2547ba5f45c24372995140546a"
+    },
+    "rust": {
+      "passed": 697,
+      "failed": 0,
+      "ignored": 33
+    },
+    "offline_strict_clippy": "passed",
+    "source_governance_python_tests_passed": 32,
+    "format_and_diff_checks": "passed"
+  },
+  "development_failure_retained": {
+    "observation": "Initial supervisor fixtures failed with kill EPERM against a caffeinate group during restart cleanup.",
+    "correction": "Treat the no-descendant keep-awake helper as a leaf child, wait for spawn/error before group cleanup, and retain orphan-tree acceptance cases.",
+    "fixed_evaluator_weakened": false
+  },
+  "limits": [
+    "No live production-company restart or real-model loading performed.",
+    "Lifecycle process-tree checks ran on macOS; Windows sealed bundles remain unsupported.",
+    "Mobile/activity launchers retain separate contracts.",
+    "Peak/GPU/model memory, real task completion and total development/hardware/electricity cost remain unknown.",
+    "Full scripts/check.sh and browser visual suites not run for this slice."
+  ]
+}

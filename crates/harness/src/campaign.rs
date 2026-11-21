@@ -1,6 +1,6 @@
 //! Evidence-producing local capability trials. Typed model work is separate
 //! from deterministic finance checks, storage, capacity admission and policy.
-use crate::workflow::{Claim, Graph, Node, Output, SqliteWorkflows, WorkflowRepository};
+use crate::workflow::{Claim, Graph, Node, Output, SqliteWorkflows};
 use crate::{company, judges, provider::Reply, Agent, App};
 use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};

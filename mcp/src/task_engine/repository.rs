@@ -511,6 +511,7 @@ impl<'a> Repository<'a> {
                 work_avoided: "Not estimated".into(),
             },
             measurements: measurements(started),
+            progress: None,
             plan: None,
             analysis: None,
             clarification_questions: vec![],

@@ -110,7 +110,11 @@ fn canonical_component_result_fills_one_slot_and_preserves_the_other_literal() {
     let f = setup("7", CONSUMER);
     assert!(child(&f).is_err());
     let produced = root(&f, "7");
-    assert_eq!(produced["value"]["output"], json!({"some":["7"]}));
+    assert_eq!(
+        produced["value"]["output"],
+        json!({"some":["7"]}),
+        "{produced}"
+    );
     assert!(!f
         .authority
         .workspace(&f.scope)

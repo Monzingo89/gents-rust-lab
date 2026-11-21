@@ -1,0 +1,427 @@
+{
+  "date": "2026-11-21",
+  "slice": "Actual native backend cancellation and fresh-session recovery",
+  "head": "28a8da823231b792030eff5b6172dba29768442f",
+  "scope": "One pinned native runtime cancellation/recovery case, not business-task competence, combined owner-HTTP latency or automatic routing qualification",
+  "native_report": {
+    "path": "data/local-evaluation/native-cancel-809dd9d0-d69e-44e2-b860-3d99ee903840/report.json",
+    "sha256": "f15bebbcacc4506c0219ca8a1e75593198d4af7487a390b0859ae640c6d9948e",
+    "result": {
+      "actual_provider_cost_usd": 0,
+      "busy_slot": {
+        "id": 0,
+        "is_processing": true,
+        "n_ctx": 8192,
+        "observed_at_ms": 1795264905221
+      },
+      "cache_hit_ratio": null,
+      "cancellation_elapsed_ms": 210.007791,
+      "cancelled_backend_reaped": true,
+      "cancelled_receipt": {
+        "backend_pid": 50130,
+        "generation_budget": {
+          "final_tokens_reserved": 2048,
+          "reasoning_tokens": 512,
+          "total_generation_tokens": 2560
+        },
+        "http_status": null,
+        "observed_at_ms": 1795264905431,
+        "port": 51781,
+        "request_attempted_at_ms": 1795264905209,
+        "response_bytes": 0,
+        "stage": "cancelled",
+        "usage": null
+      },
+      "criteria_sha256": "39c769942e236de5e5a347eb3557b5b5a835eb797e84ca7a4081d9971b30d804",
+      "elapsed_seconds": 2.35581075,
+      "estimated_total_cost_usd": null,
+      "input_tokens": null,
+      "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+      "observed_native_requests": 2,
+      "output_tokens": null,
+      "paid_calls": 0,
+      "passed": true,
+      "peak_or_gpu_memory_bytes": null,
+      "production_profile_admission": false,
+      "recovery_backend_reaped": true,
+      "recovery_reply": {
+        "latency_ms": 78,
+        "local_execution": {
+          "backend_pid": 50144,
+          "dispatched_at_ms": 1795264906444,
+          "finish_reason": "stop",
+          "generation_budget": {
+            "final_tokens_reserved": 32,
+            "reasoning_tokens": 0,
+            "total_generation_tokens": 32
+          },
+          "launch_policy": {
+            "configured_context_tokens": 8192,
+            "fit_margin_mib": 4096,
+            "requested_gpu_layers": "auto"
+          },
+          "observed_context_tokens": 8192,
+          "port": 51781,
+          "received_at_ms": 1795264906523,
+          "resident_kib": 3775408,
+          "separated_reasoning_observed": false,
+          "task_input_sha256": "74e66a528ab645a9b40f7b26ecdff7b508d8c4a06614f48aaf5d3822b6a07096"
+        },
+        "response_id": "chatcmpl-zM1UO9QNbdXH2rBeWrWiLEGphmyWBzTp",
+        "text": "OK.",
+        "usage": {
+          "cached_input": 0,
+          "cost_usd": 0.0,
+          "input": 26,
+          "output": 3,
+          "reasoning": null,
+          "source": "local local response; provider charge is zero, electricity excluded"
+        }
+      }
+    }
+  },
+  "frozen_criteria": {
+    "path": "data/local-evaluation/native-cancel-809dd9d0-d69e-44e2-b860-3d99ee903840/criteria.json",
+    "sha256": "39c769942e236de5e5a347eb3557b5b5a835eb797e84ca7a4081d9971b30d804",
+    "value": {
+      "acceptance": [
+        "Authenticated owned backend slot is processing before cancellation",
+        "Typed cancellation receipt and no completed first reply",
+        "Owned backend is reaped within five seconds",
+        "New scoped session returns a non-cutoff native reply from a different PID",
+        "Final shutdown reaps the recovery backend"
+      ],
+      "cancellation_deadline_seconds": 5,
+      "input": "Start at 1 and continue through 100000. Do not abbreviate or summarize.",
+      "max_model_calls": 2,
+      "max_retries": 0,
+      "model": {
+        "adapter": null,
+        "context_tokens": 8192,
+        "key_env": null,
+        "local_final_tokens": 2048,
+        "local_reasoning_tokens": 512,
+        "model": "Pinned native cancellation probe",
+        "path": "models/qwen3-4b-instruct/Qwen3-4B-Q4_K_M.gguf",
+        "provider": "local",
+        "url": null
+      },
+      "model_sha256": "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
+      "native_observation_deadline_seconds": 60,
+      "probe_sha256": "a27e422afd86408cb066907a3bdad331ce90df006fef90f8aedd8ac2eeabe90d",
+      "production_profile_admission": false,
+      "recovery": {
+        "context_tokens": 8192,
+        "final_tokens": 32,
+        "input": "Say OK.",
+        "reasoning_tokens": 0,
+        "system": "Reply briefly in plain text."
+      },
+      "recovery_deadline_seconds": 120,
+      "scope": "Native runtime only; owner HTTP cancellation, company budgets and subscriber persistence are separate integration checks",
+      "system": "Reply in plain text. Continue counting consecutive integers separated by commas until the output limit.",
+      "test_binary_sha256": "dc1fef865e3562e3c10f81a365520716feb225645633c22d3fc4b6d3d796c13c",
+      "version": 1
+    }
+  },
+  "retained_probe_source": {
+    "path": "data/local-evaluation/native-cancel-809dd9d0-d69e-44e2-b860-3d99ee903840/probe-source.rs",
+    "sha256": "a27e422afd86408cb066907a3bdad331ce90df006fef90f8aedd8ac2eeabe90d",
+    "matches_pre_dispatch_hash": true,
+    "retained_after_run": true
+  },
+  "validation": [
+    {
+      "path": "data/local-evaluation/native-cancel-supervised-a9b2684140eb477c8b196ec4cbe92e3a/report.json",
+      "sha256": "249e683f40170eff9a705f7dfda109edaad24e96a26f4013ac2358b0d0adf7e1",
+      "result": {
+        "name": "native-cancel",
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "gents-harness",
+          "--offline",
+          "--locked",
+          "local_runtime::native_cancel::busy_native_cancel_and_fresh_recovery",
+          "--",
+          "--ignored",
+          "--exact",
+          "--nocapture",
+          "--test-threads=1"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 14485.156,
+        "log": "native-cancel.log",
+        "log_sha256": "5b954496b996f9bee80887709597a10ff3f3bd43704d1238676700ebcba6fd8f",
+        "observations": []
+      }
+    },
+    {
+      "path": "data/local-evaluation/native-cancel-validation-60e29991f93649dfa248683f5ad5670c/report.json",
+      "sha256": "52e307c4da56ffef899624f77cb9b8052abd5599daf2a21db9344cc6beba444f",
+      "result": {
+        "scope": "No live models; native backend probe remains opt-in",
+        "checks": [
+          {
+            "name": "format",
+            "command": [
+              "cargo",
+              "fmt",
+              "--all",
+              "--check"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 618.24,
+            "log": "format.log",
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "observations": []
+          },
+          {
+            "name": "clippy",
+            "command": [
+              "cargo",
+              "clippy",
+              "--workspace",
+              "--all-targets",
+              "--offline",
+              "--locked",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 3815.995,
+            "log": "clippy.log",
+            "log_sha256": "065a21ef3678118cb1d1a454d6d4eac721beffb655066c82db033ab07dfd3f67",
+            "observations": []
+          },
+          {
+            "name": "runtime-unit",
+            "command": [
+              "cargo",
+              "test",
+              "-p",
+              "gents-harness",
+              "local_runtime::tests",
+              "--offline",
+              "--locked"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 125.461,
+            "log": "runtime-unit.log",
+            "log_sha256": "dad3311486f75df761d31688501745cbb508a61b6e4ad2c4395242f8db36cb84",
+            "observations": []
+          }
+        ],
+        "passed": true
+      }
+    },
+    {
+      "path": "data/local-evaluation/native-cancel-final-016cc487a6a74c30b8d132ccfe5ba2d6/report.json",
+      "sha256": "5262957b1c4e19fb2fba71bb4fe5e25b3c8f3c26114875ebaac28a31d20afc63",
+      "result": {
+        "scope": "No new native inference; final source snapshot/permission metadata additions",
+        "checks": [
+          {
+            "name": "format",
+            "command": [
+              "cargo",
+              "fmt",
+              "--all",
+              "--check"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 613.553,
+            "log": "format.log",
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "observations": []
+          },
+          {
+            "name": "clippy",
+            "command": [
+              "cargo",
+              "clippy",
+              "--workspace",
+              "--all-targets",
+              "--offline",
+              "--locked",
+              "--",
+              "-D",
+              "warnings"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 2627.388,
+            "log": "clippy.log",
+            "log_sha256": "7d17f0ce5941ee20036fe498c174b1cc922ced44308b1e075dc3b1f172bb946d",
+            "observations": []
+          },
+          {
+            "name": "runtime-unit",
+            "command": [
+              "cargo",
+              "test",
+              "-p",
+              "gents-harness",
+              "local_runtime::tests",
+              "--offline",
+              "--locked"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 6811.631,
+            "log": "runtime-unit.log",
+            "log_sha256": "cd1ad09192735e2015286b069aeaf622f10ce581f055647d866bee0597ca6d06",
+            "observations": []
+          },
+          {
+            "name": "discovery",
+            "command": [
+              "node",
+              "scripts/repo-skills.mjs",
+              "--codegpt"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 32.108,
+            "log": "discovery.log",
+            "log_sha256": "fa6010c72d1c9b94e10ae3d375862ae307ecf90e524eb6edab774fae73791477",
+            "observations": [
+              {
+                "canonical": [
+                  "repo-simplify",
+                  "harness-routing",
+                  "context-governance",
+                  "building-interactions",
+                  "local-evaluate"
+                ],
+                "claude": "five resolved project links",
+                "kimi": "native .agents/skills root; no duplicate adapter",
+                "codegpt": "five resolved user catalog links; existing toggles preserved",
+                "live_chat_invocation": "not performed; no model calls"
+              }
+            ]
+          },
+          {
+            "name": "skill-metadata",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3.15",
+              "/Users/rmonzingo/.codex/skills/.system/skill-creator/scripts/quick_validate.py",
+              "/Users/rmonzingo/repo-applications/gents-rust-lab/.agents/skills/local-evaluate"
+            ],
+            "passed": false,
+            "exit_code": 1,
+            "timed_out": false,
+            "elapsed_ms": 53.307,
+            "log": "skill-metadata.log",
+            "log_sha256": "305d4eaaa7fb25b8fd8db61a5c6d068b242a7361a0a2c7ad48860737992ae4a3",
+            "observations": []
+          }
+        ],
+        "passed": false
+      }
+    },
+    {
+      "path": "data/local-evaluation/native-cancel-metadata-f9bd0d43246c4bc789a61913625a1c38/report.json",
+      "sha256": "dcffad5fdc98eef2bdb8e423c1d074df10438f24ec645f851bec01359a5ffc09",
+      "result": {
+        "checks": [
+          {
+            "name": "skill-metadata",
+            "command": [
+              "/Users/rmonzingo/repo-applications/gents-rust-lab/.venv/bin/python",
+              "/Users/rmonzingo/.codex/skills/.system/skill-creator/scripts/quick_validate.py",
+              "/Users/rmonzingo/repo-applications/gents-rust-lab/.agents/skills/local-evaluate"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 24.627,
+            "log": "skill-metadata.log",
+            "log_sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0",
+            "observations": []
+          },
+          {
+            "name": "diff",
+            "command": [
+              "git",
+              "diff",
+              "--check"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 18.103,
+            "log": "diff.log",
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "observations": []
+          }
+        ],
+        "passed": true,
+        "correction": "Preserve the virtualenv executable path; resolving its symlink invokes system Python without PyYAML. No source or validator criteria changed."
+      }
+    }
+  ],
+  "validation_correction": "Final Clippy/runtime/discovery passed. Metadata validation initially dereferenced the virtualenv interpreter symlink and failed because system Python has no PyYAML. Corrected interpreter path passed; validator and criteria unchanged. Failure report retained.",
+  "source_metadata_refinement": "Current test sets directory mode 0700 and retains source before criteria freeze; compiled/linted without repeating native inference. Original trial directory was tightened to 0700 after the public synthetic probe.",
+  "measurements": {
+    "accepted_runtime_cases": 1,
+    "runtime_case_attempts": 1,
+    "business_task_completion": null,
+    "observed_native_requests": 2,
+    "completed_native_replies": 1,
+    "cancel_elapsed_ms": 210.007791,
+    "probe_operation_seconds": 2.35581075,
+    "context_tokens": 8192,
+    "interrupted_input_tokens": null,
+    "interrupted_output_tokens": null,
+    "aggregate_input_tokens": null,
+    "aggregate_output_tokens": null,
+    "recovery_input_tokens": 26,
+    "recovery_output_tokens": 3,
+    "recovery_rss_bytes_at_reply": 3866017792,
+    "cache_hit_ratio": null,
+    "paid_calls": 0,
+    "actual_provider_cost_usd": 0,
+    "estimated_total_cost_usd": null,
+    "peak_or_gpu_memory_bytes": null
+  },
+  "external_boundary": {
+    "company_launch_agent": "~/Library/LaunchAgents/com.gents.local-company.plist",
+    "entrypoint": "scripts/start-company.mjs",
+    "run_at_load": true,
+    "keep_alive": true,
+    "launchctl_query_exit_code": 113,
+    "launchctl_error": "Could not find service com.gents.local-company in gui domain",
+    "service_modified_or_started": false,
+    "open_webui_location": null,
+    "scope": "Only inspected listeners and filename-selected local configuration paths; does not establish absence or uninstallation"
+  },
+  "remaining": [
+    "Useful held-out model/routing qualification; two earlier Rust failures remain failures",
+    "Combined owner HTTP cancellation, durable settlement and actual inference in one measured trial",
+    "Open WebUI deployment/model/accounting/concurrency boundary"
+  ],
+  "files": {
+    "crates/harness/src/local_runtime.rs": "7a73a882741e16c5791cd39e577ae9715f64c00529e3de17a136bad800ca4058",
+    "crates/harness/src/local_runtime/native_cancel.rs": "a80e835fcf01f0d23de476222e1e042c396878f0c0b19279b7cbe247e5480b67",
+    ".agents/skills/local-evaluate/SKILL.md": "d444b770a5dffb299868b8236a1d2181a56a63d125298932b81dc2b24282f431",
+    "docs/171-native-cancellation-recovery.md": "55bfd464ad6a51eaea5f26d67e4c434b8fc5de19383b99d3a8ca80dc82b5200c",
+    "docs/162-local-execution-baseline.md": "d92dba7be5304d8d958dd6e4baaeb97cdcacacdb6e5f6bd59696e85fcf75e118",
+    "docs/169-requirement-audit-and-routing.md": "90a7a33ffa7c70cb3c430340a3230cdd16740c90a4b629a7886b105aef93ee14"
+  }
+}

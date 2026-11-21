@@ -38,12 +38,15 @@ test('exterior room proportions are no longer flattened and elevator traverses f
  assert.deepEqual(elevatorPose(0,towerFloors,true),elevatorPose(30000,towerFloors,true));
 });
 test('role-specific screens use real values, preserve unknown sensors and expose provenance',()=>{
- assert.deepEqual(screenDefinitions(9).map(s=>s.id),['budget']);assert.equal(screenDefinitions(5).length,11);assert.equal(screenDefinitions(10).length,6);
+ assert.deepEqual(screenDefinitions(9).map(s=>s.id),['taskbudget']);assert.equal(screenDefinitions(5).length,11);assert.equal(screenDefinitions(10).length,6);
  for(const f of towerFloors)assert.ok(screenDefinitions(f.id).length);
- const gpu=screenDefinitions(5).find(s=>s.id==='gpu'),budget=screenDefinitions(9)[0];
+ const gpu=screenDefinitions(5).find(s=>s.id==='gpu'),budget=screenDefinitions(5).find(s=>s.id==='budget');
  assert.equal(screenValue(gpu,{available:true,hardware:{gpu_percent:null}}),'UNAVAILABLE');
  assert.equal(screenValue(gpu,{available:true,hardware:{gpu_percent:13}}),'13%');
  assert.equal(screenValue(budget,{available:true,totals:{provider_cost_usd:0}}),'$0.0000');
+ assert.equal(screenValue(budget,{available:true,totals:{provider_cost_usd:null}}),'UNAVAILABLE');
+ assert.ok(dashboardDetail(budget,{available:true,totals:{provider_cost_usd:null}}).facts.includes('Recorded provider cost: UNAVAILABLE'));
+ assert.ok(dashboardDetail(budget,{available:false,totals:{provider_cost_usd:0}}).facts.includes('Recorded provider cost: UNAVAILABLE'));
  const detail=dashboardDetail(gpu,{available:true,hardware:{gpu_percent:13,source:'OS sensor'},totals:{input_tokens:25,output_tokens:12},research:{phase:'watching'}});
  assert.ok(detail.facts.includes('Local tokens: 25 input / 12 output'));assert.ok(detail.facts.includes('OS sensor'));
 });

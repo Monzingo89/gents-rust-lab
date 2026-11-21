@@ -50,7 +50,24 @@ fn response(value: Value) -> Response {
 fn rows(rows: Value) -> Response {
     response(json!({"_count":rows.as_array().unwrap().len(),"Documents":rows}))
 }
+#[test]
+fn fixture_request_reader_waits_for_delayed_bytes_on_an_accepted_nonblocking_stream() {
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let mut client = TcpStream::connect(listener.local_addr().unwrap()).unwrap();
+    let (mut accepted, _) = listener.accept().unwrap();
+    accepted.set_nonblocking(true).unwrap();
+    let reader = thread::spawn(move || read_request(&mut accepted));
+    thread::sleep(Duration::from_millis(20));
+    let request = "POST /fixture HTTP/1.1\r\nContent-Length: 2\r\n\r\n{}";
+    // A broken reader may close first; joining must report its panic rather
+    // than obscure it with the client's broken-pipe failure.
+    let _ = client.write_all(request.as_bytes());
+    assert_eq!(reader.join().unwrap(), request);
+}
 fn read_request(stream: &mut TcpStream) -> String {
+    // Nonblocking acceptance bounds the fixture's accept loop. Socket flag
+    // inheritance differs by OS; request reads use the existing finite timeout.
+    stream.set_nonblocking(false).unwrap();
     stream
         .set_read_timeout(Some(Duration::from_secs(2)))
         .unwrap();

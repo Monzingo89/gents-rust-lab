@@ -1,0 +1,30 @@
+{
+  "reviewed_on": "2026-11-21",
+  "decision": "Author five repository-specific skills. No public skill code or text is vendored; no collection installed.",
+  "sources": [
+    {
+      "repository": "https://github.com/anthropics/skills",
+      "revision": "e4bb5d960d87126ff3b3a8af1a104b7db67560ba",
+      "path": "skills/skill-creator/SKILL.md",
+      "sha256": "dcd4803e61e913e6fc27294184cd3a71f09f5e924ff20c8a9a20173e7b3c2bcf",
+      "license": "Apache-2.0",
+      "license_path": "skills/skill-creator/LICENSE.txt",
+      "useful": "Progressive disclosure and realistic measurable skill checks.",
+      "not_adopted": "Claude-specific evaluation commands, mandatory multi-run subagent workflow and viewer infrastructure add unnecessary inference/dependencies for these short Rust repository skills. Use existing offline Rust/HTTP/MCP/Node checks instead.",
+      "copied_material": false
+    },
+    {
+      "repository": "https://github.com/obra/superpowers",
+      "revision": "22f0b463e7a5e579904dd6211a520321035526f7",
+      "path": "skills/verification-before-completion/SKILL.md",
+      "sha256": "2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3",
+      "license": "MIT",
+      "license_path": "LICENSE",
+      "copyright": "Copyright (c) 2025 Jesse Vincent",
+      "useful": "Completion claims require fresh observable evidence.",
+      "not_adopted": "Do not import an entire workflow collection or rigid universal process. Repository-native acceptance and denial tests provide scoped evidence.",
+      "copied_material": false
+    }
+  ],
+  "attribution_policy": "Keep these revision/license pointers. If a later change copies or adapts source text/code, retain the applicable full license, notices and modification attribution with that material. These independently authored skills use the repository MIT license."
+}

@@ -22,6 +22,10 @@ struct State {
     reasoning_tokens: u32,
 }
 
+#[cfg(test)]
+#[path = "local_runtime/native_cancel.rs"]
+mod native_cancel;
+
 pub struct LocalRuntime {
     root: PathBuf,
     binary: Option<PathBuf>,

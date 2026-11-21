@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():
+    started = time.perf_counter()
     if any(arg != "--browser" for arg in sys.argv[1:]):
         raise SystemExit("unsupported fixture option")
     browser = "--browser" in sys.argv
@@ -77,6 +78,7 @@ def main():
                 assert paths.count("exact_answer_cache") == 7, paths
                 assert len({reply["request"]["task_id"] for reply in replies}) == 8
                 assert all(reply["result"]["answer"] == "Gerald Ford" and reply["result"]["measurements"]["generative_model_calls"] == 0 for reply in replies)
+                concurrent_elapsed_ms = round((time.perf_counter() - started) * 1000, 3)
                 lookup = request(route, {"op": "search", "query": "Carter election", "domain": "history"})
                 assert lookup["hits"] and lookup["generative_model_calls"] == 0
                 assert request(route, {"op": "inspect_cache"})["exact_entries"] == 1
@@ -121,7 +123,22 @@ def main():
                 request(route, {"op": "invalidate_cache"})
                 assert request(route, {"op": "inspect_cache"})["exact_entries"] == 0
                 assert request("/api/runs")["runs"] == []
+                try:
+                    resident_bytes = int(subprocess.check_output(
+                        ["ps", "-o", "rss=", "-p", str(child.pid)], timeout=3).strip()) * 1024
+                except (OSError, ValueError, subprocess.SubprocessError):
+                    resident_bytes = None
                 print("PASS: real HTTP ingestion/retrieval/cache; eight concurrent requests (one extraction, seven hits); original CEO/UI planning endpoint returns source/cached answers BEFORE any model requirement, persists history and redacts deleted evidence; tenant separation and input checks; zero generative calls or runs. Historical data are fixtures.")
+                print(json.dumps({"fixture": "exact-cache-and-ceo", "checks_passed": True,
+                    "measurements": {"elapsed_ms": round((time.perf_counter() - started) * 1000, 3),
+                        "startup_through_concurrent_cache_ms": concurrent_elapsed_ms,
+                        "resident_bytes": resident_bytes, "resident_scope": "single harness RSS sample before shutdown; not peak or model memory",
+                        "generative_model_calls": 0, "model_context_tokens": 0,
+                        "request_json_bytes": len(json.dumps(task).encode()),
+                        "cache_requests": 8, "cache_hits": 7, "cache_misses": 1,
+                        "cache_hit_ratio": 7 / 8, "paid_calls": 0,
+                        "actual_provider_cost_usd": 0, "estimated_total_cost_usd": None},
+                    "completion_scope": "synthetic source/cache fixture only; no model competence claim"}))
             finally:
                 child.terminate()
                 assert child.wait(timeout=15) == 0

@@ -46,6 +46,31 @@ pub struct StageInput {
     pub allowed_tools: Vec<String>,
     pub evidence_required: bool,
 }
+impl StageInput {
+    /// One packet construction boundary for admission sizing and execution.
+    /// Dependency replies are supplied only by the host's completed graph.
+    pub fn for_node(
+        task: &TaskRequest,
+        node: &PlanNode,
+        profile: &routing::Profile,
+        evidence: &[Evidence],
+        dependencies: BTreeMap<String, StageReply>,
+        evidence_required: bool,
+    ) -> Self {
+        Self {
+            schema_version: VERSION,
+            task: task.clone(),
+            node_id: node.id.clone(),
+            profile_instructions: profile.instructions.clone(),
+            stage_instruction: stage_instruction(node),
+            evidence: evidence.to_vec(),
+            dependencies,
+            tool_results: vec![],
+            allowed_tools: node.tools.clone(),
+            evidence_required,
+        }
+    }
+}
 #[derive(Clone, Debug)]
 pub struct ModelOutput {
     pub text: String,
@@ -412,18 +437,14 @@ impl Executor<'_> {
                         .iter()
                         .map(|id| (id.clone(), outputs[id].clone()))
                         .collect();
-                    let input = StageInput {
-                        schema_version: VERSION,
-                        task: request.clone(),
-                        node_id: node.id.clone(),
-                        profile_instructions: profiles[&node.profile].instructions.clone(),
-                        stage_instruction: stage_instruction(node),
-                        evidence: evidence.clone(),
-                        dependencies: deps,
-                        tool_results: vec![],
-                        allowed_tools: node.tools.clone(),
-                        evidence_required: grounded,
-                    };
+                    let input = StageInput::for_node(
+                        request,
+                        node,
+                        &profiles[&node.profile],
+                        &evidence,
+                        deps,
+                        grounded,
+                    );
                     self.run_node(node, input, policy, budget)
                 })
                 .map(|f| Box::pin(f) as FutureResult<'_, NodeReceipt>)

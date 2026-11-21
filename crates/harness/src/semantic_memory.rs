@@ -397,26 +397,6 @@ pub fn install(db: &Connection) -> Result<()> {
 /// Transactions and authenticated company connections are supplied by callers.
 /// Claim clock is (UTC for scheduling/audit, monotonic lease milliseconds).
 /// Commit requires a non-serializable kernel ownership guard and elapsed time.
-pub trait SummaryRepository {
-    fn claim(
-        &self,
-        run: Uuid,
-        actor: &str,
-        clock: (u64, u64),
-        finalize: bool,
-        max_versions: u32,
-    ) -> Result<Option<Job>>;
-    fn commit(
-        &self,
-        job: &Job,
-        memo: &Memo,
-        reply: &crate::provider::Reply,
-        now: u64,
-    ) -> Result<()>;
-    fn get(&self, run: Uuid, actor: &str) -> Result<Option<Value>>;
-    /// Resolve only an alias in the recipient's current, validated memo.
-    fn resolve(&self, run: Uuid, actor: &str, input: &str, alias: &str) -> Result<Value>;
-}
 pub struct SqliteMemos<'a> {
     pub db: &'a Connection,
     pub company: &'a str,
@@ -472,9 +452,7 @@ impl SqliteMemos<'_> {
         }
         Ok(())
     }
-}
-impl SummaryRepository for SqliteMemos<'_> {
-    fn claim(
+    pub fn claim(
         &self,
         run: Uuid,
         actor: &str,
@@ -482,7 +460,6 @@ impl SummaryRepository for SqliteMemos<'_> {
         finalize: bool,
         max_versions: u32,
     ) -> Result<Option<Job>> {
-        use crate::memory::SnapshotRepository;
         let (utc, now) = clock;
         let (contract, revision, state) = self.admission(run, actor)?;
         if state != "running" {
@@ -601,7 +578,7 @@ impl SummaryRepository for SqliteMemos<'_> {
         self.db.execute("INSERT INTO semantic_memos VALUES(?1,?2,?3,?4,?5,?6,?7,'running',?8,?9,?10,NULL,NULL,NULL,?11,?12) ON CONFLICT(run_id,actor,input_sha256) DO UPDATE SET state='running',token=excluded.token,deadline=excluded.deadline,attempt=excluded.attempt",params![run.to_string(),actor,job.input_sha256,revision as i64,job.contract_sha256,job.generation,serde_json::to_string(&job.sources)?,job.token,(now+300_000) as i64,attempt,utc as i64,VERSION])?;
         Ok(Some(job))
     }
-    fn commit(
+    pub fn commit(
         &self,
         job: &Job,
         memo: &Memo,
@@ -634,7 +611,7 @@ impl SummaryRepository for SqliteMemos<'_> {
         self.db.execute("UPDATE semantic_memos SET state='completed',token=NULL,deadline=NULL,result=?6,result_sha256=?7,receipt=?8 WHERE run_id=?1 AND actor=?2 AND input_sha256=?3 AND token=?4 AND deadline>?5",params![job.run.to_string(),job.actor,job.input_sha256,job.token,now as i64,body,hash(memo)?,serde_json::to_string(reply)?])?;
         Ok(())
     }
-    fn get(&self, run: Uuid, actor: &str) -> Result<Option<Value>> {
+    pub fn get(&self, run: Uuid, actor: &str) -> Result<Option<Value>> {
         let (contract, revision, _) = self.admission(run, actor)?;
         let row:Option<(String,String,String,i64,String)>=self.db.query_row("SELECT result,result_sha256,source_refs,generation,input_sha256 FROM semantic_memos WHERE run_id=?1 AND actor=?2 AND state='completed' AND policy_revision=?3 AND contract_sha256=?4 AND protocol_version=?5 ORDER BY created DESC LIMIT 1",params![run.to_string(),actor,revision as i64,hash(&contract)?,VERSION],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?,r.get(4)?))).optional()?;
         let Some((body, digest, refs, generation, input)) = row else {
@@ -679,7 +656,8 @@ impl SummaryRepository for SqliteMemos<'_> {
             "pending_updates":generation!=crate::memory::clock(self.db)?.generation,"authority":"model-written advisory; source quotes/references checked, semantic entailment not proven; never a permission grant or verified completion evidence","coverage":"at most four eligible source records; canonical history and frozen task are retained separately"}),
         ))
     }
-    fn resolve(&self, run: Uuid, actor: &str, input: &str, alias: &str) -> Result<Value> {
+    /// Resolve only an alias in the recipient's current, validated memo.
+    pub fn resolve(&self, run: Uuid, actor: &str, input: &str, alias: &str) -> Result<Value> {
         let memo = self
             .get(run, actor)?
             .context("current authorized memo unavailable")?;

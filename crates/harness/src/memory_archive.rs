@@ -38,10 +38,6 @@ pub fn install(db: &Connection) -> Result<()> {
     Ok(())
 }
 
-pub trait ContextArchiveRepository {
-    fn archive(&self, run: Option<&str>, lifecycle: ContextLifecycle, now: u64) -> Result<usize>;
-    fn recall(&self, run: &str) -> Result<usize>;
-}
 pub struct SqliteContextArchive<'a> {
     pub db: &'a Connection,
 }
@@ -100,9 +96,12 @@ impl SqliteContextArchive<'_> {
         }
         Ok(())
     }
-}
-impl ContextArchiveRepository for SqliteContextArchive<'_> {
-    fn archive(&self, run: Option<&str>, lifecycle: ContextLifecycle, now: u64) -> Result<usize> {
+    pub fn archive(
+        &self,
+        run: Option<&str>,
+        lifecycle: ContextLifecycle,
+        now: u64,
+    ) -> Result<usize> {
         ensure!(
             !self.db.is_autocommit(),
             "archive requires the caller's atomic transaction"
@@ -115,7 +114,7 @@ impl ContextArchiveRepository for SqliteContextArchive<'_> {
         self.checkpoint(run, lifecycle, now)?;
         Ok(moved)
     }
-    fn recall(&self, run: &str) -> Result<usize> {
+    pub fn recall(&self, run: &str) -> Result<usize> {
         ensure!(
             !self.db.is_autocommit(),
             "recall requires the caller's atomic transaction"

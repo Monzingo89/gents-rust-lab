@@ -1,0 +1,1022 @@
+{
+  "date": "2026-11-21",
+  "slice": "Shared owned local probe construction and instance readiness",
+  "head": "28a8da823231b792030eff5b6172dba29768442f",
+  "scope": "Two isolated Python real-model probes; not production launcher replacement, model readiness or new task qualification",
+  "changed_behavior": [
+    "Both probes use one local-only/offline/whitelist process-group factory",
+    "Exact fresh startup instance and local-auth/company/tool flags required before yielding API handle",
+    "Readiness wall deadline interrupts stalled IO and preserves prior handlers/timers",
+    "Parent TERM unwinds cleanup; bounded TERM/KILL/leader reap and leftover descendant checks",
+    "Permission failures reconcile through independent process-group state; live unsignalable/unknown state fails rather than counting as cleanup",
+    "Host helper/probe/native-test source paths require owner review for agent source patches"
+  ],
+  "original_probe_assertions": [
+    {
+      "script": "scripts/task_engine_live.py",
+      "before": "data/local-evaluation/trial-lifecycle-before-371ee2bbfffe4496a8a5a197f5bf67ba/task_engine_live.py",
+      "before_sha256": "6c589b6c1d0b94f5c4c619c31ef2c1157c50d9f09975ae32c98d7860ffc4a79d",
+      "after_sha256": "f4ddf58758813877e4d7e5b8874021247313ff6ad0439468a8a354bca51dd759",
+      "unchanged_assertions": 6,
+      "assertions_ast_sha256": "77d8a9020469de70ba7e57c149fc92f6f9afd738b5b2a63b37af4e4edca19078"
+    },
+    {
+      "script": "scripts/rust_candidate_live.py",
+      "before": "data/local-evaluation/trial-lifecycle-before-371ee2bbfffe4496a8a5a197f5bf67ba/rust_candidate_live.py",
+      "before_sha256": "67aa61f5cc7b9509bf1c5ef1a5f6aa326d12e4351c8c4b50001c30019f62fa0c",
+      "after_sha256": "061d1b27b2bbee767a6eccd9bb9f4c60f99b51faa5cb26a291ae142279a82cc5",
+      "unchanged_assertions": 4,
+      "assertions_ast_sha256": "201dc16d950f28c74b264e4c0ef2ad0de5d0cb067b0c8e874d6317100d882433"
+    }
+  ],
+  "red_reproduction": {
+    "log": "data/local-evaluation/trial-lifecycle-before-371ee2bbfffe4496a8a5a197f5bf67ba/red.log",
+    "sha256": "0ff2c7616a182bec7d29899f42fb104949554f724eb7aa0d1836196344c2bab8",
+    "failed_assertions": 6,
+    "includes_actual_occupied_rust_listener": true,
+    "standalone_exit_code": null,
+    "reason_exit_unknown": "Shell command printed the failed log afterward; unittest failure output is retained without reconstructing its exit code"
+  },
+  "retained_shutdown_failure": {
+    "report": "data/local-evaluation/probe-lifecycle-final-b7bcd7114f134f8aa3484c5cc2ac1e25/report.json",
+    "error_type": "PermissionError",
+    "operation": "owned group signal-zero liveness after TERM",
+    "exact_kernel_cause": null,
+    "observed_pid_later_absent": 62185,
+    "handling": "Independent read-only group membership/state; no inference of absence from EPERM alone",
+    "reference": "https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/kill.2.html"
+  },
+  "reports": [
+    {
+      "path": "data/local-evaluation/5d94bf1c-68af-499d-975e-0ee19a05e8d0/report.json",
+      "sha256": "f4674510cb143ab87429d8756f625f3bfb050497db0bd6571219bbc44c86e205",
+      "result": {
+        "schema_version": 1,
+        "scope": "synthetic integration fixtures; not real-model task qualification",
+        "head": "28a8da823231b792030eff5b6172dba29768442f",
+        "git_status": " M .github/workflows/ci.yml\n M README.md\n M config/schemas/task-engine-v1.json\n M crates/harness/src/company.rs\n M crates/harness/src/local_runtime.rs\n M crates/harness/src/main.rs\n M crates/harness/src/memory_handoff.rs\n M crates/harness/src/model_artifact.rs\n M crates/harness/src/model_package.rs\n M crates/harness/src/office_activity.rs\n M crates/harness/src/task_answers.rs\n M crates/harness/src/task_frontdoor.rs\n M crates/harness/src/task_workflows.rs\n M mcp/src/task_engine/contracts.rs\n M mcp/src/task_engine/mod.rs\n M mcp/src/task_engine/native.rs\n M mcp/src/task_engine/repository.rs\n M mcp/src/task_engine/workflows.rs\n M mcp/tests/cosmos_check.rs\n M mcp/tests/owned_component_edges.rs\n M scripts/check.sh\n M scripts/company-env.mjs\n M scripts/company-env.test.mjs\n M scripts/company_tools.py\n M scripts/experiment_loop.py\n M scripts/office-activity.test.mjs\n M scripts/run-harness.mjs\n M scripts/start-company.mjs\n M scripts/task_engine_live.py\n M scripts/task_frontdoor_smoke.py\n M scripts/task_native_smoke.py\n M scripts/task_workflows_browser.mjs\n M scripts/task_workflows_smoke.py\n M scripts/test_company_tools.py\n M web/app.js\n M web/assets/office-dashboards.js\n M web/assets/task-workbench.js\n?? .agents/\n?? .claude/\n?? AGENTS.md\n?? crates/harness/src/local_runtime/\n?? crates/harness/src/model_pins.rs\n?? crates/harness/src/task_usage.rs\n?? docs/162-local-execution-baseline.md\n?? docs/163-company-lifecycle.md\n?? docs/164-scoped-task-progress.md\n?? docs/165-shared-model-pins.md\n?? docs/166-revoked-task-settlement.md\n?? docs/167-retained-task-usage.md\n?? docs/168-background-research-priority.md\n?? docs/169-requirement-audit-and-routing.md\n?? docs/170-native-rust-qualification.md\n?? docs/171-native-cancellation-recovery.md\n?? docs/172-focused-rust-task-evidence.md\n?? docs/evidence/background-research-priority-2026-11-21.json\n?? docs/evidence/company-lifecycle-2026-11-21.json\n?? docs/evidence/focused-rust-candidate-2026-11-21.rs\n?? docs/evidence/focused-rust-task-2026-11-21.json\n?? docs/evidence/local-execution-baseline-2026-11-21.json\n?? docs/evidence/native-cancellation-recovery-2026-11-21.json\n?? docs/evidence/native-rust-qualification-2026-11-21.json\n?? docs/evidence/retained-task-usage-2026-11-21.json\n?? docs/evidence/revoked-task-settlement-2026-11-21.json\n?? docs/evidence/routing-feasibility-2026-11-21.json\n?? docs/evidence/scoped-task-progress-2026-11-21.json\n?? docs/evidence/shared-model-pins-2026-11-21.json\n?? mcp/src/task_engine/progress.rs\n?? mcp/tests/task_progress.rs\n?? scripts/company-lifecycle-smoke.mjs\n?? scripts/company-lifecycle.mjs\n?? scripts/company-lifecycle.test.mjs\n?? scripts/fixtures/company-lifecycle.mjs\n?? scripts/local_evaluate.py\n?? scripts/local_trial.py\n?? scripts/repo-skills.mjs\n?? scripts/rust_candidate_live.py\n?? scripts/task-activity.test.mjs\n?? scripts/test_local_evaluate.py\n?? scripts/test_local_trial.py\n?? web/assets/task-activity.js\n",
+        "measurements": {
+          "verified_real_tasks": null,
+          "generative_model_calls": 0,
+          "paid_calls": 0,
+          "actual_provider_cost_usd": 0,
+          "estimated_total_cost_usd": null,
+          "resident_bytes": null,
+          "model_context_tokens": null,
+          "cache_hit_ratio": null
+        },
+        "checks": [
+          {
+            "name": "build",
+            "command": [
+              "cargo",
+              "build",
+              "--workspace",
+              "--offline",
+              "--locked"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 9156.906,
+            "log": "build.log",
+            "log_sha256": "d5947abecb5c848e91db9ecac138a14cb102d4378a080c0e1a8c1d9b9b937ad8",
+            "observations": []
+          },
+          {
+            "name": "lifecycle",
+            "command": [
+              "node",
+              "--test",
+              "scripts/company-lifecycle.test.mjs"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 5579.425,
+            "log": "lifecycle.log",
+            "log_sha256": "cb6518c13992e350ac871279827dafada6a177d1f2fafbe18e9a995c0a8d6127",
+            "observations": []
+          },
+          {
+            "name": "probe-lifecycle",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "scripts",
+              "-p",
+              "test_local_trial.py"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 5208.626,
+            "log": "probe-lifecycle.log",
+            "log_sha256": "692f6f63c1d57e76274b33414963687380ca7016710de00dbffd207d8b64cc08",
+            "observations": []
+          },
+          {
+            "name": "rust-lifecycle",
+            "command": [
+              "node",
+              "scripts/company-lifecycle-smoke.mjs"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 1843.886,
+            "log": "rust-lifecycle.log",
+            "log_sha256": "77cdc102d6287be5698dcb8fcad8ffcc9d50b4c314c93bbbc477421deb4b1ea5",
+            "observations": [
+              {
+                "fixture": "actual-rust-lifecycle",
+                "passed": true,
+                "instance_binding": true,
+                "sealed_bundle_verified": true,
+                "graceful_shutdown": true,
+                "listener_closed": true,
+                "harness_sha256": "7686726d5f85b782b49bbec52f683669f7d9915139fc4e2687aa39594449ffc4",
+                "measurements": {
+                  "startup_ms": 766.678,
+                  "shutdown_ms": 724.041,
+                  "resident_bytes": 29687808,
+                  "resident_scope": "single idle harness RSS sample, not model/peak/GPU memory",
+                  "generative_model_calls": 0,
+                  "paid_calls": 0,
+                  "actual_provider_cost_usd": 0,
+                  "verified_real_tasks": null,
+                  "model_context_tokens": null,
+                  "estimated_total_cost_usd": null
+                }
+              }
+            ]
+          },
+          {
+            "name": "frontdoor",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "scripts/task_frontdoor_smoke.py"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 1011.283,
+            "log": "frontdoor.log",
+            "log_sha256": "cc24628a08a57c9b6805f742779b8500fd915e5360a2c5f9f527a04f41f3d879",
+            "observations": [
+              {
+                "fixture": "exact-cache-and-ceo",
+                "checks_passed": true,
+                "measurements": {
+                  "elapsed_ms": 230.195,
+                  "startup_through_concurrent_cache_ms": 179.082,
+                  "resident_bytes": 33587200,
+                  "resident_scope": "single harness RSS sample before shutdown; not peak or model memory",
+                  "generative_model_calls": 0,
+                  "model_context_tokens": 0,
+                  "request_json_bytes": 123,
+                  "cache_requests": 8,
+                  "cache_hits": 7,
+                  "cache_misses": 1,
+                  "cache_hit_ratio": 0.875,
+                  "paid_calls": 0,
+                  "actual_provider_cost_usd": 0,
+                  "estimated_total_cost_usd": null
+                },
+                "completion_scope": "synthetic source/cache fixture only; no model competence claim"
+              }
+            ]
+          },
+          {
+            "name": "grounded",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "scripts/task_workflows_smoke.py",
+              "--grounded"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 3058.811,
+            "log": "grounded.log",
+            "log_sha256": "7693c89f8a4082f21cee4721e611e68c1d07107c51c8d9434fd0280f11253746",
+            "observations": [
+              {
+                "transport": "real HTTP and SQLite",
+                "provider": "mock only; no model load",
+                "executor": "grounded_answer/v1",
+                "duplicate_job_coalesced": true,
+                "shared_job_priority_count": 1,
+                "subscriber_cancel_isolated": true,
+                "priority_released_after_completion_and_invalidation": true,
+                "source_correction_invalidated": true,
+                "retained_company_usage": {
+                  "company": "one",
+                  "coverage_complete": true,
+                  "events_truncated": false,
+                  "generative_model_calls": 0,
+                  "grounded_jobs_without_receipt": 0,
+                  "input_tokens": null,
+                  "jobs_truncated": false,
+                  "malformed_records": false,
+                  "observed_fixture_replies": 1,
+                  "observed_native_replies": 0,
+                  "orphan_returns": false,
+                  "output_tokens": null,
+                  "provider_cost_usd": 0.0,
+                  "running_jobs": 0,
+                  "sampled_at_ms": 1795266904578,
+                  "sampled_jobs": 1,
+                  "schema_version": 1,
+                  "scope": "Retained company task-engine job/call receipts only; includes owner and native actor jobs. Subscriber copies, legacy run journals and local research are excluded. Not lifetime billing or a spending limit.",
+                  "unresolved_workflow_requests": 0,
+                  "workflow_dispatch_records": 0,
+                  "workflow_return_records": 0
+                },
+                "provider_cost_usd": 0
+              }
+            ]
+          },
+          {
+            "name": "routing",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "scripts/task_workflows_smoke.py",
+              "--routing"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 3119.79,
+            "log": "routing.log",
+            "log_sha256": "ca34984eb1faf8d28d17781a61dc66ac798a62ea0656f1929b4411d26666aa47",
+            "observations": [
+              {
+                "analysis_only_worker_dispatches": 0,
+                "transport": "real HTTP and SQLite",
+                "provider": "mock only",
+                "routing_inputs": "Owner-configured synthetic latency values; no benchmark speed claim",
+                "selections": [
+                  {
+                    "supplied_context_json_bytes": 4012,
+                    "selected": "fixture",
+                    "routing_justification": "Selected fixture from host-admitted profile evaluations and explicit memory reservations; initial root packet 5230 bytes fits the host input ceiling; owner-configured full-path latency Some(50) ms. Comparability and optimality are not established by this value."
+                  },
+                  {
+                    "supplied_context_json_bytes": 2,
+                    "selected": "fast",
+                    "routing_justification": "Selected fast from host-admitted profile evaluations and explicit memory reservations; initial root packet 1221 bytes fits the host input ceiling; owner-configured full-path latency Some(1) ms. Comparability and optimality are not established by this value."
+                  }
+                ],
+                "profile_and_memory_filters_preserved": true,
+                "infeasible_request_dispatches": 0,
+                "fixture_dispatches": 2,
+                "generative_model_calls": 0,
+                "provider_cost_usd": 0
+              }
+            ]
+          },
+          {
+            "name": "workflows",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "scripts/task_workflows_smoke.py"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 29945.793,
+            "log": "workflows.log",
+            "log_sha256": "e8e518f66c5920b58fe506960fbc10cee2507743ab4c1c6f2737f165eddbef7e",
+            "observations": [
+              {
+                "transport": "real HTTP and SQLite",
+                "provider": "mock, zero generative calls",
+                "workflows": [
+                  {
+                    "template": "direct/v1",
+                    "nodes": 1,
+                    "status": "generated"
+                  },
+                  {
+                    "template": "rag/v1",
+                    "nodes": 1,
+                    "status": "generated"
+                  },
+                  {
+                    "template": "tool_loop/v1",
+                    "nodes": 1,
+                    "status": "generated"
+                  },
+                  {
+                    "template": "pipeline/v1",
+                    "nodes": 3,
+                    "status": "generated"
+                  },
+                  {
+                    "template": "hub/v1",
+                    "nodes": 4,
+                    "status": "generated"
+                  },
+                  {
+                    "template": "hierarchy/v1",
+                    "nodes": 5,
+                    "status": "generated"
+                  },
+                  {
+                    "template": "peer/v1",
+                    "nodes": 5,
+                    "status": "generated"
+                  },
+                  {
+                    "template": "critique/v1",
+                    "nodes": 3,
+                    "status": "generated"
+                  },
+                  {
+                    "template": "explore/v1",
+                    "nodes": 4,
+                    "status": "generated"
+                  }
+                ],
+                "duplicate_job_coalesced": true,
+                "shared_job_priority_count": 1,
+                "priority_released_after_completion": true,
+                "subscriber_cancel_isolated": true,
+                "source_correction_invalidated": true,
+                "retained_company_usage": {
+                  "company": "one",
+                  "coverage_complete": true,
+                  "events_truncated": false,
+                  "generative_model_calls": 0,
+                  "grounded_jobs_without_receipt": 0,
+                  "input_tokens": null,
+                  "jobs_truncated": false,
+                  "malformed_records": false,
+                  "observed_fixture_replies": 29,
+                  "observed_native_replies": 0,
+                  "orphan_returns": false,
+                  "output_tokens": null,
+                  "provider_cost_usd": 0.0,
+                  "running_jobs": 0,
+                  "sampled_at_ms": 1795266934395,
+                  "sampled_jobs": 10,
+                  "schema_version": 1,
+                  "scope": "Retained company task-engine job/call receipts only; includes owner and native actor jobs. Subscriber copies, legacy run journals and local research are excluded. Not lifetime billing or a spending limit.",
+                  "unresolved_workflow_requests": 0,
+                  "workflow_dispatch_records": 29,
+                  "workflow_return_records": 29
+                },
+                "provider_cost_usd": 0
+              }
+            ]
+          },
+          {
+            "name": "native-stdio",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "scripts/task_native_smoke.py"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 43867.288,
+            "log": "native-stdio.log",
+            "log_sha256": "d4eefeea73c96474440dae5038272f4770adb59e8408f06cb8d879f83b04f62d",
+            "observations": [
+              {
+                "transport": "actual native MCP stdio, HTTP owner governance and SQLite",
+                "worker": "mock only; no model weights loaded",
+                "templates": [
+                  {
+                    "template": "direct/v1",
+                    "nodes": 1
+                  },
+                  {
+                    "template": "rag/v1",
+                    "nodes": 1
+                  },
+                  {
+                    "template": "tool_loop/v1",
+                    "nodes": 1
+                  },
+                  {
+                    "template": "pipeline/v1",
+                    "nodes": 3
+                  },
+                  {
+                    "template": "hub/v1",
+                    "nodes": 4
+                  },
+                  {
+                    "template": "hierarchy/v1",
+                    "nodes": 5
+                  },
+                  {
+                    "template": "peer/v1",
+                    "nodes": 5
+                  },
+                  {
+                    "template": "critique/v1",
+                    "nodes": 3
+                  },
+                  {
+                    "template": "explore/v1",
+                    "nodes": 4
+                  }
+                ],
+                "exact_repeat_zero_generation": true,
+                "actor_private": true,
+                "coalesced_subscriber_cancellation": true,
+                "shared_job_priority_count": 1,
+                "priority_released_after_completion": true,
+                "revocation_invalidated": true,
+                "revocation_after_dispatch": true,
+                "revoked_call_id": "8ae42ac3-1225-45c8-834a-a69fa5c3637a",
+                "revoked_job_dispatches": 1,
+                "revoked_job_returns": 0,
+                "revoked_executor_settled": true,
+                "regrant_did_not_revive": true,
+                "concurrent_owner_update_stale_rejected": true,
+                "restart_did_not_replay": true,
+                "parent_budget_enforced": true,
+                "parent_budget_reservations": 33,
+                "dispatch_reservations_not_inference_proof": 33,
+                "other_company_not_enabled": true,
+                "provider_cost_usd": 0
+              }
+            ]
+          },
+          {
+            "name": "native-sse",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "scripts/task_native_smoke.py",
+              "--sse"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 43791.524,
+            "log": "native-sse.log",
+            "log_sha256": "4cb9cae464046d60fa0d3964d676bd48893df41ec4f2ed0d7e9aea47cee36186",
+            "observations": [
+              {
+                "transport": "actual native MCP sse, HTTP owner governance and SQLite",
+                "worker": "mock only; no model weights loaded",
+                "templates": [
+                  {
+                    "template": "direct/v1",
+                    "nodes": 1
+                  },
+                  {
+                    "template": "rag/v1",
+                    "nodes": 1
+                  },
+                  {
+                    "template": "tool_loop/v1",
+                    "nodes": 1
+                  },
+                  {
+                    "template": "pipeline/v1",
+                    "nodes": 3
+                  },
+                  {
+                    "template": "hub/v1",
+                    "nodes": 4
+                  },
+                  {
+                    "template": "hierarchy/v1",
+                    "nodes": 5
+                  },
+                  {
+                    "template": "peer/v1",
+                    "nodes": 5
+                  },
+                  {
+                    "template": "critique/v1",
+                    "nodes": 3
+                  },
+                  {
+                    "template": "explore/v1",
+                    "nodes": 4
+                  }
+                ],
+                "exact_repeat_zero_generation": true,
+                "actor_private": true,
+                "coalesced_subscriber_cancellation": true,
+                "shared_job_priority_count": 1,
+                "priority_released_after_completion": true,
+                "revocation_invalidated": true,
+                "revocation_after_dispatch": true,
+                "revoked_call_id": "156b9a3a-419e-4d94-9a55-8177b93195ba",
+                "revoked_job_dispatches": 1,
+                "revoked_job_returns": 0,
+                "revoked_executor_settled": true,
+                "regrant_did_not_revive": true,
+                "concurrent_owner_update_stale_rejected": true,
+                "restart_did_not_replay": true,
+                "parent_budget_enforced": true,
+                "parent_budget_reservations": 33,
+                "dispatch_reservations_not_inference_proof": 33,
+                "other_company_not_enabled": true,
+                "provider_cost_usd": 0
+              }
+            ]
+          },
+          {
+            "name": "screens",
+            "command": [
+              "node",
+              "--test",
+              "scripts/office-activity.test.mjs",
+              "scripts/task-activity.test.mjs",
+              "scripts/room-activity.test.mjs",
+              "scripts/ceo-execution.test.mjs"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 98.834,
+            "log": "screens.log",
+            "log_sha256": "22b3a579db33788d2eab8b4ae066cdf1c1c3a38d209ac0b06931defed86e6b93",
+            "observations": []
+          }
+        ],
+        "harness_sha256": "7686726d5f85b782b49bbec52f683669f7d9915139fc4e2687aa39594449ffc4",
+        "elapsed_ms": 146709.836,
+        "passed": true
+      }
+    },
+    {
+      "path": "data/local-evaluation/probe-lifecycle-final-b7bcd7114f134f8aa3484c5cc2ac1e25/report.json",
+      "sha256": "71ae03ec389296778c21b628579008ac3dbe45ceb8441795fd556f5fa4c2db14",
+      "result": {
+        "scope": "Final owned probe lifecycle and unchanged controller/evaluator; no inference",
+        "checks": [
+          {
+            "name": "probe-lifecycle",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "scripts",
+              "-p",
+              "test_local_trial.py"
+            ],
+            "passed": false,
+            "exit_code": 1,
+            "timed_out": false,
+            "elapsed_ms": 4016.5,
+            "log": "probe-lifecycle.log",
+            "log_sha256": "2242971a45cdc9818d0ead2a00842c88bcc4c8ef7cf68486415e6c19ffb74bb6",
+            "observations": []
+          }
+        ],
+        "passed": false
+      }
+    },
+    {
+      "path": "data/local-evaluation/probe-lifecycle-reconciled-96546bea58484ab990c218bfc37c5d40/report.json",
+      "sha256": "78e590d4435a18fe7b409c8f71a0b21e0ea3f98270a2fbeb84a8514c3525f268",
+      "result": {
+        "scope": "Final probe lifecycle including independent EPERM reconciliation; no inference",
+        "checks": [
+          {
+            "name": "probe-lifecycle",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "scripts",
+              "-p",
+              "test_local_trial.py"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 4070.221,
+            "log": "probe-lifecycle.log",
+            "log_sha256": "1bd7a2ed679670f6639ba9fde049a7022442154b64bee581b5ec167ca35ff47c",
+            "observations": []
+          },
+          {
+            "name": "occupied-repeat",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "-c",
+              "import sys,unittest;sys.path.insert(0,'scripts');from test_local_trial import HarnessTests; suite=unittest.TestSuite(HarnessTests('test_actual_rust_readiness_and_shutdown_preserve_the_incumbent') for _ in range(10));result=unittest.TextTestRunner().run(suite);raise SystemExit(not result.wasSuccessful())"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 8448.371,
+            "log": "occupied-repeat.log",
+            "log_sha256": "4e0dc206dce2da2850947a44eb517ca3605f25f6d45020baf103a81f8248a3a4",
+            "observations": []
+          },
+          {
+            "name": "experiment-loop",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "scripts",
+              "-p",
+              "test_experiment_loop.py"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 1736.65,
+            "log": "experiment-loop.log",
+            "log_sha256": "30cf79b199c4f9ce2d23a2a3755ea15373b22d058021d2ae86142dd5fbcd2a1a",
+            "observations": []
+          },
+          {
+            "name": "evaluation",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "scripts",
+              "-p",
+              "test_experiment_evaluation.py"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 336.896,
+            "log": "evaluation.log",
+            "log_sha256": "8c8ef93b64b589761e3936b4a68f6ef4c6f6bb8360789d109c0273c09953fea4",
+            "observations": []
+          },
+          {
+            "name": "evaluator-failure",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "scripts",
+              "-p",
+              "test_local_evaluate.py"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 167.232,
+            "log": "evaluator-failure.log",
+            "log_sha256": "6745558e6ded2bb2dc402101cac307a4bdf00f16c5255c6cd09c39a4edeea57c",
+            "observations": []
+          },
+          {
+            "name": "syntax",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "-m",
+              "py_compile",
+              "scripts/local_trial.py",
+              "scripts/task_engine_live.py",
+              "scripts/rust_candidate_live.py",
+              "scripts/experiment_loop.py",
+              "scripts/local_evaluate.py"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 38.01,
+            "log": "syntax.log",
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "observations": []
+          },
+          {
+            "name": "discovery",
+            "command": [
+              "node",
+              "scripts/repo-skills.mjs",
+              "--codegpt"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 25.651,
+            "log": "discovery.log",
+            "log_sha256": "fa6010c72d1c9b94e10ae3d375862ae307ecf90e524eb6edab774fae73791477",
+            "observations": [
+              {
+                "canonical": [
+                  "repo-simplify",
+                  "harness-routing",
+                  "context-governance",
+                  "building-interactions",
+                  "local-evaluate"
+                ],
+                "claude": "five resolved project links",
+                "kimi": "native .agents/skills root; no duplicate adapter",
+                "codegpt": "five resolved user catalog links; existing toggles preserved",
+                "live_chat_invocation": "not performed; no model calls"
+              }
+            ]
+          },
+          {
+            "name": "metadata",
+            "command": [
+              "/Users/rmonzingo/repo-applications/gents-rust-lab/.venv/bin/python",
+              "/Users/rmonzingo/.codex/skills/.system/skill-creator/scripts/quick_validate.py",
+              "/Users/rmonzingo/repo-applications/gents-rust-lab/.agents/skills/local-evaluate"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 26.864,
+            "log": "metadata.log",
+            "log_sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0",
+            "observations": []
+          },
+          {
+            "name": "diff",
+            "command": [
+              "git",
+              "diff",
+              "--check"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 19.757,
+            "log": "diff.log",
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "observations": []
+          }
+        ],
+        "passed": true
+      }
+    },
+    {
+      "path": "data/local-evaluation/probe-lifecycle-verified-40592a279dec40768b479c38bc050770/report.json",
+      "sha256": "28b8c61e3edd3db81f49346bdab54007b7ee7f3aa03ff06a5e67f1761c89b9af",
+      "result": {
+        "scope": "Final probe lifecycle, source denial and unchanged controller/evaluator; no inference",
+        "checks": [
+          {
+            "name": "probe-lifecycle",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "scripts",
+              "-p",
+              "test_local_trial.py"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 4031.971,
+            "log": "probe-lifecycle.log",
+            "log_sha256": "c4c8920e47dd6da87374e927523832a37c84999a171b7156a715e8a4be08a179",
+            "observations": []
+          },
+          {
+            "name": "broker-denials",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "scripts",
+              "-p",
+              "test_company_tools.py"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 202.355,
+            "log": "broker-denials.log",
+            "log_sha256": "eee1717fdb9e80d92fdffb8a3f4fe25b46d193442e591a5332546804221face9",
+            "observations": []
+          },
+          {
+            "name": "experiment-loop",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "scripts",
+              "-p",
+              "test_experiment_loop.py"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 1590.063,
+            "log": "experiment-loop.log",
+            "log_sha256": "c812c1be30f7f79e98652e8b15689ce322caf0665277b9b7400b3b9a987e4663",
+            "observations": []
+          },
+          {
+            "name": "evaluation",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "scripts",
+              "-p",
+              "test_experiment_evaluation.py"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 356.774,
+            "log": "evaluation.log",
+            "log_sha256": "364fc0ae498b80b83819d585a133f90b9de4197c0452692b553d8b3cf58c2eb8",
+            "observations": []
+          },
+          {
+            "name": "evaluator-failure",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "-m",
+              "unittest",
+              "discover",
+              "-s",
+              "scripts",
+              "-p",
+              "test_local_evaluate.py"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 168.047,
+            "log": "evaluator-failure.log",
+            "log_sha256": "4bc88273774c301cff4538c69b8df9455378aa588baa3868e8984ec63f148ea1",
+            "observations": []
+          },
+          {
+            "name": "syntax",
+            "command": [
+              "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+              "-m",
+              "py_compile",
+              "scripts/local_trial.py",
+              "scripts/test_local_trial.py",
+              "scripts/company_tools.py",
+              "scripts/task_engine_live.py",
+              "scripts/rust_candidate_live.py",
+              "scripts/experiment_loop.py",
+              "scripts/local_evaluate.py"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 43.596,
+            "log": "syntax.log",
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "observations": []
+          },
+          {
+            "name": "discovery",
+            "command": [
+              "node",
+              "scripts/repo-skills.mjs",
+              "--codegpt"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 24.394,
+            "log": "discovery.log",
+            "log_sha256": "fa6010c72d1c9b94e10ae3d375862ae307ecf90e524eb6edab774fae73791477",
+            "observations": [
+              {
+                "canonical": [
+                  "repo-simplify",
+                  "harness-routing",
+                  "context-governance",
+                  "building-interactions",
+                  "local-evaluate"
+                ],
+                "claude": "five resolved project links",
+                "kimi": "native .agents/skills root; no duplicate adapter",
+                "codegpt": "five resolved user catalog links; existing toggles preserved",
+                "live_chat_invocation": "not performed; no model calls"
+              }
+            ]
+          },
+          {
+            "name": "metadata",
+            "command": [
+              "/Users/rmonzingo/repo-applications/gents-rust-lab/.venv/bin/python",
+              "/Users/rmonzingo/.codex/skills/.system/skill-creator/scripts/quick_validate.py",
+              "/Users/rmonzingo/repo-applications/gents-rust-lab/.agents/skills/local-evaluate"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 27.243,
+            "log": "metadata.log",
+            "log_sha256": "db349825903d66adffea3ecf1bd8e1803043e8a71cf1a051235dabc5371f5bb0",
+            "observations": []
+          },
+          {
+            "name": "diff",
+            "command": [
+              "git",
+              "diff",
+              "--check"
+            ],
+            "passed": true,
+            "exit_code": 0,
+            "timed_out": false,
+            "elapsed_ms": 21.019,
+            "log": "diff.log",
+            "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "observations": []
+          }
+        ],
+        "passed": true
+      }
+    },
+    {
+      "path": "data/local-evaluation/probe-lifecycle-verified-40592a279dec40768b479c38bc050770/occupied-repeat-current.json",
+      "sha256": "5b40bea873c61719a52d834169d867150fefe460f57896c9023d5fc9b00a653e",
+      "result": {
+        "name": "occupied-repeat-current",
+        "command": [
+          "/Library/Frameworks/Python.framework/Versions/3.15/bin/python3",
+          "-c",
+          "import sys,unittest;sys.path.insert(0,'scripts');from test_local_trial import HarnessTests;suite=unittest.TestSuite(HarnessTests('test_actual_rust_readiness_and_shutdown_preserve_the_incumbent') for _ in range(10));result=unittest.TextTestRunner().run(suite);raise SystemExit(not result.wasSuccessful())"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "timed_out": false,
+        "elapsed_ms": 8498.2,
+        "log": "occupied-repeat-current.log",
+        "log_sha256": "f6ae1a0261dc3aee427e409023cb5bacd4f5bfaa9927d0f2fc8018242022727b",
+        "observations": [],
+        "helper_sha256": "18bf2955083e25186727d2f8d26a9dc1527b95c092e9d71f4e1c877e04b4c9bd"
+      }
+    }
+  ],
+  "verification_counts": {
+    "final_lifecycle_tests": 10,
+    "broker_source_denial_tests": 32,
+    "experiment_controller_tests": 33,
+    "independent_evaluator_tests": 21,
+    "evaluator_failure_timeout_tests": 2,
+    "additional_final_actual_occupied_start_stop_repetitions": 10,
+    "baseline_commands": 11
+  },
+  "measurements": {
+    "fixture_baseline_elapsed_ms": 146709.836,
+    "generative_model_calls": 0,
+    "paid_calls": 0,
+    "actual_provider_cost_usd": 0,
+    "estimated_total_cost_usd": null,
+    "verified_real_model_tasks_this_slice": null,
+    "model_context_tokens": null,
+    "resident_memory_bytes": null,
+    "cache_hit_ratio": null
+  },
+  "verification_limit": "Baseline ran seven lifecycle cases; the final timer/reconciliation/leader-reap code then passed ten cases and ten repeated actual occupied-port/start-stop cases separately. Previous real-model trials retain their original binary/source identity; neither probe was rerun with real inference after this refactor. Remote CI/full broad script not rerun.",
+  "remaining": [
+    "Actual Open WebUI deployment/accounting/concurrency boundary",
+    "Broader held-out useful task and comparable routing qualification",
+    "Combined real owner HTTP/native cancellation latency"
+  ],
+  "files": {
+    "scripts/local_trial.py": "18bf2955083e25186727d2f8d26a9dc1527b95c092e9d71f4e1c877e04b4c9bd",
+    "scripts/test_local_trial.py": "5d57e91745c73cbbb4cd74d394e3e0c42cc1642c9c3f56ed3735ce15d8231d86",
+    "scripts/experiment_loop.py": "12aea74ea7f3f24fb060f34ba34c0a831ad396e243f825f5e47fbd2512059f60",
+    "scripts/company_tools.py": "280c5fa9338b89e593703aef227171a6ceb78fc975ccbf5a64b82abd6d81e36f",
+    "scripts/test_company_tools.py": "40a265bf95afcda5c64a2ead61482575c37bc5b3e81936607ffe802d8fa9095e",
+    "scripts/task_engine_live.py": "f4ddf58758813877e4d7e5b8874021247313ff6ad0439468a8a354bca51dd759",
+    "scripts/rust_candidate_live.py": "061d1b27b2bbee767a6eccd9bb9f4c60f99b51faa5cb26a291ae142279a82cc5",
+    "scripts/local_evaluate.py": "788161dbed14c7988e0b9dd485c38aac98c2852d3eb758fad39c8395b143be66",
+    "scripts/check.sh": "aacc859203a87344015efe418cb9d80344475273104951e64acda953e6a98af1",
+    ".github/workflows/ci.yml": "0a32e493b2a899bd142b3ba81caaf7e3ab139769d4726f1bc2880070d2cc7a48",
+    ".agents/skills/local-evaluate/SKILL.md": "6748a40bb04b02cb47beed12ad6d7f9689dfe999034359fcf6d935dd5791c69c",
+    "docs/173-owned-probe-lifecycle.md": "ae09b34dbbc66029c80705e50bc929848c667a0de409e57b0a1c2b126b76f848",
+    "docs/162-local-execution-baseline.md": "91ff212531f43306e572a55bd0ea67d88fe5dc31b48b9b6a90793852ca8a45fe",
+    "docs/169-requirement-audit-and-routing.md": "03b52f52b91bffa11a94a49b602ad0c114bddc17ec6733d68adf57a5eda38255"
+  }
+}

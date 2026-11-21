@@ -1,5 +1,6 @@
 import {mountBasicAnswers} from './assets/basic-answers.js';
 import {taskWorkbench} from './assets/task-workbench.js';
+import {currentTaskActivity,currentTaskUsage} from './assets/task-activity.js';
 import {localComputerPanel} from './assets/local-computer-check.js';
 import {architectureReviewPanel} from './assets/architecture-review.js';
 import {appendInvocation} from './assets/owned-invocations.js';
@@ -42,7 +43,7 @@ const rooms={planning:[3,3],library:[7.5,3],training:[10.4,3],meeting:[3,8.5],wo
 const colors=['#9de3bf','#e4b4ff','#ffcf8d','#8ed6ff','#f89dbe','#e7e794','#a2a3ff','#77d8d4'];
 const canvas=$('office'),ctx=canvas.getContext('2d');
 let towerFilter='all',hoverFloor=null,walkingPreview=false,tourMode=new URLSearchParams(location.search).get('tour')==='1';
-let officeTelemetry={available:false},officePollBusy=false,selectedDashboard=null,dashboardPinned=false;
+let officeTelemetry={available:false},officePollBusy=false,selectedDashboard=null,dashboardPinned=false,selectedTaskActivity=null,companyTaskUsage=null,officePollEpoch=0;
 const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');
 document.documentElement.classList.add('tower-theme');
 document.querySelector('.floor-kicker').textContent='THE GENTS / VERTICAL CAMPUS';
@@ -88,12 +89,13 @@ function setOfficeTour(active){
 const crewManifest=document.createElement('details');crewManifest.className='crew-manifest';crewManifest.innerHTML='<summary>Crew manifest · select a Gent</summary><div class="crew-manifest-list"></div>';canvas.parentElement.after(crewManifest);
 let manifestSignature='';
 function updateCrewManifest(){
- const signature=sprites.map(s=>`${s.id}:${s.role}:${s.busy}:${s.visualState}:${characterFor(s.id,s.role)?.id}`).join('|');if(signature===manifestSignature)return;manifestSignature=signature;
+ const signature=sprites.map(s=>`${s.id}:${s.role}:${s.busy}:${s.visualState}:${s.runtimeTaskPhase}:${characterFor(s.id,s.role)?.id}`).join('|');if(signature===manifestSignature)return;manifestSignature=signature;
  crewManifest.querySelector('summary').textContent=`Crew manifest · ${sprites.length} distinct Gents`;
  crewManifest.querySelector('div').replaceChildren(...sprites.map((s,i)=>{
   const look=characterFor(s.id,s.role),button=document.createElement('button');button.type='button';button.dataset.crewKey=`${s.id}:${s.role}`;button.dataset.character=look.id;
   const img=document.createElement('img');img.src=look.src;img.alt='';img.loading='lazy';img.decoding='async';
   const info=document.createElement('span'),name=document.createElement('strong'),state=document.createElement('small');name.textContent=`${s.id.replace(' Gent','')} · ${s.role}`;const assignment=officeAssignment(s,i);state.textContent=`${look.name} / ${tourMode?`${assignment.state} · floor ${assignment.floor}`:s.busy?'At work':`Recharge pod ${String(i+1).padStart(2,'0')}`}`;
+  if(s.runtimeTaskId){button.dataset.runtimeTask=s.runtimeTaskId;button.dataset.runtimePhase=s.runtimeTaskPhase;button.dataset.runtimeActive=String(s.busy);state.textContent=`${look.name} / ${s.activity}`;}
   info.append(name,state);button.append(img,info);button.onclick=()=>showGent(s.id,true,s.role);return button;
  }));
 }
@@ -127,7 +129,7 @@ const ceoPlanningPanel=document.createElement('section');ceoPlanningPanel.classN
 ceoPlanningPanel.innerHTML='<small>CEO / LOCAL PLANNING</small><h3>Plan with the CEO</h3><p>Clarify the task, then review proposed agents, tools and the definition of done. Planning creates a draft; execution uses the approved company workflow.</p><label>Saved CEO conversations<select id="ceo-plan-sessions"><option value="">Select a saved conversation</option></select></label><button type="button" id="ceo-plan-abandon" hidden>Abandon pending turn</button><form id="ceo-plan-form"><label class="consent"><input type="checkbox" id="ceo-reasoning-only">Text-only planning · no files or tools (fixed for this conversation)</label><label>Your requirements<textarea id="ceo-plan-message" maxlength="4000" required></textarea></label><label class="consent"><input type="checkbox" id="ceo-separate-duties">For native data-to-file work, keep analysis and file writing with different agents.</label><p>This requirement is fixed once selected for a conversation.</p><label>Attach local JSON tables<input id="ceo-source-files" type="file" accept=".json,application/json" multiple></label><p>Up to eight files, 8192 bytes each and 32768 bytes total. Flat scalar records only. Files stay on this computer; exact bytes are copied into the run after approval. Start a new conversation to change attached files.</p><pre id="ceo-source-file-manifest"></pre><details><summary>Exact source inputs (optional)</summary><p>Attach exact read-only tool inputs once. The CEO selects agents and output checks while the host preserves these values. Input IDs are immutable within this conversation. For a dependent input, explicitly declare derived_fields with empty placeholders; the CEO must reference verified native sources for those fields.</p><label>Source input declarations<textarea id="ceo-inputs" spellcheck="false">[]</textarea></label></details><details><summary>Owned interfaces for this conversation (optional)</summary><p>Select up to four previously reviewed local components before starting. The CEO receives function schemas and identities only. Selection stays fixed in this conversation; it does not grant execution. Add exact invocation data below; the host retains source bytes separately and stages them only after approval.</p><button type="button" id="ceo-discovery-refresh">Refresh available interfaces</button><p id="ceo-discovery-status" role="status">Refresh to inspect available local interfaces.</p><div id="ceo-discovery-choices"></div><label>Owned invocation inputs (JSON array)<textarea id="ceo-owned-invocations" spellcheck="false">[]</textarea></label><p>Each entry has id, component_id, function and a positional arguments array. Use the schemas above and replace the empty arguments before sending. Integer values use decimal strings. Add inputs during clarification; retained input IDs cannot change. Source bytes and assigned actors are resolved by the host.</p></details><button id="ceo-plan-send" type="submit">Discuss with local CEO</button><button id="ceo-plan-new" type="button">New conversation</button></form><p id="ceo-plan-status" role="status">No planning session started.</p><div id="ceo-plan-transcript"></div><details id="ceo-plan-attempts" hidden><summary>Local planning attempts and validation</summary><pre id="ceo-plan-attempt-log"></pre></details><section id="ceo-execution" hidden><h4>Review execution</h4><p>Agents receive only their assigned tools and permitted handoffs. Execution stays local. Tool-enabled flow uses independent local review. New guided reasoning plans include a separately pinned local reviewer. Every frozen criterion must pass; peer agreement alone cannot complete the task. For an exact source-to-file guarantee, add a native artifact binding; a model review alone cannot establish byte-for-byte correctness.</p><details><summary>CEO-proposed artifact checks (review or edit)</summary><label>Source arguments, output projection and destination for your review<textarea id="ceo-bindings" spellcheck="false">[]</textarea></label></details><label>Tool authorization<select id="ceo-authorization"><option value="model_review">Review each proposed operation</option><option value="approved_workflow" disabled>Execute exact approved native steps</option></select></label><p id="ceo-authorization-description"></p><button type="button" id="ceo-prepare">Prepare frozen execution review</button><div id="ceo-execution-summary"></div><details id="ceo-execution-details" hidden><summary>Exact frozen scope and permissions</summary><pre id="ceo-execution-review"></pre></details><label id="ceo-execution-consent-label" class="consent" hidden><input type="checkbox" id="ceo-execution-consent">I approve this exact frozen scope, agent tools, authorization mode and definition of done.</label><button type="button" id="ceo-execute" hidden disabled>Approve and start locally</button></section>';
 const factoryData=document.createElement('label');factoryData.innerHTML='Data used for this task<select id="ceo-data-classification"><option value="">Choose the data scope</option><option value="synthetic">Made-up test data</option><option value="public">Public information</option><option value="confidential">Private information · control review required</option><option value="regulated">Regulated information · control review required</option></select>';ceoPlanningPanel.querySelector('#ceo-prepare').before(factoryData);
 const basicQuestions=document.createElement('section');basicQuestions.id='local-basic-answers';ceoPlanningPanel.prepend(basicQuestions);mountBasicAnswers(basicQuestions);
-const localTasks=taskWorkbench({request:(path,options)=>api(path,options),context:()=>({company:companyId,origin:base,connected:backendOnline})});ceoPlanningPanel.prepend(localTasks.element);
+const localTasks=taskWorkbench({request:(path,options)=>api(path,options),context:()=>({company:companyId,origin:base,connected:backendOnline}),onState:value=>{selectedTaskActivity=value?{...value,company:companyId,origin:base,observed_at_ms:Date.now()}:null;updateSpriteActivity();updateCrewManifest();updateSignal();if(selectedDashboard)renderDashboard();}});ceoPlanningPanel.prepend(localTasks.element);
 canvas.parentElement.after(ceoPlanningPanel);
 const architecturePanel=architectureReviewPanel({request:(path,options)=>api(path,options),context:()=>({company:companyId,session:ceoSession,revision:ceoRevision,visible:!ceoPlanningPanel.hidden}),invalidate:()=>clearCeoReview()});
 ceoPlanningPanel.querySelector('#ceo-execution').before(architecturePanel.element);
@@ -254,7 +256,7 @@ function renderOrganization(){
 }
 $('connect').onclick=async()=>{
  try{
-  if(working||ceoBusy)throw new Error('Finish the active operation before changing connections');localTasks.reset();clearCeoReview();ceoState=null;ceoSession=null;ceoRevision=0;ceoInitialAcceptance=[];componentDiscovery.reset();resetOwnedSelection();$('ceo-owned-invocations').value='[]';$('ceo-execution').hidden=true;
+  if(working||ceoBusy)throw new Error('Finish the active operation before changing connections');resetTaskTelemetry();clearCeoReview();ceoState=null;ceoSession=null;ceoRevision=0;ceoInitialAcceptance=[];componentDiscovery.reset();resetOwnedSelection();$('ceo-owned-invocations').value='[]';$('ceo-execution').hidden=true;
   const u=new URL($('base').value);if(u.protocol!=='https:'&&!(u.protocol==='http:'&&['localhost','127.0.0.1','[::1]'].includes(u.hostname)))throw new Error('Use HTTPS for a remote harness.');
   base=u.origin;token=$('token').value.trim();config=await api('/api/config');ownedSelectionPanel.hidden=config.owned_selection_drafts!==true;backendOnline=true;renderOrganization();decorateRoster();codexPhone.querySelector('small').textContent=config.local_only?'Local only · paid inference disabled':'Cloud inference enabled by operator';
   $('company-controls').hidden=!config.company_mode;
@@ -277,8 +279,8 @@ $('connect').onclick=async()=>{
   $('error').textContent='';if(!tourMode){await refreshHistory();updateJobBoard();const previous=localStorage.getItem(runKey());if(previous&&!working){try{const saved=await api(`/api/runs/${previous}`);await openRun(previous,saved);}catch(e){if(e.status===404)localStorage.removeItem(runKey());else throw e;}}await followLatestRun();await refreshAttention();}updateSignal();
  }catch(e){if(e?.name==='AbortError')return;error(e);}
 };
-$('token').onchange=()=>{localTasks.reset();clearCeoReview();ceoState=null;ceoSession=null;ceoRevision=0;ceoInitialAcceptance=[];componentDiscovery.reset();resetOwnedSelection();$('ceo-owned-invocations').value='[]';$('ceo-inputs').value='[]';$('ceo-bindings').value='[]';$('ceo-plan-transcript').replaceChildren();$('ceo-execution').hidden=true;token=$('token').value.trim();};
-$('logout').onclick=()=>{if(ceoBusy)return;localTasks.reset();backendOnline=false;clearCeoReview();ceoState=null;ceoSession=null;ceoRevision=0;ceoInitialAcceptance=[];componentDiscovery.reset();resetOwnedSelection();$('ceo-owned-invocations').value='[]';$('ceo-execution').hidden=true;for(const request of pendingRequests)request.abort();finish();token='';$('token').value='';localStorage.removeItem(runKey());events=[];seen=0;runId=null;pending=null;$('history').replaceChildren();$('judgement').textContent='';for(const id of ['task','dod','required','forbidden'])$(id).value='';render();$('status').textContent='Signed out';};
+$('token').onchange=()=>{resetTaskTelemetry();clearCeoReview();ceoState=null;ceoSession=null;ceoRevision=0;ceoInitialAcceptance=[];componentDiscovery.reset();resetOwnedSelection();$('ceo-owned-invocations').value='[]';$('ceo-inputs').value='[]';$('ceo-bindings').value='[]';$('ceo-plan-transcript').replaceChildren();$('ceo-execution').hidden=true;token=$('token').value.trim();};
+$('logout').onclick=()=>{if(ceoBusy)return;resetTaskTelemetry();backendOnline=false;clearCeoReview();ceoState=null;ceoSession=null;ceoRevision=0;ceoInitialAcceptance=[];componentDiscovery.reset();resetOwnedSelection();$('ceo-owned-invocations').value='[]';$('ceo-execution').hidden=true;for(const request of pendingRequests)request.abort();finish();token='';$('token').value='';localStorage.removeItem(runKey());events=[];seen=0;runId=null;pending=null;$('history').replaceChildren();$('judgement').textContent='';for(const id of ['task','dod','required','forbidden'])$(id).value='';render();$('status').textContent='Signed out';};
 $('login').onclick=async()=>{try{if(working||ceoBusy)throw new Error('Finish the active operation before switching sign-in');if(!window.__TAURI__)throw new Error('Use the macOS Tauri app for native sign-in; see the auth chapter.');token=await window.__TAURI__.core.invoke('login',{tenant:$('tenant').value.trim(),clientId:$('client').value.trim(),apiId:$('api').value.trim()});$('token').value='';$('status').textContent='Signed in · access token kept in memory';}catch(e){if(e?.name==='AbortError')return;error(e);}};
 $('run').onclick=async()=>{
  if(working||ceoBusy)return;
@@ -443,7 +445,7 @@ async function syncCompanyView(){
 setInterval(syncCompanyView,5000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){syncCompanyView();if(working){clearTimeout(poll);tick();}}});
 window.addEventListener('online',()=>{syncCompanyView();if(working){clearTimeout(poll);tick();}});
-$('watch-company').onclick=async()=>{try{if(working||ceoBusy)throw new Error('Finish the active operation before changing company');localTasks.reset();clearCeoReview();ceoState=null;ceoSession=null;ceoRevision=0;ceoInitialAcceptance=[];componentDiscovery.reset();resetOwnedSelection();$('ceo-owned-invocations').value='[]';$('ceo-execution').hidden=true;followCompany=true;conferenceUntil=0;companyId=$('company-id').value.trim();events=[];seen=0;runId=null;activeGent=null;$('gent-drawer').hidden=true;render();await refreshCompany();await refreshHistory();await followLatestRun();}catch(e){error(e);}};
+$('watch-company').onclick=async()=>{try{if(working||ceoBusy)throw new Error('Finish the active operation before changing company');resetTaskTelemetry();clearCeoReview();ceoState=null;ceoSession=null;ceoRevision=0;ceoInitialAcceptance=[];componentDiscovery.reset();resetOwnedSelection();$('ceo-owned-invocations').value='[]';$('ceo-execution').hidden=true;followCompany=true;conferenceUntil=0;companyId=$('company-id').value.trim();events=[];seen=0;runId=null;activeGent=null;$('gent-drawer').hidden=true;render();await refreshCompany();await refreshHistory();await followLatestRun();}catch(e){error(e);}};
 $('export').onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify({runId,events},null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='gents-events.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 $('focus-request').onclick=()=>{$('request-desk').scrollIntoView({behavior:'smooth',block:'start'});$('task').focus();};
 document.querySelectorAll('[data-mobile-target]').forEach(button=>button.onclick=()=>$(button.dataset.mobileTarget).scrollIntoView({behavior:'smooth',block:'start'}));
@@ -468,13 +470,16 @@ $('attention-form').onsubmit=async e=>{
  try{await api(`/api/runs/${attentionRun}/attention`,{method:'POST',body:JSON.stringify({question_id:attention.id,answer:$('attention-answer').value})});$('attention-answer').value='';$('attention-error').textContent='';attention=null;await refreshAttention();updateSignal();}
  catch(e){$('attention-error').textContent=e.message;}finally{button.disabled=false;}
 };
+function selectedTask(){return currentTaskActivity(selectedTaskActivity,{origin:base,company:companyId,connected:backendOnline});}
+function resetTaskTelemetry(){companyTaskUsage=null;officePollEpoch++;localTasks.reset();}
+function dashboardTelemetry(){return {...officeTelemetry,task:selectedTask(),task_usage:currentTaskUsage(companyTaskUsage,{origin:base,company:companyId,connected:backendOnline})};}
 function updateSignal(){
  if(tourMode){
   $('company-signal').dataset.state='green';$('signal-title').textContent='OFFICE OPEN';$('signal-detail').textContent=`${sprites.length} Gents in the building`;
   $('status').textContent=officeTelemetry.research?.enabled?'Local efficiency watch':'Headquarters';$('current-job').textContent='Company efficiency research';$('current-process').textContent=officeTelemetry.research?.phase||'Waiting for local measurements';codexPhone.dataset.ringing='false';
   $('job-cards').replaceChildren();return;
  }
- const active=(companyState?.jobs||[]).some(j=>j.state==='running')||working;
+ const active=(companyState?.jobs||[]).some(j=>j.state==='running')||working||selectedTask()?.active;
  const training=(companyState?.training||[]).some(j=>['running','queued'].includes(j.state));
  const state=attention||config&&!backendOnline?'phone':active||training?'green':'red';
  $('company-signal').dataset.state=state;
@@ -486,13 +491,16 @@ function updateSignal(){
 }
 function updateSpriteActivity(){
  const resolved=new Set(events.filter(e=>e.reply).map(e=>e.call_id));
+ const task=selectedTask();
  for(const sprite of sprites){
+  sprite.runtimeTaskId=null;sprite.runtimeTaskPhase=null;
   const matching=events.filter(e=>sameAgent(e.agent,sprite.id)&&(activityRole(e.role)===sprite.role||sprite.role==='worker'&&activityRole(e.role)==='judge'||['Operations Gent','Training Gent','CEO'].includes(sprite.id)));
   const latest=matching.at(-1);
   sprite.busy=backendOnline&&working&&!attention&&!!latest&&(['loading','tool_started','context_retrieved'].includes(latest.kind)||latest.kind==='call_started'&&!resolved.has(latest.call_id));
   sprite.activity=latest?.kind==='loading'?'Loading local model':latest?.kind==='context_retrieved'?'Reading handoff context':latest?.kind==='call_started'?(sprite.role==='admin'?'Reviewing the next action':sprite.role==='planner'?'Planning the next step':'Working on the mission'):latest?.kind==='tool_started'?(()=>{try{return JSON.parse(latest.message).action.replaceAll('_',' ');}catch{return 'Running a tool';}})():'';
   if(sprite.busy&&latest){const home=rooms[latest.room]||rooms.operations;sprite.tx=home[0]+(sprite.role==='planner'?-.35:.25);sprite.ty=home[1]+(sprite.index%3)*.32;}
   if(sprite.id==='Training Gent'&&backendOnline){sprite.busy=(companyState?.training||[]).some(j=>j.state==='running');sprite.activity=sprite.busy?'Training local adapter':'';}
+  if(sprite.id==='CEO'&&!sprite.busy&&task){sprite.busy=task.active;sprite.activity=`Selected task monitor · ${task.label}`;sprite.runtimeTaskId=task.task_id;sprite.runtimeTaskPhase=task.phase;}
  }
 }
 const hoverPreview=document.createElement('div');hoverPreview.id='gent-hover-preview';hoverPreview.hidden=true;hoverPreview.setAttribute('role','tooltip');canvas.parentElement.append(hoverPreview);
@@ -551,7 +559,7 @@ function showDashboard(screen,pinned=false){
 }
 function renderDashboard(){
  if(!selectedDashboard)return;
- const screen=selectedDashboard,detail=dashboardDetail(screen,officeTelemetry),points=(officeTelemetry.history||[]).map(p=>p[screen.series]).filter(v=>typeof v==='number'&&Number.isFinite(v));
+ const screen=selectedDashboard,detail=dashboardDetail(screen,dashboardTelemetry()),points=(officeTelemetry.history||[]).map(p=>p[screen.series]).filter(v=>typeof v==='number'&&Number.isFinite(v));
  const max=Math.max(1,...points),coordinates=points.map((v,i)=>`${8+i*384/Math.max(1,points.length-1)},${84-v/max*68}`).join(' ');
  dashboardPane.innerHTML=`<button type="button" class="close-dashboard" aria-label="Close dashboard">×</button><small>FLOOR ${screen.floor} · MEASURED TELEMETRY</small><h3>${esc(detail.title)}</h3><strong>${esc(detail.value)}</strong>${points.length?`<svg viewBox="0 0 400 96" role="img" aria-label="Recent measured ${esc(detail.title.toLowerCase())}"><path d="M8 84H392" stroke="#36515b"/><polyline points="${coordinates}" fill="none" stroke="#8cddc4" stroke-width="2"/></svg>`:''}<p>${esc(detail.detail)}</p><ul>${detail.facts.map(f=>`<li>${esc(f)}</li>`).join('')}</ul><p class="research-note">${esc(detail.note)}</p><small>${detail.age!==null&&detail.age>20?'STALE · ':''}Updated ${esc(detail.updated)}${detail.age===null?'':` · ${detail.age}s ago`} · ${dashboardPinned?'Pinned':'Click screen to pin'}</small>`;
  dashboardPane.querySelector('button').onclick=closeDashboard;dashboardPane.hidden=false;
@@ -559,9 +567,15 @@ function renderDashboard(){
 async function refreshOfficeTelemetry(){
  if(!config||officePollBusy||document.hidden)return;
  officePollBusy=true;
- try{officeTelemetry=await api('/api/office/activity');canvas.dataset.telemetryAt=String(officeTelemetry.sampled_at_ms||0);if(selectedDashboard)renderDashboard();if(tourMode)updateSignal();}
- catch{officeTelemetry={...officeTelemetry,available:false};if(selectedDashboard)renderDashboard();}
- finally{officePollBusy=false;}
+ const epoch=officePollEpoch,context={origin:base,company:companyId};
+ try{
+  const [office,usage]=await Promise.allSettled([api('/api/office/activity'),api(`/api/companies/${encodeURIComponent(context.company)}/tasks`,{method:'POST',body:JSON.stringify({op:'usage'})})]);
+  if(epoch!==officePollEpoch)return;
+  officeTelemetry=office.status==='fulfilled'?office.value:{...officeTelemetry,available:false};
+  companyTaskUsage=usage.status==='fulfilled'&&usage.value.company===context.company?{...usage.value,...context,observed_at_ms:Date.now()}:null;
+  canvas.dataset.telemetryAt=String(officeTelemetry.sampled_at_ms||0);if(selectedDashboard)renderDashboard();if(tourMode)updateSignal();
+ }catch{if(epoch===officePollEpoch){officeTelemetry={...officeTelemetry,available:false};companyTaskUsage=null;if(selectedDashboard)renderDashboard();}}
+ finally{officePollBusy=false;updateSpriteActivity();updateSignal();}
 }
 setInterval(refreshOfficeTelemetry,5000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshOfficeTelemetry();});
@@ -569,7 +583,7 @@ let lastTowerFrame=0;
 function frame(now=performance.now()){
  if(document.hidden||now-lastTowerFrame<(towerFilter==='all'?100:66)){requestAnimationFrame(frame);return;}lastTowerFrame=now;
  const phoneActive=codexPhone.dataset.ringing==='true',conferenceActive=Date.now()<conferenceUntil;
- const stats=renderTower(ctx,{crew:sprites,characterFor:(id,phase)=>crewLooks.get(appearanceKey(id,phase)),spriteFrames,filter:towerFilter,hoverGent,hoverFloor,time:now,preview:walkingPreview,tour:tourMode,reducedMotion:motionPreference.matches,conferenceActive:!tourMode&&conferenceActive,phoneActive:!tourMode&&phoneActive,telemetry:officeTelemetry});
+ const stats=renderTower(ctx,{crew:sprites,characterFor:(id,phase)=>crewLooks.get(appearanceKey(id,phase)),spriteFrames,filter:towerFilter,hoverGent,hoverFloor,time:now,preview:walkingPreview,tour:tourMode,reducedMotion:motionPreference.matches,conferenceActive:!tourMode&&conferenceActive,phoneActive:!tourMode&&phoneActive,telemetry:dashboardTelemetry()});
  const visualStates=sprites.map((s,i)=>s.visualState||officeAssignment(s,i).state),sleepers=visualStates.filter(s=>s==='sleeping').length,seated=visualStates.filter(s=>s==='seated').length,walking=visualStates.filter(s=>s==='walking').length,interacting=visualStates.filter(s=>s==='interacting').length;
  const summary=tourMode?`${sprites.length-stats.unassigned} Gents · ${walking} walking · ${interacting} interacting · ${seated} seated · ${sleepers} recharging · live screens`:`${stats.active} working · ${stats.resting} in recharge · ${sprites.length-stats.unassigned} unique Gents${stats.unassigned?' · More character art required':''}`;
  if(towerSummary.textContent!==summary)towerSummary.textContent=summary;

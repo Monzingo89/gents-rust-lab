@@ -12,8 +12,8 @@ pass. Prior protocol memos remain retained but cannot be read as current ones.
 
 ## Scope and interfaces
 
-`semantic_memory.rs` adds a `SummaryRepository` interface, a private SQLite
-adapter, bounded source projection, an input-bound decoder contract and a local
+`semantic_memory.rs` provides the private `SqliteMemos` storage adapter,
+bounded source projection, an input-bound decoder contract and a local
 generation service. `company.rs` remains the source authorization boundary.
 `memory.rs` retains raw-event/index scheduling. The model gateway retains local
 capacity limits, permission watches and inference receipts. No vendor SDK,

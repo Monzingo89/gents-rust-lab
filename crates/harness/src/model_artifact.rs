@@ -1,4 +1,5 @@
 //! Read-only identity checks for owner-managed local model artifacts. No model selection or execution.
+use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::{
     fs,
@@ -37,11 +38,19 @@ pub fn verify(
         return Err("model_root_rejected");
     }
     let mut path = root.to_path_buf();
+    let target = root.join(relative);
     for part in Path::new(relative).components() {
         path.push(part);
         let meta = fs::symlink_metadata(&path).map_err(|_| "model_not_installed_or_unreadable")?;
         if meta.is_symlink() {
             return Err("model_symlink_rejected");
+        }
+        if if path == target {
+            !meta.is_file()
+        } else {
+            !meta.is_dir()
+        } {
+            return Err("model_not_bounded_regular_file");
         }
         #[cfg(unix)]
         {
@@ -104,4 +113,27 @@ pub fn verify(
         return Err("model_hash_pin_mismatch");
     }
     Ok(read)
+}
+
+pub(crate) fn metadata_identity(meta: &fs::Metadata) -> Value {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt;
+        json!([
+            meta.dev(),
+            meta.ino(),
+            meta.uid(),
+            meta.mode(),
+            meta.nlink(),
+            meta.len(),
+            meta.mtime(),
+            meta.mtime_nsec(),
+            meta.ctime(),
+            meta.ctime_nsec()
+        ])
+    }
+    #[cfg(not(unix))]
+    {
+        json!([meta.len(), format!("{:?}", meta.modified())])
+    }
 }

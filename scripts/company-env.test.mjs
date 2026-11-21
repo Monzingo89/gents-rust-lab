@@ -54,5 +54,11 @@ test('direct company launch loads integrations while preserving runtime isolatio
     assert.equal(env.GENTS_RUNTIME_MANIFEST, 'data/mcp-runtime-bundles/frozen/manifest.json');
     assert.equal(env.GENTS_RUNTIME_MANIFEST_SHA256, 'frozen-digest');
     assert.equal(env.GENTS_SQLITE_BRIDGE, '/owned/frozen/gents-sqlite-bridge');
+    env.GENTS_STARTUP_ID='owned-startup';
+    env.GENTS_SUPERVISOR_PID='1234';
+    writeFileSync(join(root,'.env.company'),'GENTS_STARTUP_ID=another-process\nGENTS_SUPERVISOR_PID=5678\n');
+    loadCompanyRuntimeEnv({root,env});
+    assert.equal(env.GENTS_STARTUP_ID,'owned-startup');
+    assert.equal(env.GENTS_SUPERVISOR_PID,'1234');
   } finally { rmSync(root, { recursive: true }); }
 });

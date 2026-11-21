@@ -5,6 +5,11 @@ cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo test --workspace --locked
 cargo build --workspace --locked
+node scripts/repo-skills.mjs
+node --test scripts/company-lifecycle.test.mjs
+node scripts/company-lifecycle-smoke.mjs
+python3 -m unittest discover -s scripts -p 'test_local_evaluate.py'
+python3 -m unittest discover -s scripts -p 'test_local_trial.py'
 RESEARCH_CANDIDATE="$PWD/scripts/public_research.py" python3 scripts/fixtures/public-research/acceptance.py
 python3 -m unittest discover -s scripts -p 'test_company_research.py'
 python3 -m unittest discover -s scripts -p 'test_python_snapshot_check.py'
@@ -31,6 +36,8 @@ python3 scripts/experiment_evaluation_smoke.py --continuation
 python3 scripts/experiment_evaluation_smoke.py --research
 python3 scripts/task_frontdoor_smoke.py
 python3 scripts/task_workflows_smoke.py
+python3 scripts/task_workflows_smoke.py --grounded
+python3 scripts/task_workflows_smoke.py --routing
 python3 scripts/task_workflows_smoke.py --adaptive
 python3 scripts/task_workflows_smoke.py --workspace
 python3 scripts/task_workflows_smoke.py --workspace-denied
@@ -66,6 +73,7 @@ node --test scripts/architecture-review.test.mjs scripts/support.test.mjs script
 node --test scripts/public-network.test.mjs
 node --test scripts/gent-avatars.test.mjs
 node --test scripts/office-activity.test.mjs
+node --test scripts/task-activity.test.mjs
 node --test scripts/room-activity.test.mjs
 node --test scripts/ceo-execution.test.mjs
 node --test scripts/ceo-source-files.test.mjs
